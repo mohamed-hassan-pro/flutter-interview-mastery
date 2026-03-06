@@ -73,10 +73,9 @@ npm run dev
 ## 💌 تواصل معي (Contact)
 
 **Mohamed Hassan Kamel**
-- 🌍 [Portfolio](https://mohamed-hassan-pro.github.io/dart-oop-guide/)
 - 💼 [LinkedIn](https://www.linkedin.com/in/mohamed-hassan-pro/)
 - 📧 [Email](mailto:mohamedhassankamel9@gmail.com)
 
 ---
 
-> **زكاة العلم نشره - هدية رمضان 2026 للمطورين العرب** 🎁
+> **زكاة العلم نشره - هدية للمطورين بمناسبة اتمامي 20 عاما** 🎁
