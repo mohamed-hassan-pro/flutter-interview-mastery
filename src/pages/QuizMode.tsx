@@ -43,9 +43,9 @@ export function QuizMode() {
   const [questionCount, setQuestionCount] = useState(10);
 
   const generateQuiz = () => {
-    let filteredCards = cards;
+    let filteredCards = cards.filter(c => c.questions && c.questions.length > 0);
     if (selectedDifficulty !== 'all') {
-      filteredCards = cards.filter(c => c.level === selectedDifficulty);
+      filteredCards = filteredCards.filter(c => c.level === selectedDifficulty);
     }
 
     const shuffled = [...filteredCards].sort(() => Math.random() - 0.5);

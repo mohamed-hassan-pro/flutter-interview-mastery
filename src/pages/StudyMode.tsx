@@ -210,41 +210,47 @@ export function StudyMode() {
             )}
 
             {/* Questions */}
-            <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-              <h2 className={`font-bold text-lg mb-4 border-r-2 border-purple-400 pr-2 ${isArabic ? 'arabic-text' : ''}`}>
-                {isArabic ? 'أسئلة المقابلة' : 'Interview Questions'}
-              </h2>
-              <div className="space-y-4">
-                {currentCard.questions.slice(0, 2).map((q, idx) => (
-                  <div key={idx} className="border dark:border-slate-700 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-900/20">
-                    <div className="flex justify-between mb-2">
-                      <Badge variant="secondary" className="text-xs">{q.type}</Badge>
-                      <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Difficulty: {q.difficulty}/5</span>
+            {currentCard.questions && currentCard.questions.length > 0 && (
+              <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+                <h2 className={`font-bold text-lg mb-4 border-r-2 border-purple-400 pr-2 ${isArabic ? 'arabic-text' : ''}`}>
+                  {isArabic ? 'أسئلة المقابلة' : 'Interview Questions'}
+                </h2>
+                <div className="space-y-4">
+                  {currentCard.questions.slice(0, 2).map((q, idx) => (
+                    <div key={idx} className="border dark:border-slate-700 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-900/20">
+                      <div className="flex justify-between mb-2">
+                        <Badge variant="secondary" className="text-xs">{q.type}</Badge>
+                        <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Difficulty: {q.difficulty}/5</span>
+                      </div>
+                      <p className={`text-readable font-bold ${isArabic ? 'arabic-text' : ''}`}>
+                        {isArabic && q.questionAr ? q.questionAr : q.question}
+                      </p>
                     </div>
-                    <p className={`text-readable font-bold ${isArabic ? 'arabic-text' : ''}`}>
-                      {isArabic && q.questionAr ? q.questionAr : q.question}
-                    </p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Quick Revision */}
-            <div className="p-6 bg-yellow-50 dark:bg-yellow-900/10">
-              <h2 className={`font-bold text-lg mb-4 border-r-2 border-yellow-400 pr-2 ${isArabic ? 'arabic-text' : ''}`}>
-                {isArabic ? 'مراجعة سريعة' : 'Quick Revision'}
-              </h2>
-              <ul className={`list-disc list-inside space-y-3 mb-5 ${isArabic ? 'arabic-text mr-4' : ''}`}>
-                {currentCard.quickRevision.bulletPoints.map((point, idx) => (
-                  <li key={idx} className="text-readable">{point}</li>
-                ))}
-              </ul>
-              <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-yellow-200 dark:border-yellow-800 shadow-sm">
-                <p className={`font-bold text-purple-700 dark:text-purple-300 ${isArabic ? 'arabic-text' : ''}`}>
-                  🧠 {currentCard.quickRevision.memoryHook}
-                </p>
+            {currentCard.quickRevision && (
+              <div className="p-6 bg-yellow-50 dark:bg-yellow-900/10">
+                <h2 className={`font-bold text-lg mb-4 border-r-2 border-yellow-400 pr-2 ${isArabic ? 'arabic-text' : ''}`}>
+                  {isArabic ? 'مراجعة سريعة' : 'Quick Revision'}
+                </h2>
+                <ul className={`list-disc list-inside space-y-3 mb-5 ${isArabic ? 'arabic-text mr-4' : ''}`}>
+                  {currentCard.quickRevision.bulletPoints?.map((point, idx) => (
+                    <li key={idx} className="text-readable">{point}</li>
+                  ))}
+                </ul>
+                {currentCard.quickRevision.memoryHook && (
+                  <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-yellow-200 dark:border-yellow-800 shadow-sm">
+                    <p className={`font-bold text-purple-700 dark:text-purple-300 ${isArabic ? 'arabic-text' : ''}`}>
+                      🧠 {currentCard.quickRevision.memoryHook}
+                    </p>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
 
             {/* Actions */}
             <div className="p-6 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-700">
