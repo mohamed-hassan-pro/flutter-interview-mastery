@@ -139,7 +139,7 @@ export function CardDetail() {
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2">
-              {card.tags.map((tag) => (
+              {card.tags?.map((tag) => (
                 <Badge key={tag} variant="outline" className="text-xs">
                   {tag}
                 </Badge>
@@ -200,7 +200,7 @@ export function CardDetail() {
               <h2 className={`text-xl font-semibold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'أسئلة المقابلة' : 'Interview Questions'}</h2>
             </div>
             <div className="space-y-4">
-              {card.questions.map((q, idx) => (
+              {card.questions?.map((q, idx) => (
                 <Card key={idx} className="p-4">
                   <div className="flex justify-between items-start mb-3">
                     <Badge variant="secondary">{q.type}</Badge>
@@ -248,7 +248,7 @@ export function CardDetail() {
                           )}
                           {q.expectedAnswer.codeExample && (
                             <pre className="mt-3 bg-slate-900 text-slate-50 p-3 rounded text-sm">
-                              <code>{q.expectedAnswer.codeExample.after}</code>
+                              <code>{q.expectedAnswer.codeExample.after || q.expectedAnswer.codeExample.code}</code>
                             </pre>
                           )}
                         </motion.div>
@@ -261,81 +261,91 @@ export function CardDetail() {
           </div>
 
           {/* Interviewer Mind */}
-          <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-            <h2 className={`text-xl font-semibold mb-4 ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'ما يريده المحاور' : 'What Interviewers Want'}</h2>
-            <div className="grid md:grid-cols-3 gap-4">
-              <Card className="p-4 bg-green-50 dark:bg-green-900/20">
-                <h3 className="font-semibold text-green-800 dark:text-green-300 mb-2">
-                  {isArabic ? 'إشارات إيجابية' : 'Green Flags'}
-                </h3>
-                <ul className={`list-disc list-inside space-y-1.5 text-sm ${isArabic ? 'arabic-text mr-2' : ''}`}>
-                  {card.interviewerMind.greenFlags.map((flag, idx) => (
-                    <li key={idx} className="text-green-800 dark:text-green-200">{flag}</li>
-                  ))}
-                </ul>
-              </Card>
-              <Card className="p-4 bg-red-50 dark:bg-red-900/20">
-                <h3 className="font-semibold text-red-800 dark:text-red-300 mb-2">
-                  {isArabic ? 'إشارات سلبية' : 'Red Flags'}
-                </h3>
-                <ul className={`list-disc list-inside space-y-1.5 text-sm ${isArabic ? 'arabic-text mr-2' : ''}`}>
-                  {card.interviewerMind.redFlags.map((flag, idx) => (
-                    <li key={idx} className="text-red-800 dark:text-red-200">{flag}</li>
-                  ))}
-                </ul>
-              </Card>
-              <Card className="p-4 bg-blue-50 dark:bg-blue-900/20">
-                <h3 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">
-                  {isArabic ? 'ما يبحثون عنه' : 'What They Want'}
-                </h3>
-                <ul className={`list-disc list-inside space-y-1.5 text-sm ${isArabic ? 'arabic-text mr-2' : ''}`}>
-                  {card.interviewerMind.whatTheyWant.map((want, idx) => (
-                    <li key={idx} className="text-blue-800 dark:text-blue-200">{want}</li>
-                  ))}
-                </ul>
-              </Card>
+          {card.interviewerMind && (
+            <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+              <h2 className={`text-xl font-semibold mb-4 ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'ما يريده المحاور' : 'What Interviewers Want'}</h2>
+              <div className="grid md:grid-cols-3 gap-4">
+                <Card className="p-4 bg-green-50 dark:bg-green-900/20">
+                  <h3 className="font-semibold text-green-800 dark:text-green-300 mb-2">
+                    {isArabic ? 'إشارات إيجابية' : 'Green Flags'}
+                  </h3>
+                  <ul className={`list-disc list-inside space-y-1.5 text-sm ${isArabic ? 'arabic-text mr-2' : ''}`}>
+                    {card.interviewerMind.greenFlags?.map((flag, idx) => (
+                      <li key={idx} className="text-green-800 dark:text-green-200">{flag}</li>
+                    ))}
+                  </ul>
+                </Card>
+                <Card className="p-4 bg-red-50 dark:bg-red-900/20">
+                  <h3 className="font-semibold text-red-800 dark:text-red-300 mb-2">
+                    {isArabic ? 'إشارات سلبية' : 'Red Flags'}
+                  </h3>
+                  <ul className={`list-disc list-inside space-y-1.5 text-sm ${isArabic ? 'arabic-text mr-2' : ''}`}>
+                    {card.interviewerMind.redFlags?.map((flag, idx) => (
+                      <li key={idx} className="text-red-800 dark:text-red-200">{flag}</li>
+                    ))}
+                  </ul>
+                </Card>
+                <Card className="p-4 bg-blue-50 dark:bg-blue-900/20">
+                  <h3 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">
+                    {isArabic ? 'ما يبحثون عنه' : 'What They Want'}
+                  </h3>
+                  <ul className={`list-disc list-inside space-y-1.5 text-sm ${isArabic ? 'arabic-text mr-2' : ''}`}>
+                    {card.interviewerMind.whatTheyWant?.map((want, idx) => (
+                      <li key={idx} className="text-blue-800 dark:text-blue-200">{want}</li>
+                    ))}
+                  </ul>
+                </Card>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Pitfalls */}
-          <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-            <div className="flex items-center gap-2 mb-4">
-              <AlertTriangle className="w-5 h-5 text-amber-600" />
-              <h2 className={`text-xl font-semibold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'أخطاء شائعة' : 'Common Pitfalls'}</h2>
+          {card.commonPitfalls && card.commonPitfalls.length > 0 && (
+            <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-2 mb-4">
+                <AlertTriangle className="w-5 h-5 text-amber-600" />
+                <h2 className={`text-xl font-semibold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'أخطاء شائعة' : 'Common Pitfalls'}</h2>
+              </div>
+              <div className="space-y-4">
+                {card.commonPitfalls.map((pitfall, idx) => (
+                  <Card key={idx} className="p-4 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/10">
+                    <p className={`font-bold text-amber-900 dark:text-amber-200 ${isArabic ? 'arabic-text' : ''}`}>{pitfall.mistake}</p>
+                    <p className={`text-amber-800 dark:text-amber-300 text-sm mt-1.5 leading-relaxed ${isArabic ? 'arabic-text' : ''}`}>{pitfall.whyWrong}</p>
+                    <p className={`text-green-800 dark:text-green-300 text-sm mt-3 font-medium ${isArabic ? 'arabic-text' : ''}`}>
+                      <span className="font-bold underline decoration-green-500/30">{isArabic ? 'الصح:' : 'Correct:'}</span> {pitfall.correctApproach}
+                    </p>
+                  </Card>
+                ))}
+              </div>
             </div>
-            <div className="space-y-4">
-              {card.commonPitfalls.map((pitfall, idx) => (
-                <Card key={idx} className="p-4 border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/10">
-                  <p className={`font-bold text-amber-900 dark:text-amber-200 ${isArabic ? 'arabic-text' : ''}`}>{pitfall.mistake}</p>
-                  <p className={`text-amber-800 dark:text-amber-300 text-sm mt-1.5 leading-relaxed ${isArabic ? 'arabic-text' : ''}`}>{pitfall.whyWrong}</p>
-                  <p className={`text-green-800 dark:text-green-300 text-sm mt-3 font-medium ${isArabic ? 'arabic-text' : ''}`}>
-                    <span className="font-bold underline decoration-green-500/30">{isArabic ? 'الصح:' : 'Correct:'}</span> {pitfall.correctApproach}
-                  </p>
-                </Card>
-              ))}
-            </div>
-          </div>
+          )}
 
           {/* Quick Revision */}
-          <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-yellow-50 dark:bg-yellow-900/10">
-            <div className="flex items-center gap-2 mb-4">
-              <Lightbulb className="w-5 h-5 text-yellow-600" />
-              <h2 className={`text-xl font-semibold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'مراجعة سريعة' : 'Quick Revision'}</h2>
+          {card.quickRevision && (
+            <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-yellow-50 dark:bg-yellow-900/10">
+              <div className="flex items-center gap-2 mb-4">
+                <Lightbulb className="w-5 h-5 text-yellow-600" />
+                <h2 className={`text-xl font-semibold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'مراجعة سريعة' : 'Quick Revision'}</h2>
+              </div>
+              <ul className={`list-disc list-inside space-y-3 mb-4 ${isArabic ? 'arabic-text mr-4' : ''}`}>
+                {card.quickRevision.bulletPoints?.map((point, idx) => (
+                  <li key={idx} className="text-readable">{point}</li>
+                ))}
+              </ul>
+              {card.quickRevision.memoryHook && (
+                <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-yellow-200 dark:border-yellow-800 shadow-sm">
+                  <p className={`font-bold text-lg text-purple-700 dark:text-purple-300 ${isArabic ? 'arabic-text' : ''}`}>
+                    🧠 {card.quickRevision.memoryHook}
+                  </p>
+                </div>
+              )}
+              {card.quickRevision.cheatSheet && (
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 font-mono">
+                  {card.quickRevision.cheatSheet}
+                </p>
+              )}
             </div>
-            <ul className={`list-disc list-inside space-y-3 mb-4 ${isArabic ? 'arabic-text mr-4' : ''}`}>
-              {card.quickRevision.bulletPoints.map((point, idx) => (
-                <li key={idx} className="text-readable">{point}</li>
-              ))}
-            </ul>
-            <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-yellow-200 dark:border-yellow-800 shadow-sm">
-              <p className={`font-bold text-lg text-purple-700 dark:text-purple-300 ${isArabic ? 'arabic-text' : ''}`}>
-                🧠 {card.quickRevision.memoryHook}
-              </p>
-            </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 font-mono">
-              {card.quickRevision.cheatSheet}
-            </p>
-          </div>
+          )}
 
           {/* Company Tags */}
           <div className="p-6 border-b border-slate-200 dark:border-slate-700">
@@ -344,24 +354,26 @@ export function CardDetail() {
               <h2 className="text-xl font-semibold">{isArabic ? 'الشركات' : 'Companies'}</h2>
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
-              {card.companyTags.map((company) => (
+              {card.companyTags?.map((company) => (
                 <Badge key={company} variant="outline">{company}</Badge>
               ))}
             </div>
-            <div className="flex items-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-green-600" />
-                <span className="text-slate-600 dark:text-slate-400">
-                  {isArabic ? 'الشعبية:' : 'Popularity:'} {card.egyptianMarket.popularity}
-                </span>
+            {card.egyptianMarket && (
+              <div className="flex items-center gap-6 text-sm">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-600 dark:text-slate-400">
+                    {isArabic ? 'الشعبية:' : 'Popularity:'} {card.egyptianMarket.popularity}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-yellow-500" />
+                  <span className="text-slate-600 dark:text-slate-400">
+                    {isArabic ? 'تأثير الراتب:' : 'Salary Impact:'} {card.egyptianMarket.salaryImpact}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Star className="w-4 h-4 text-yellow-500" />
-                <span className="text-slate-600 dark:text-slate-400">
-                  {isArabic ? 'تأثير الراتب:' : 'Salary Impact:'} {card.egyptianMarket.salaryImpact}
-                </span>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Linked Cards */}
