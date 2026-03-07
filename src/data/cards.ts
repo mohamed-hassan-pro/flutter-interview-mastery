@@ -13626,11 +13626,11 @@ export const getAllCompanies = (): string[] => {
 export const getPrerequisites = (cardId: string): Card[] => {
   const card = getCardById(cardId);
   if (!card) return [];
-  return cards.filter(c => card.linkedCards.prerequisites.includes(c.id));
+  return cards.filter(c => card.linkedCards?.prerequisites?.includes(c.id) ?? false);
 };
 
 export const getNextSteps = (cardId: string): Card[] => {
   const card = getCardById(cardId);
   if (!card) return [];
-  return cards.filter(c => card.linkedCards.nextSteps.some(ns => ns.id === c.id));
+  return cards.filter(c => card.linkedCards?.nextSteps?.some(ns => ns.id === c.id) ?? false);
 };
