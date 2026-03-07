@@ -1,14 +1,13 @@
 import { motion } from 'framer-motion';
-import { Target, Trophy, Github, Monitor, Map, FileText } from 'lucide-react';
+import { Target, Trophy, Monitor, Map, FileText } from 'lucide-react';
 import { Button } from './ui/button';
 import { useProgressStore } from '@/store/useProgressStore';
 
 interface HeroProps {
     onStart: () => void;
-    onQuiz: () => void;
 }
 
-export function Hero({ onStart, onQuiz }: HeroProps) {
+export function Hero({ onStart }: HeroProps) {
     const { currentLanguage } = useProgressStore();
     const isArabic = currentLanguage === 'ar';
 
@@ -26,7 +25,13 @@ export function Hero({ onStart, onQuiz }: HeroProps) {
                     animate={{ opacity: 1, y: 0 }}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/80 border border-slate-700/50 text-sm font-medium mb-8"
                 >
-                    🎁 <span className={isArabic ? 'arabic-text' : ''}>{isArabic ? 'هدية للمطورين العرب' : 'Gift for Developers'}</span>
+                    🎁 <span className={isArabic ? 'arabic-text' : ''}>
+                        {isArabic ? 'هدية للمطورين' : 'Gift for Developers'}
+                        {' '}
+                        <a href="https://www.linkedin.com/in/mohamed-hassan-pro/" target="_blank" rel="noopener noreferrer" className="hover:underline font-bold text-cyan-400">
+                            {isArabic ? 'من محمد حسن' : 'by Mohamed Hassan'}
+                        </a>
+                    </span>
                 </motion.div>
 
                 {/* Huge Title */}
@@ -36,7 +41,7 @@ export function Hero({ onStart, onQuiz }: HeroProps) {
                     transition={{ delay: 0.1 }}
                     className="text-5xl md:text-7xl font-extrabold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500"
                 >
-                    Flutter Mastery
+                    Flutter Interview Mastery
                 </motion.h1>
 
                 {/* Subtitle with Rocket */}
@@ -50,7 +55,6 @@ export function Hero({ onStart, onQuiz }: HeroProps) {
                     <span className="text-white">Deep Dive</span>
                 </motion.div>
 
-                {/* Description */}
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -58,8 +62,8 @@ export function Hero({ onStart, onQuiz }: HeroProps) {
                     className={`text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed mb-12 ${isArabic ? 'arabic-text' : ''}`}
                 >
                     {isArabic
-                        ? 'دليل شامل ومُبسط لاجتياز مقابلات Flutter باللغة العربية. من الأساسيات لحـد الاحتراف — مع أمثلة عملية، تحديات تفاعلية، وتحضير كامل للمقابلات التقنية.'
-                        : 'A comprehensive guide to ace Flutter interviews. From basics to advanced concepts — with practical examples, interactive quizzes, and full technical interview prep.'}
+                        ? 'دليلك المتكامل لاجتياز مقابلات Flutter بثقة. نأخذك من الأساسيات وحتى هندسة البرمجيات المتقدمة (Architecture)، مع +150 موضوع، أمثلة عملية، ومحاكي حقيقي للمقابلات.'
+                        : 'The ultimate guide to ace Flutter interviews with confidence. From core basics to advanced architecture, featuring 150+ topics, practical examples, and a real interview simulator.'}
                 </motion.p>
 
                 {/* Stats Row */}
@@ -67,22 +71,16 @@ export function Hero({ onStart, onQuiz }: HeroProps) {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="grid grid-cols-3 gap-4 md:gap-8 max-w-2xl mx-auto mb-12"
+                    className="flex justify-center gap-16 max-w-2xl mx-auto mb-16"
                 >
-                    <div className="flex flex-col items-center">
-                        <Github className="w-8 h-8 text-slate-400 mb-2" />
-                        <span className="text-slate-400 text-sm">{isArabic ? 'مفتوح المصدر' : 'Open Source'}</span>
-                        <a href="https://github.com" target="_blank" rel="noreferrer" className="text-cyan-400 text-xs mt-1 hover:underline">
-                            {isArabic ? 'شارك في التطوير →' : 'Contribute →'}
-                        </a>
-                    </div>
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center relative">
                         <span className="text-3xl md:text-4xl font-bold text-cyan-400 mb-1">+150</span>
                         <span className="text-slate-400 text-sm">{isArabic ? 'موضوع / كارد' : 'Topics / Cards'}</span>
                     </div>
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center relative">
                         <span className="text-3xl md:text-4xl font-bold text-cyan-400 mb-1">10</span>
                         <span className="text-slate-400 text-sm">{isArabic ? 'مستويات رئيسية' : 'Core Levels'}</span>
+                        <span className="absolute -bottom-6 text-emerald-400 text-sm font-bold opacity-80">{isArabic ? 'خريطة الطريق المدمجة' : 'Built-in Roadmap'}</span>
                     </div>
                 </motion.div>
 
@@ -97,9 +95,9 @@ export function Hero({ onStart, onQuiz }: HeroProps) {
                         <Map className="w-5 h-5 mr-2" />
                         <span className={`text-lg font-bold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'ابدأ التعلم' : 'Start Learning'}</span>
                     </Button>
-                    <Button size="lg" variant="outline" className="border-cyan-800 bg-slate-800 text-white hover:bg-slate-700 rounded-full px-8 h-14" onClick={onQuiz}>
+                    <Button size="lg" variant="outline" className="border-cyan-800 bg-slate-800 text-white hover:bg-slate-700 rounded-full px-8 h-14 relative overflow-hidden" onClick={() => window.location.hash = '#/quiz'}>
                         <Trophy className="w-5 h-5 mr-2 text-yellow-400" />
-                        <span className={`text-lg font-bold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'اختبر نفسك' : 'Test Yourself'}</span>
+                        <span className={`text-lg font-bold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'محاكاة المقابلات' : 'Interview Simulation'}</span>
                     </Button>
                     <Button size="lg" variant="outline" className="border-cyan-800 bg-slate-800 text-white hover:bg-slate-700 rounded-full px-8 h-14" onClick={onStart}>
                         <Target className="w-5 h-5 mr-2 text-rose-400" />

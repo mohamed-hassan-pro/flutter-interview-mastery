@@ -4,31 +4,9 @@
  */
 
 import type { Card } from '@/types/card';
-import { cards as cards1_45 } from './cards';
-import { cardsExtra1 } from './cards_extra1';
-import { cardsExtra2 } from './cards_extra2';
-import { cardsExtra3 } from './cards_extra3';
-import { cardsExtra4 } from './cards_extra4';
-import { cardsExtra5 } from './cards_extra5';
-import { cardsExtra6 } from './cards_extra6';
-import { cardsExtra7 } from './cards_extra7';
-import { cardsExtra8 } from './cards_extra8';
-import { cardsExtra9 } from './cards_extra9';
-import { cardsExtra10 } from './cards_extra10';
+import { cards } from './cards';
 
-export const allCards: Card[] = [
-    ...cards1_45,
-    ...cardsExtra1,
-    ...cardsExtra2,
-    ...cardsExtra3,
-    ...cardsExtra4,
-    ...cardsExtra5,
-    ...cardsExtra6,
-    ...cardsExtra7,
-    ...cardsExtra8,
-    ...cardsExtra9,
-    ...cardsExtra10,
-];
+export const allCards: Card[] = cards;
 
 // ─── Utility Functions ───────────────────────────────────────────────────────
 

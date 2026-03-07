@@ -18,10 +18,11 @@ import {
   GraduationCap,
   Brain,
   Moon,
-  Sun,
   Globe,
   Github,
-  Linkedin
+  Linkedin,
+  Mail,
+  Sun
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CardDetail } from '@/pages/CardDetail';
@@ -44,14 +45,9 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors">
-      <Hero
-        onStart={() => window.scrollTo({ top: 800, behavior: 'smooth' })}
-        onQuiz={() => window.location.hash = '#/quiz'}
-      />
-
-      {/* Header */}
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+      {/* Header - Made smaller and sticky */}
+      <header className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
@@ -109,12 +105,19 @@ function Dashboard() {
             <Link to="/quiz">
               <Button variant="outline" size="sm">
                 <Brain className="w-4 h-4 mr-2" />
-                {isArabic ? 'وضع الاختبار' : 'Quiz Mode'}
+                {isArabic ? 'محاكاة المقابلات' : 'Interview Simulation'}
               </Button>
             </Link>
           </nav>
         </div>
       </header>
+
+      {/* Hero moves BELOW header and adjusts padding */}
+      <div className="mt-0">
+        <Hero
+          onStart={() => window.scrollTo({ top: 800, behavior: 'smooth' })}
+        />
+      </div>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
@@ -188,65 +191,65 @@ function Dashboard() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-12 py-12">
+      <footer className="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-8 py-8 text-sm">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start mb-8 text-center md:text-left">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 justify-center md:justify-start">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start mb-6 text-center md:text-left">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 justify-center md:justify-start">
+                <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+                  <BookOpen className="w-4 h-4 text-white" />
                 </div>
-                <h3 className="font-bold text-lg">Flutter Mastery</h3>
+                <h3 className="font-bold text-base">Flutter Interview Mastery</h3>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h4 className="font-semibold">{isArabic ? 'تواصل معي' : 'Connect with me'}</h4>
-              <div className="flex gap-4 justify-center md:justify-start">
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm">{isArabic ? 'تواصل معي' : 'Connect with me'}</h4>
+              <div className="flex gap-3 justify-center md:justify-start">
                 <a
                   href="https://github.com/mohamed-hassan-pro"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-purple-100 hover:text-purple-600 transition-colors"
+                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-purple-100 hover:text-purple-600 transition-colors"
                 >
-                  <Github className="w-5 h-5" />
+                  <Github className="w-4 h-4" />
                 </a>
                 <a
                   href="https://www.linkedin.com/in/mohamed-hassan-pro/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-blue-100 hover:text-blue-600 transition-colors"
+                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-blue-100 hover:text-blue-600 transition-colors"
                 >
-                  <Linkedin className="w-5 h-5" />
+                  <Linkedin className="w-4 h-4" />
                 </a>
                 <a
                   href="mailto:mohamedhassankamel9@gmail.com"
-                  className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-rose-100 hover:text-rose-600 transition-colors"
+                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-rose-100 hover:text-rose-600 transition-colors"
                 >
-                  <Globe className="w-5 h-5" />
+                  <Mail className="w-4 h-4" />
                 </a>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 py-1.5 px-4 rounded-full">
+            <div className="space-y-3">
+              <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 py-1 px-3 rounded-full text-xs">
                 🎁 {isArabic ? 'هدية بمناسبة إتمامي 20 عاماً' : 'Gift for turning 20 years old'}
               </Badge>
-              <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                {isArabic ? 'صُنع بحب بواسطة محمد حسن مبدع' : 'Created with love by Mohamed Hassan'}
+              <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                {isArabic ? 'صُنع بحب بواسطة محمد حسن' : 'Created with love by Mohamed Hassan'}
               </p>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-slate-100 dark:border-slate-700/50 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+          <div className="pt-6 border-t border-slate-100 dark:border-slate-700/50 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
             <p>© 2026 Flutter Interview Mastery.</p>
             <div className="flex gap-6">
               <a href="#" className="hover:text-purple-500 transition-colors">{isArabic ? 'عن المشروع' : 'About'}</a>
-              <a href="#" className="hover:text-purple-500 transition-colors">{isArabic ? 'المساهمة' : 'Contribute'}</a>
             </div>
           </div>
         </div>
       </footer>
+
     </div>
   );
 }

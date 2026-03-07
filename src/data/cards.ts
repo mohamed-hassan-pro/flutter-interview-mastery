@@ -9992,7 +9992,3607 @@ Widget buildSwitch() {
     },
     companyTags: ["Software Houses (Making Dashboards)", "Swvl", "Bosta"],
     egyptianMarket: { popularity: "Very High", salaryImpact: "Moderate" }
+  },
+
+  // CARD 101
+  {
+    id: "flutter-buildcontext-deepdive",
+    number: 101,
+    title: "BuildContext Deep Dive",
+    titleAr: "التعمق في الـ BuildContext",
+    level: "Mid",
+    frequency: "Must Know",
+    tags: ["Core Concepts", "Widgets", "Architecture"],
+    definition: {
+      summary: "الـ BuildContext هو بمثابة (موقع الـ Widget في الشجرة). وهو الطريقة التي تتعرف بها الـ Widget على الـ Parent الخاص بها وتستخرج منه البيانات (مثل الثيم، أو الميديا كويري، أو البروفايدر).",
+      detailed: "1. **What is it?**: في الواقع \`BuildContext\` هو عبارة عن \`Element\` (الجزء المسؤول عن ربط الـ Widget بالـ RenderObject). كل Widget لها Context خاص بها.\n2. **Lookups (O(1))**: دوال مثل \`Theme.of(context)\` أو \`Provider.of(context)\` تقوم بالبحث في الشجرة صعوداً (Upwards) عن أقرب أب يوفر هذه البيانات.\n3. **Context across async gaps**: المشكلة الأشهر في الدارت هي تمرير الـ context لدالة \`async\` واستخدامه بعد الـ \`await\`. قد تكون الـ Widget قد أُغلقت (unmounted) وهذا سيؤدي إلى Crash.",
+      analogy: "زي الـ 'GPS Location' للموظف جوه الشركة.. لو الموظف (Widget) عايز يعرف لون لبس الشركة (Theme) أو مين المدير بتاعه (Provider)، لازم يستخدم الـ GPS بتاعه (Context) عشان يسأل اللي فوقيه. ولو الموظف ده اترفد من الشركة (Unmounted) وحاول يستخدم الـ GPS بعدين، النظام هيعمله Crash.",
+      keyPoints: [
+        "Identifies widget's position in the Element Tree",
+        "Used for InheritedWidgets lookup (Nav, Theme, media)",
+        "Every widget builds its own context",
+        "Mounted check before using across async gaps"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// === الاستخدام الخاطئ والصحيح للـ Context في Async ===
+Future<void> fetchAndShowDialog(BuildContext context) async {
+  // 1. استدعاء API طويل
+  await Future.delayed(Duration(seconds: 3));
+
+  // 2. فلاتر هتزعل هنا ويطلع تحذير: (Don't use BuildContext across async gaps)
+  // ليه؟ لأن ممكن اليوزر يكون قفل الشاشة دي وقت التالت ثواني والـ context مات.
+
+  // 3. الحل: نتأكد إن الـ context لسه موجود في الشجرة (mounted)
+  if (!context.mounted) return;
+
+  // 4. دلوقتي نقدر نظهر الديالوج بأمان
+  showDialog(
+    context: context,
+    builder: (c) => AlertDialog(title: Text("Done")),
+  );
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Core Mechanics",
+        question: "Why do you get a 'No MediaQuery widget found' or 'No Navigator' error when using context in initState?",
+        questionAr: "لماذا يظهر خطأ 'No Navigator' عند استخدام context داخل دالة initState؟",
+        difficulty: 2,
+        expectedAnswer: {
+          points: [
+            "لأن في فترة الـ \`initState\`، الشجرة (Tree) لم يكتمل بناؤها بعد، والربط بين הـ Widget والأباء (Ancestors) لم يكتمل.",
+            "الحل: الـ \`context\` يمكن استخدامه بأمان في \`build()\`, أو \`didChangeDependencies()\`, أو عبر تأخير تنفيذه داخل الـ initState باستخدام \`Future.microtask(() => ...)\`."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["معرفة هل أنت تحفظ الأكواد أم تفهم كيف يقرأ فلاتر الـ UI ويجد بياناته."],
+      redFlags: ["تجاهل رسالة التحذير (Don't use BuildContext across async gaps) وإسكاتها بـ ignore، بدون فهم سببها."],
+      greenFlags: ["ذكر علاقة الـ Context بالـ Element Tree والـ InheritedWidget."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-widget-lifecycle"],
+      nextSteps: [{ id: "flutter-keys", title: "Using Keys (ValueKey, ObjectKey, GlobalKey)" }],
+      related: ["state-management-comparison"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "استخدام Context الشاشة (Parent) لفتح SnackBar وإغلاق الشاشة فوراً \`Navigator.pop(context)\`.",
+        whyWrong: "لأن الـ SnackBar يحتاج ScafflodMessenger ليبقى ظاهراً، وإغلاق الشاشة قد يغير أو يدمر الـ Context مما يُخفي الـ SnackBar أو يسبب شذوذاً في الواجهة.",
+        correctApproach: "استخدام \`ScaffoldMessenger.of(context).showSnackBar()\` (لأنه يرتبط بالـ Root لا الشاشة نفسها) ثم عمل الـ Pop."
+      }
+    ],
+    answerStrategy: {
+      structure: ["تعريف الـ Context كـ \`Element\` و 'عنوان' في الشجرة.", "شرح أهم عملياته (Searching up).", "ذكر المشكلة الشائعة (Async Gaps ومسألة הـ mounted)."],
+      timeAllocation: { junior: "1.5 دق", mid: "1 دق", senior: "1 دق" },
+      keyPhrases: ["Position in the tree", "InheritedWidget lookup", "Async Gaps", "Mounted check"]
+    },
+    quickRevision: {
+      bulletPoints: ["Context = موقع الويدجت في الشجرة.", "\`Theme.of(context)\` = بتبص لفوق لحد ما تلاقي أقرب Theme.", "إياك تستخدمه بعد \`await\` من غير ما تتأكد \`if(context.mounted)\`."],
+      memoryHook: "الـ Context = الـ GPS Coordinates الخاصة بكل ويدجت.",
+      cheatSheet: "دائماً افتح الـ \`build\` ميثود وهتلاقي بتاخد \`BuildContext context\` كدليل إن فلاتر بيخلق Context جديد لكل زرار وكل تكست."
+    },
+    companyTags: ["Any Software House", "Bosta", "Swvl", "Paymob"],
+    egyptianMarket: { popularity: "Very High", salaryImpact: "Moderate" }
+  },
+
+  // CARD 102
+  {
+    id: "flutter-keys",
+    number: 102,
+    title: "Using Keys (ValueKey, ObjectKey, GlobalKey)",
+    titleAr: "استخدام الـ Keys في فلاتر",
+    level: "Mid",
+    frequency: "Must Know",
+    tags: ["UI", "Core Concepts", "Troubleshooting"],
+    definition: {
+      summary: "الـ Keys تُستخدم للتحكم في كيفية قيام فلاتر بإعادة استخدام (Reusing) ونسخ الـ Widgets القديمة عند عمل Rebuild، خاصة في القوائم المتغيرة (Lists).",
+      detailed: "1. **Local Keys (ValueKey, ObjectKey, UniqueKey)**: تتعامل في محيط (Same Parent). إذا قمت بحذف أو تبديل عنصرين لهما نفس الـ Type (مثلاً 2 StatelessWidgets) وبداخلهما State معينة.. فلاتر سيصاب بالحيرة ويبدل مكانهما خطأ، الـ Key يخبر فلاتر من هو من.\n2. **GlobalKey**: يُستخدم للوصول إلى \`State\` الخاص بويدجت من مكان بعيد تماماً في الشجرة (مثال: فتح الدرج \`Drawer\` بضغط زر من شاشة أخرى)، أو لنقل المكون (Reparenting) بالكامل بدون فقدان حالته.",
+      analogy: "تخيل قدامك علبتين هدايا لونهم أحمر (نفس الـ Type). وأنا بدلت أماكنهم وأنت مغمض. لما تفتح عينك مش هتعرف هديتك فيهم فين. الحل؟ نلزق على كل علبة كارت عليه اسمك (الـ Key). وقتها حتى لو تبدلوا ألف مرة، هتلاقي هديتك.",
+      keyPoints: [
+        "Keys preserve state inside collections",
+        "Default widget matching is by Type only",
+        "ValueKey (for Strings/Ints), ObjectKey (for Objects)",
+        "GlobalKey is expensive (causes full tree search)"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// === مثال على ValueKey ===
+// لو عملنا Dismiss (سحب ومسح) لعنصر من قائمة، فلاتر ممكن يمسح العنصر الغلط
+// لكن لما نحط Key، مستحيل يغلط
+ListView.builder(
+  itemCount: items.length,
+  itemBuilder: (context, index) {
+    return Dismissible(
+      key: ValueKey(items[index].id), // هنا الـ Key بيحمي الداتا
+      onDismissed: (direction) => items.removeAt(index),
+      child: ListTile(title: Text(items[index].title)),
+    );
+  },
+)
+
+// === مثال Global Key ===
+final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+// بعدين جوا الفورم
+Form(
+  key: _formKey,
+  child: ...
+)
+
+// لما نحب نعمل Validate من أي أداة تانية (زر خارج الفورم مثلاً)
+_formKey.currentState!.validate();`
+      }
+    },
+    questions: [
+      {
+        type: "Debugging & UI",
+        question: "When should you NOT use a GlobalKey?",
+        questionAr: "متى يجب عليك 'عدم' استخدام الـ GlobalKey؟",
+        difficulty: 2,
+        expectedAnswer: {
+          points: [
+            "يجب تجنب \`GlobalKey\` قدر الإمكان لأنه يستهلك الموارد (Expensive) ويخلق اعتمادات قوية تشبه الـ (Global Variables).",
+            "لا يجب استخدامه فقط للوصول إلى الـ State لنقل البيانات؛ بدلاً من ذلك يجب الاعتماد على (State Management) مثل \`Provider\` أو رفع الـ State للأب (State Lifting).",
+            "يقتصر استخدامه على الضرورة القصوى مثل الـ Form Validation أو التحكم المباشر بـ Scaffold (كفتح الدرج)."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["فهمك لكيفية عمل الـ Element Tree الخاص بفلاتر وكيف يطابق (Diffing Algorithm) الأجزاء القديمة بالجديدة."],
+      redFlags: ["استخدام \`UniqueKey()\` داخل دالة \`build()\` لقائمة."],
+      greenFlags: ["معرفة لماذا يؤدي استخدام \`UniqueKey()\` داخل الـ \`build\` إلى تدمير الأداء (لأنه يخلق مفتاحاً جديداً كل ثانية، مما يجبر פلاتر على تدمير المكونات ورسمها من الصفر بدلاً من تحديثها)."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-widgets-trees"],
+      nextSteps: [{ id: "flutter-forms-validation", title: "Form Handling & Validation" }],
+      related: ["flutter-buildcontext-deepdive"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "وضع الـ Key في أداة فرعية بدلاً من الأداة الجذرية المضافة للقائمة.",
+        whyWrong: "إذا وضعت הـ Key داخل \`Text()\` والمشكلة هي في الـ \`Card()\` الذي يحويه، فلن يعمل الـ Key. يجب وضعه في الـ Top-level widget للعنصر المراد التحكم فيه في القائمة.",
+        correctApproach: "وضع \`key: ValueKey()\` في الـ Parent widget للعنصر المضاف للـ Row أو Column."
+      }
+    ],
+    answerStrategy: {
+      structure: ["تعريف الـ Keys ومبدأ المطابقة الافتراضي (Type only).", "شرح الـ Local Keys (Value, Object) وحل مشاكل القوائم المتغيرة.", "شرح الـ GlobalKey ومخاطر استخدامه بإفراط."],
+      timeAllocation: { junior: "1.5 دق", mid: "1.5 دق", senior: "1 دق" },
+      keyPhrases: ["Preserving state", "Widget matching type and key", "Element Tree", "Expensive GlobalKey"]
+    },
+    quickRevision: {
+      bulletPoints: ["ValueKey: اربطه بـ ID أو رقم مميز.", "ObjectKey: اربطه بالكائن (Object) لو مفهوش ID.", "GlobalKey: للوصول لـ State من حته تانية بعيدة (زي الـ Form).", "بدون Keys، فلاتر ممكن يبدل حالة زرارين ببعض لو ليهم نفس الشكل."],
+      memoryHook: "الـ Key = البطاقة الشخصية اللي بتمنع تشابه الأسماء في الداتا بيز.",
+      cheatSheet: "دائماً افتكر الـ Dismissible Widget.. مستحيل تشتغل من غير Key يربط الـ UI ببيانات الليست."
+    },
+    companyTags: ["Any Software House"],
+    egyptianMarket: { popularity: "High", salaryImpact: "Moderate" }
+  },
+
+  // CARD 103
+  {
+    id: "flutter-scrollables",
+    number: 103,
+    title: "Scrollables (ListView vs SingleChildScrollView vs Slivers)",
+    titleAr: "قوائم التمرير وبناء الشاشات المعقدة",
+    level: "Mid",
+    frequency: "Crucial",
+    tags: ["UI", "Performance", "Layout"],
+    definition: {
+      summary: "لإمساك شاشة قابلة للتمرير في فلاتر، توجد 3 مستويات: المستوى البسيط (SingleChild)، القوائم الذكية (ListView builder)، والوحش المعقد والأكثر كفاءة (Slivers).",
+      detailed: "1. **SingleChildScrollView**: تلف بداخله Column. يقوم برسم كل مكوناته من البداية سواء كانت ظاهرة على الشاشة أو لا. (ممتاز للشاشات القصيرة كالفورم ولعبء الأداء الضعيف).\n2. **ListView.builder**: يعتمد على مفهوم الـ (Lazy Loading)، أي أنه يبني المكونات التي تظهر أمام عين المستخدم فقط، ويدمرها إذا اختفت. (ممتاز للقوائم الطويلة جداً كالشات).\n3. **CustomScrollView (Slivers)**: المكون الأقوى. الـ Sliver هو جزء (Slice) من مساحة الـ Scroll. تتيح لك وضع Header ينكمش ويتمدد مع الحركة (SliverAppBar) مع قائمة من تحتها (SliverList) أو شبكة (SliverGrid) في نفس التمريرة الواحدة (Single Scroll Context).",
+      analogy: "SingleChild عامل زي الورقة العادية، بتفرد المساحة وتقعد تكتب. ListView زي ماكينة العرض السينمائي، بتجيب اللقطة اللي قدام العدسة بس. Slivers دي ماكينة تانية أذكى، متقسمة أجزاء.. جزء للعنوان بيكبر ويسغر بمزاجه، وجزء بعده شبكة صور، كلهم ماشيين ورا بعض في بكرة سكرول واحدة سلسة.",
+      keyPoints: [
+        "Lazy compilation vs Eager compilation",
+        "Slivers enable fancy scrolling effects",
+        "Never use ListView inside Column without constraints"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// === مثال على Slivers لبناء شاشة احترافية ===
+CustomScrollView(
+  slivers: [
+    SliverAppBar(
+      pinned: true, // يفضل العنوان متعلق في الأعلى
+      expandedHeight: 200.0,
+      flexibleSpace: FlexibleSpaceBar(
+        title: Text('Slivers Demo'),
+        background: Image.network('...', fit: BoxFit.cover),
+      ),
+    ),
+    SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => ListTile(title: Text('Item \$index')),
+        childCount: 1000, // Lazy Building
+      ),
+    ),
+  ],
+)`
+      }
+    },
+    questions: [
+      {
+        type: "Layout & Errors",
+        question: "Why do you get a 'Viewport was given unbounded height' error when placing a ListView inside a Column?",
+        questionAr: "لماذا تواجه خطأ 'Unbounded height' عند وضع ListView داخل Column، وكيف تحله؟",
+        difficulty: 1,
+        expectedAnswer: {
+          points: [
+            "الـ \`Column\` يحاول إعطاء طول لا نهائي لأبنائه (Vertical Unbounded). والـ \`ListView\` تحاول التمدد لتملأ أكبر طول ممكن.. مما يؤدي لتعارض وكراش.",
+            "الحل: وضع الـ \`ListView\` داخل \`Expanded\` أو \`Flexible\`، أو استخدام \`shrinkWrap: true\` (على حساب الأداء) لتجبر الـ ListView على أخذ مساحة ما بداخلها فقط."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["التأكد أنك لست مبتدئاً يستخدم \`SingleChildScrollView\` لحمل قائمة بيانات ضخمة (500 منتج) مما سيدمر أداء التطبيق والميموري."],
+      redFlags: ["عدم معرفة ماهية الـ Lazy Loading في الـ .builder", "استخدام \`shrinkWrap: true\` دائماً كحل سحري لمشاكل الشاشة دون وعي بتكلفته على الرام."],
+      greenFlags: ["ذكر الـ Slivers بوضوح وكيف تبني تأثيرات الـ Parallax أو הـ Collapsible Headers بالشاشات الاحترافية."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-widgets-trees"],
+      nextSteps: [],
+      related: ["flutter-performance-profiling"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "استخدام \`ListView\` (وليس ListView.builder) لعرض عدد ضخم من العناصر.",
+        whyWrong: "لأن الـ \`ListView\` (العادي) يشبه SingleChildScrollView، فهو Eagerly compiled وسيبني الـ 1000 عنصر مرة واحدة ويسد الميموري.",
+        correctApproach: "الاستخدام الدائم لـ \`ListView.builder\` أو \`ListView.separated\` للقوائم الطويلة لتشغيل الـ Lazy Building."
+      }
+    ],
+    answerStrategy: {
+      structure: ["ذكر المشاكل الأدائية للـ SingleChildScrollView للقوائم الطويلة.", "بيان قوة الـ builder للـ Lazy loading.", "ختام إجابة مبهرة بشرح הـ Slivers لأقصى تحكم في הـ Scrolling."],
+      timeAllocation: { junior: "1.5 دق", mid: "1.5 دق", senior: "1 دق" },
+      keyPhrases: ["Lazy Building", "ShrinkWrap performance penalty", "SliverAppBar", "Single scroll context"]
+    },
+    quickRevision: {
+      bulletPoints: ["SingleChildScrollView: لشاشة الـ Login أو فورم بسيط.", "ListView.builder: لشات أو قائمة منتجات (لأنها موفرة للأداء).", "Slivers: لشاشات البروفايل المعقدة اللي فيها صورة بتنكمش فوق وتحتها ليست.", "متنساش Expanded لو الـ List جوه Column."],
+      memoryHook: "Slivers = بكرة سكرول واحدة ساحرة بتعمل كل حاجة.",
+      cheatSheet: "دائماً هاجم \`shrinkWrap: true\` وقول إن استخدامه الكتير هو عدو الـ Performance الأول للمبتدئين."
+    },
+    companyTags: ["Any E-commerce Company", "Valu", "Talabat"],
+    egyptianMarket: { popularity: "Very High", salaryImpact: "Moderate" }
+  },
+
+  // CARD 104
+  {
+    id: "flutter-forms-validation",
+    number: 104,
+    title: "Form Handling & Validation",
+    titleAr: "التعامل مع الاستمارات (Forms) والتحقق",
+    level: "Junior",
+    frequency: "Must Know",
+    tags: ["UI", "Forms", "UX"],
+    definition: {
+      summary: "هي طريقة فلاتر الرسمية لأخذ بيانات إدخال متعددة (TextFormFields) والتحكم فيها، والتحقق من صحتها (Validation) بضغطة زر بدلاً من التحقق من كل حقل منفرداً.",
+      detailed: "1. **Form Widget**: كلاس نقوم بتغليف الحقول (Fields) بداخله، ونربطه بـ \`GlobalKey<FormState>\` للسيطرة عليه.\n2. **Validation**: يحتوي كل \`TextFormField\` على خاصية \`validator\`. تقوم بإعادة \`null\` إذا كان الإدخال صحيحاً، أو \`String\` بنوع الخطأ إذا كان الإدخال غير صحيح.\n3. **Controllers**: تستخدم الـ \`TextEditingController\` للوصول السريع للنصوص المكتوبة، لكن في الفورمز يفضل استخدام خاصية \`onSaved\` لتجميع بيانات الموديل مرة واحدة عند نجاح التحقق.",
+      analogy: "زي موظف الشباك (Form) اللي رايح تسلمه أوراقك. بدل ما كل موظف صغير (Field) يراجع ورقة وتبهدل نفسك، أنت بتدي الدوسيه للمدير (GlobalKey) يضرب عينه على كل الأوراق (Validate)، ولو حاجة غلط يعلم لك عليها بالقلم الأحمر (Error message)، ولو سليم يقولك أتممنا الطلب (Save).",
+      keyPoints: [
+        "GlobalKey<FormState>",
+        "Validator functions returning null or String",
+        "FormState.validate() and FormState.save()",
+        "TextEditingController limitation (causes rebuilds if not careful)"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// === مثال على إنشاء Form سليم ===
+final _formKey = GlobalKey<FormState>();
+
+Form(
+  key: _formKey,
+  child: Column(
+    children: [
+      TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'برجاء كتابة الاسم';
+          }
+           if (value.length < 3) {
+            return 'الاسم قصير';
+          }
+          return null; // الإدخال سليم!
+        },
+        onSaved: (val) => myModel.name = val,
+      ),
+      ElevatedButton(
+        onPressed: () {
+          // التحقق من كل الحقول التابعة للـ Form دي
+          if (_formKey.currentState!.validate()) {
+            _formKey.currentState!.save();
+            sendToServer(myModel);
+          }
+        },
+        child: Text('Submit'),
+      ),
+    ],
+  ),
+)`
+      }
+    },
+    questions: [
+      {
+        type: "UX & Behavior",
+        question: "What is autovalidateMode and how do you use it effectively?",
+        questionAr: "ما هو autovalidateMode وكيف تستخدمه بشكل فعال لتقديم تجربة مستخدم (UX) جيدة؟",
+        difficulty: 1,
+        expectedAnswer: {
+          points: [
+            "هي خاصية في الـ \`Form\` تحدد متى يتم التحقق واللون الأحمر تلقائياً.",
+            "يفضل استخدام \`AutovalidateMode.onUserInteraction\` بدلاً من \`always\`.",
+            "هذا يجعل اللون الأحمر (الخطأ) لا يظهر للمستخدم في بداية فتح الشاشة (مما يخيفك)، بل يظهر فقط إذا بدأ يكتب شيئاً خاطئاً أو مسحه."
+          ],
+          timeToAnswer: "1 min"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["التأكد أنك قادر على بناء الشاشة الأكثر مللاً وأهمية في التطبيقات (Login / Checkout) بكفاءة."],
+      redFlags: ["إنشاء 10 \`TextEditingController\` في شاشة واحدة وعدم عمل \`dispose\` لهم، مما يُحدث تسريباً للذاكرة."],
+      greenFlags: ["استخدام الـ RegExp (التعابير النمطية) للتحقق من الإيميلات في הـ validator."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-keys"],
+      nextSteps: [],
+      related: ["flutter-buildcontext-deepdive"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "عمل Rebuild للشاشة بكل مرة يتغير فيها حرف في הـ TextField.",
+        whyWrong: "استخدام \`onChange: (val) { setState((){}) }\` يبطئ الأداة جداً وتختفي لوحة المفاتيح أحياناً.",
+        correctApproach: "استخدم Controllers واقتصر الـ rebuild على مكان الحاجة فقط (مثبتة في الـ Form)."
+      }
+    ],
+    answerStrategy: {
+      structure: ["شرح الـ FormKey.", "أهمية הـ Validator وقيمة הـ Null للرد الإيجابي.", "كيفية تجميع البيانات بالـ Save."],
+      timeAllocation: { junior: "1.5 دق", mid: "1 دق", senior: "1 دق" },
+      keyPhrases: ["Validation", "GlobalKey", "Regex", "TextEditingController lifecycle"]
+    },
+    quickRevision: {
+      bulletPoints: ["عشان تحكم الشاشة، حط Fields في Form ممسوك بـ GlobalKey.", "الـ Validator لو نجح لازم يرجع null.", "\`validate()\` بتأكد من الأخطاء، \`save()\` بـ trigger دالة \`onSaved\` عشان تجمع الداتا بسهولة بدون كاتبة controllers كتير."],
+      memoryHook: "الـ Form = الدوسيه والمدير.",
+      cheatSheet: "دائماً افتكر تقفل الـ \`TextEditingController\` بالـ \`dispose\` لو اضطريت تستخدمهم."
+    },
+    companyTags: ["Any Software House", "Startups"],
+    egyptianMarket: { popularity: "High", salaryImpact: "Low" }
+  },
+
+  // CARD 105
+  {
+    id: "flutter-localization",
+    number: 105,
+    title: "Internationalization (i18n) & Localization (l10n)",
+    titleAr: "التعريب والتعدد اللغوي (Localization)",
+    level: "Mid",
+    frequency: "Must Know",
+    tags: ["UX", "Architecture", "Tools"],
+    definition: {
+      summary: "هي عملية تجهيز التطبيق ليدعم لغات واتجاهات متعددة (مثل العربية RTL والإنجليزية LTR)، بحيث يمكن تبديل لغة الواجهة ديناميكياً بدون المساس بالمنطق الأساسي.",
+      detailed: "1. **Official Way (.arb)**: ينصح باستخدام الحزمة الرسمية \`flutter_localizations\`، وإنشاء ملفات \`.arb\` (زي \`app_en.arb\`, \`app_ar.arb\`) التي تحتوي الكلمات كمفتاح وقيمة ظاهرة.\n2. **Generation**: عند الـ Build يتم استخراج كلاس \`AppLocalizations\` للوصول للنصوص من خلال הـ \`BuildContext\` بأمان وتوفر التلميح للكود (Autocompletion).\n3. **Easy Localization**: بعض الشباب يفضلون مكتبة \`easy_localization\` مع ملفات \`JSON\` أو \`YAML\` للسهولة الشديدة، إلا أن الطريقة الرسمية أفضل للأداء الـ (Type-Safe).",
+      analogy: "زي قائمة الطعام في مطعم سياحي.. الوصفة وحدة لكن التسمية تختلف. الـ JSON أو הـ .arb هو المنيو المترجم للموظف (Context). بتسأله: 'يا context هات اسم الوجبة رقم 5'، هيجيبها بالإنجليزي أو العربي حسب زبون المنيو فاتح بأي لغة.",
+      keyPoints: [
+        ".arb files (Application Resource Bundle)",
+        "AppLocalizations.of(context).helloWord",
+        "RTL (Right-To-Left) vs LTR rendering support",
+        "Type Safety directly inside the Dart compiler"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// === 1. شكل ملف الـ app_en.arb ===
+{
+  "greeting": "Hello, {name}!",
+  "@greeting": {
+    "description": "A welcome message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Ali"
+      }
+    }
   }
+}
+
+// === 2. الاستخدام في الكود ===
+// الميزة هنا إن لو نسيت الباراميتر، الكومبايلر هيرفض يشتغل (Type-safe)
+Text(
+  AppLocalizations.of(context)!.greeting('Ali'),
+  style: TextStyle(fontSize: 20),
+)`
+      }
+    },
+    questions: [
+      {
+        type: "Troubleshooting",
+        question: "How do you force the entire app to be 'RTL' locally for testing even if the device language is English?",
+        questionAr: "كيف تجبر التطبيق كاملاً ليصبح من اليمين لليسار (RTL) بهدف المراجعة حتى لو كان الهاتف بالإنجليزية؟",
+        difficulty: 1,
+        expectedAnswer: {
+          points: [
+            "باستخدام خاصية \`locale\` بداخل הـ \`MaterialApp\`.",
+            "عبر تعيين \`locale: const Locale('ar', 'EG')\` سيُجبر فلاتر على إظهار النصوص العربية وتبديل اتجاه الـ \`Directionality\` لجميع الودجتس، بغض النظر عن لغة جهاز الإختبار."
+          ],
+          timeToAnswer: "1 min"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["في السوق الخليجي والمصري، الدعم العربي والمحاذاة RTL شرط أساسي لكل مبرمج Flutter."],
+      redFlags: ["التعديل اليدوي العنيف (استخدام \`Row\` مع عكس ترتيب العناصر برمجياً) للتحايل على הـ RTL.", "استخدام ملفات Dart ضخمة جداً بها Map ثابتة للترجمات بدون \`Context\` (مما يمنع تغيير اللغة فورياً بداخل الـ State)."],
+      greenFlags: ["ذكر الاعتماد الدائم على خاصيات \`start\` و \`end\` بدلاً من الـ \`left\` و \`right\` في الـ Padding/Margin لدعم اللغتين تلقائياً."]
+    },
+    linkedCards: {
+      prerequisites: ["clean-architecture-flutter"], // Used mostly there
+      nextSteps: [],
+      related: ["flutter-buildcontext-deepdive"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "استخدام \`EdgeInsets.only(left: 10, right: 20)\` للمحاذاة.",
+        whyWrong: "سيظل الفراغ على اليسار 10 سواء كانت اللغة عربي أو إنجليزي، مما يُشوه شكل التطبيق في الـ RTL.",
+        correctApproach: "يجب دائماً وبلا استثناء استخدام \`EdgeInsetsDirectional.only(start: 10, end: 20)\`، فـ Start ستعني دائمـاً (اليسار في LTR) و (اليمين في RTL)."
+      }
+    ],
+    answerStrategy: {
+      structure: ["توضيح الطريقة المتبعة (.arb أو easy_localization).", "كيف يساعد فلاتر نفسه (الـ Directionality).", "النصيحة الذهبية (Start vs Left)."],
+      timeAllocation: { junior: "1.5 دق", mid: "1 دق", senior: "1 دق" },
+      keyPhrases: ["Type-safe translations", "Directional Padding", "L10n / i18n", "Context dependent translations"]
+    },
+    quickRevision: {
+      bulletPoints: ["التعريب Официально: عن طريق ملفات الـ \`.arb\` اللي بتولد أكواد Type-safe.", "لازم الماتيريال اب ياخد הـ \`localizationsDelegates\`.", "انسى خالص كلمة \`Left\` و \`Right\` واستخدم مكانهم \`Start\` و \`End\`."],
+      memoryHook: "L10n دي اختصار لـ Localization (حرف L و n بينهم 10 حروف).",
+      cheatSheet: "دائماً جاوب إنك بتفضل الطريقة الرسمية بتاعت فلاتر عشان مفيهاش أي Magic strings ومفيدة في הـ Refactoring لو غيرت كلمة."
+    },
+    companyTags: ["Any Software House (MENA Region)"],
+    egyptianMarket: { popularity: "Crucial", salaryImpact: "Moderate" }
+  },
+
+  // CARD 106
+  {
+    id: "flutter-navigation-routing",
+    number: 106,
+    title: "Navigation & Routing (1.0 vs 2.0 / go_router)",
+    titleAr: "التنقل بين الشاشات (Navigator vs Router)",
+    level: "Mid",
+    frequency: "Must Know",
+    tags: ["Core Concepts", "Architecture", "Web"],
+    definition: {
+      summary: "هي طريقة فلاتر في إدارة انتقال المستخدم بين الشاشات (Routes). يوجد الجيل الأول البسيط (Navigator 1.0)، والجيل الثاني المعقد والمناسب للويب (Router/Navigator 2.0).",
+      detailed: "1. **Navigator 1.0**: يعتمد على مبدأ الـ Stack (Imperative). أنت تأمر فلاتر بـ \`push\` شاشة فوق أخرى، أو \`pop\` للخروج منها. عيبه الحقيقي يظهر في تطبيقات الويب حيث لا يتحكم بشكل جيد في زر الـ Back بتاع المتصفح أو الـ Deep Linking.\n2. **Navigator 2.0 (Router)**: يعتمد على حالة التطبيق (Declarative). الشاشات المفتوحة هي عبارة عن State، إذا تغيرت الـ State، تتغير الشاشات. يدعم بالكامل مميزات المتصفح والروابط العميقة (Deep Links).\n3. **go_router**: مكتبة رسمية من فريق فلاتر بُنيت لتسهيل تعقيد Navigator 2.0 الشديد، وتعتبر المعيار الحالي (Industry Standard) للمشاريع الجديدة.",
+      analogy: "Navigator 1.0 زي إنك تحط كروت (شاشات) فوق بعض على الترابيزة (Push).. والمستخدم يشيل الكارت اللي فوق عشان يشوف اللي تحته (Pop). أما Navigator 2.0 (أو go_router) زي شريط البحث في المتصفح.. أنت بتكتب العنوان، وهو بيعرضلك الشاشة المربوطة بالعنوان ده فورا.",
+      keyPoints: [
+        "Navigator 1.0: Imperative (push/pop)",
+        "Navigator 2.0 (Router API): Declarative (State-driven)",
+        "go_router simplifies 2.0 complexity",
+        "Deep linking and Web URL support"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// === مثال على استخدام go_router ===
+import 'package:go_router/go_router.dart';
+
+// 1. إعداد الـ Router
+final GoRouter _router = GoRouter(
+  routes: <RouteBase>[
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) => const HomeScreen(),
+      routes: <RouteBase>[
+        GoRoute(
+          path: 'details/:id', // يدعم الباراميترز بسهولة
+          builder: (BuildContext context, GoRouterState state) {
+            final id = state.pathParameters['id'];
+            return DetailsScreen(id: id);
+          },
+        ),
+      ],
+    ),
+  ],
+);
+
+// 2. التنقل في الـ UI
+ElevatedButton(
+  onPressed: () => context.go('/details/42'), // تغيير الـ URL والتنقل
+  child: const Text('Go to Details'),
+);`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture",
+        question: "What is the difference between \`context.go()\` and \`context.push()\` in go_router?",
+        questionAr: "ما هو الفرق بين \`context.go()\` و \`context.push()\` عند استخدام مكتبة go_router؟",
+        difficulty: 2,
+        expectedAnswer: {
+          points: [
+            "**\`context.go()\`**: يقوم باستبدال المسار الحالي (URL) بالكامل بالمسار الجديد. إذا كنت في \`/A\` وذهبت לـ \`/B\`، فإن زر العودة قد يخرجك من التطبيق إذا لم تكن \`B\` متفرعة من \`A\` في تعريف الروتر (يغير הـ Stack).",
+            "**\`context.push()\`**: يتصرف مثل Navigator 1.0، حيث يضع الشاشة الجديدة فوق الشاشة الحالية في الـ Stack، احتفاظاً بالشاشة القديمة تحتها (مثالي لزر الـ Back الصريح)."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["معرفة ما إذا كنت مواكباً لتحديثات فلاتر (go_router) أم أنك محبوس في عام 2019 (Navigator.push)."],
+      redFlags: ["بناء تطبيق فلاتر (Web) بالكامل باستخدام Navigator 1.0 وعدم عمل أي حساب لأن المستخدم قد يضغط زر 'العودة' في المتصفح مما قد يغلق التطبيق."],
+      greenFlags: ["ذكر Nested Navigation (وجود أكثر من Navigator في نفس الشاشة، كالـ BottomNavigationBar) وتسهيل go_router لها."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-buildcontext-deepdive"],
+      nextSteps: [],
+      related: ["flutter-responsive-adaptive"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "استخدام \`Navigator.pushReplacement()\` في كل مكان لمنع زر الرجوع.",
+        whyWrong: "هذا يجعل كود الـ Routing مبعثراً في كل شاشات الـ UI، ويجعل من المستحيل عمل Deep Link صريح من إشعار (Notification) لشاشة داخلية.",
+        correctApproach: "استخدام Router (مثل go_router) لمركزية جميع المسارات في مكان واحد (Single Source of Truth) وتسهيل التعامل مع الروابط العميقة."
+      }
+    ],
+    answerStrategy: {
+      structure: ["مقارنة سريعة بين 1.0 و 2.0 (Push/Pop vs Declarative/URL).", "الإشارة لتعقيد 2.0 وتقديم الحل السحري (\`go_router\`).", "ذكر ميزتي الويب والـ Deep Linking."],
+      timeAllocation: { junior: "1.5 دق", mid: "1.5 دق", senior: "1 دق" },
+      keyPhrases: ["Declarative routing", "Deep links", "go_router", "Web history state"]
+    },
+    quickRevision: {
+      bulletPoints: ["Navigator 1.0: شغال بنظام ادفع وفضي (Push/Pop).", "Navigator 2.0: شغال بنظام الروابط والـ State (زي الويب).", "go_router: المكتبة الرسمية اللي خلت Navigator 2.0 سهل للبشر.", "\`push\` بتحط الشاشة فوق اللي فاتت، \`go\` بتروح للرابط الجديد وتمسح اللي فات لو مش تحته في الشجرة."],
+      memoryHook: "Navigator 1.0 = كروت كوتشينة. Navigator 2.0 = شريط روابط المتصفح.",
+      cheatSheet: "لو الانترفيو عن موبايل بس، 1.0 مقبول. لو بيسألوا عن Web، لازم تجاوب بـ Router / go_router."
+    },
+    companyTags: ["Any Startup", "Companies making Web Dashboards"],
+    egyptianMarket: { popularity: "High", salaryImpact: "High" }
+  },
+
+  // CARD 107
+  {
+    id: "flutter-packages-vs-plugins",
+    number: 107,
+    title: "Packages vs Plugins",
+    titleAr: "الفرق بين الـ Packages والـ Plugins",
+    level: "Junior",
+    frequency: "Must Know",
+    tags: ["Core Concepts", "Architecture", "Dependencies"],
+    definition: {
+      summary: "رغم أن كلاهما يتم إضافته في ملف \`pubspec.yaml\`، إلا أن بينهما اختلافاً جوهرياً في طبيعة الكود الذي يقدمانه.",
+      detailed: "1. **Packages (Dart Packages)**: هي حزم مكتوبة بالكامل بلغة \`Dart\` الصافية. لا تعتمد على أي نظام تشغيل، وتعمل فوراً على الفون والويب والديسكتوب. (مثال: \`provider\`, \`intl\`, \`path\`).\n2. **Plugins (Flutter Plugins)**: هي نوع خاص من الباكدجات، تحتوي كود Dart يمثل واجهة، وخلفه يوجد كود \`Native\` (Java/Kotlin للأندرويد، Swift/ObjC للـ iOS) للتعامل مع عتاد الجهاز أو نظام التشغيل. (مثال: \`camera\`, \`geolocator\`, \`shared_preferences\`).",
+      analogy: "الـ Package زي (كتاب وصفات طبخ).. مكتوب بلغة واحدة (Dart) وممكن أي حد يقراه وينفذه في أي مطبخ. أما الـ Plugin زي (فيشة كهربا محولة).. جزء منها من بره متصمم لليوزر العادي يمسكه (Dart)، والجزء التاني اللي جوه الحيطة متصمم خصوصي للبلد دي (Native Code) عشان يقدر يسحب الكهربا.",
+      keyPoints: [
+        "Package = 100% Dart code",
+        "Plugin = Dart interface + Native implementation",
+        "Plugins require MethodChannels or FFI",
+        "All Plugins are Packages, but not all Packages are Plugins"
+      ],
+      codeExample: {
+        language: "yaml",
+        code: `# في ملف pubspec.yaml لا يوجد فرق في طريقة الإضافة
+dependencies:
+  flutter:
+    sdk: flutter
+    
+  # Package (Dart only - Logic/UI)
+  cached_network_image: ^3.3.0
+  
+  # Plugin (Needs Native OS APIs - Hardware/Storage)
+  image_picker: ^1.0.4`
+      }
+    },
+    questions: [
+      {
+        type: "Concept",
+        question: "If your Flutter app works on Android but crashes on the Web complaining about 'MissingPluginException', what went wrong?",
+        questionAr: "إذا كان تطبيقك يعمل على أندرويد ولكنه ينهار (Crash) على الويب بخطأ 'MissingPluginException'، فماذا حدث؟",
+        difficulty: 1,
+        expectedAnswer: {
+          points: [
+            "الخطأ يعني أنك تستخدم **Plugin**.",
+            "البلجن المضاف (مثلاً للكاميرا أو البطارية) يحتوي على كود Native للأندرويد والـ iOS، ولكنه يفتقر إلى تنفيذ (Implementation) خاص بالويب (JavaScript/Browser APIs).",
+            "يجب التأكد من موقع pub.dev أن البلجن المختار يدعم منصة الـ Web قبل استخدامه لتجنب هذا الخطأ."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["التأكد من فهمك لتركيبة فلاتر والمكتبات التي تستخدمها، وأنك لا ترمي الأكواد دون فهم ما يعمل في بيئة الـ Native وما يعمل في الدارت."],
+      redFlags: ["الاعتقاد بأن كل شيء في pub.dev هو كود فلاتر محلي (Native Dart)."],
+      greenFlags: ["ذكر أن الـ Plugins تستخدم بالضرورة (Platform Channels)."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-platform-channels"],
+      nextSteps: [{ id: "flutter-dependency-overrides", title: "Dependency Overrides & pubspec" }], // Future card
+      related: ["flutter-native-communication"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "نسيان عمل Restart للتطبيق (أو إعادة الـ Build للـ APK/Run) بعد إضافة Plugin جديد.",
+        whyWrong: "ميزة الـ Hot Reload تطبق التغييرات على درات فقط (Dart code). أما الـ Plugin فهو يجلب كود Java/Swift جديد يحتاج للـ Gradle او XCode بجمعه أولاً.",
+        correctApproach: "أي مكتبة تتعامل مع الكاميرا أو التخزين (Plugin).. قم بإيقاف التطبيق، وتشغيله من جديد (Full Stop and Run)."
+      }
+    ],
+    answerStrategy: {
+      structure: ["تعريف الـ Package ككود دارت صافي.", "تعريف الـ Plugin ككود دارت + ملفات نيتف للأنظمة.", "ذكر أمثلة لكل نوع."],
+      timeAllocation: { junior: "1 دق", mid: "1 دق", senior: "45 ث" },
+      keyPhrases: ["Pure Dart", "Native implementation", "MethodChannels", "Hardware access"]
+    },
+    quickRevision: {
+      bulletPoints: ["Package: كود دارت فقط (زي رسم UI أو انيمشين).", "Plugin: كود دارت + كود نيتف (زي الكاميرا والـ GPS).", "لو ضفت Package، الـ Hot Reload شغال.", "لو ضفت Plugin، لازم تقفل التطبيق وتفتحه تاني."],
+      memoryHook: "البلجن (Plug-in) يعني بتفيش الفيشة في حيطة الموبايل الحقيقية (النيتف).",
+      cheatSheet: "دائماً لاحظ أي مكتبة في pub.dev فيها كلمة (Platform Support).. دي بنسبة 99% Plugin."
+    },
+    companyTags: ["Any Startup"],
+    egyptianMarket: { popularity: "Moderate", salaryImpact: "Low" }
+  },
+
+  // CARD 108
+  {
+    id: "flutter-custom-painter",
+    number: 108,
+    title: "CustomPainter & Canvas",
+    titleAr: "الرسم الحر (CustomPainter)",
+    level: "Senior",
+    frequency: "Good to Know",
+    tags: ["UI", "Advanced UI", "Animations"],
+    definition: {
+      summary: "هو كلاس في فلاتر يعطيك 'لوحة رسم' (Canvas) فارغة وأدوات هندسية (قلم، فرشاة، شكل) لترسم واجهات مستخدم معقدة جداً أو رسوماً بيانية لا يمكن بناؤها بالودجتس العادية.",
+      detailed: "1. **The Canvas**: هي المساحة التي ترسم عليها باستخدام دوال مثل \`drawLine\`, \`drawCircle\`, أو \`drawPath\`.\n2. **The Paint**: هو الكائن الذي يحدد لون الرسم، السُمك (strokeWidth)، ونوع الرسم (ممتلئ fill أو خطوط stroke).\n3. **CustomPaint Widget**: هي الويدجت التي تحوّل الـ \`CustomPainter\` الخاص بك إلى ويدجت فعلية تُعرض في الشاشة وتأخذ حجم معين (Size).\n4. **Performance**: الرسم بالكانفاس سريع جداً، ولكنه يحتاج ذكاء في دالة \`shouldRepaint\` لمنع فلاتر من إعادة رسم الأشكال المعقدة بلا داعي.",
+      analogy: "زي الرسام المحترف.. بدل ما تجبله مكعبات جاهزة يبني بيها البيت (الودجتس العادية زي Container).. أنت بتحطه قدام لوحة قماش بيضاء (Canvas)، وبتديله باليتة ألوان وفرشاة (Paint)، وبتقوله ارسم لي منحنى وشمس وخطوط بدقة المللي.",
+      keyPoints: [
+        "Overrides paint() and shouldRepaint()",
+        "Canvas operations (Paths, Shapes, Text)",
+        "Paint object defines style and color",
+        "Extremely performant for charts/complex UI"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// === مثال لرسم خط مائل وشكل دائرة باستخدام الكانفاس ===
+import 'package:flutter/material.dart';
+
+class MyCoolPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    // 1. تعريف الفرشاة (لون أحمر وسمك 5)
+    final paint = Paint()
+      ..color = Colors.red
+      ..strokeWidth = 5.0
+      ..style = PaintingStyle.stroke;
+
+    // 2. رسم خط من الزاوية العلوية اليسرى للسفلية اليمنى
+    canvas.drawLine(Offset.zero, Offset(size.width, size.height), paint);
+    
+    // 3. رسم دائرة في المنتصف
+    canvas.drawCircle(Offset(size.width / 2, size.height / 2), 40, paint);
+  }
+
+  // متى نعيد الرسم لو تغيرت الخصائص الخارجية؟
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false; 
+}
+
+// الاستخدام في الـ UI
+CustomPaint(
+  size: Size(200, 200),
+  painter: MyCoolPainter(),
+)`
+      }
+    },
+    questions: [
+      {
+        type: "Graphics & UI",
+        question: "When would you prefer using CustomPainter over composition (combining normal widgets like Containers and Columns)?",
+        questionAr: "متى تفضل استخدام الـ CustomPainter بدلاً من تجميع الودجتس العادية لبناء شكل معين؟",
+        difficulty: 2,
+        expectedAnswer: {
+          points: [
+            "عندما لا يمكن للودجتس العادية تشكيل التصميم (مثل رسومات بيانية منحنية Charts، أو أشكال متموجة Waves).",
+            "عندما يتم توليد التصميم ديناميكياً بهندسة رياضية.",
+            "لأسباب الأداء: الـ CustomPainter أسرع بكثير من استخدام 1000 أداة \`Container\` صغيرة لبناء أداة قياس (Gauge) أو شبكة، لأنه يتخطى طبقة الـ Widget Tree بأكملها ويرسم للكانفاس المباشر (Skia/Impeller)."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["تحديد ما إذا كنت Senior قادراً على تلبية طلبات الـ UI/UX الغريبة لشركات كبرى تصمم تطبيقات غير تقليدية (كالبنوك وتطبيقات الصحة التي تعتمد على الرسوم البيانية)."],
+      redFlags: ["الخوف من استخدام الرياضيات (الـ Sine و Cosine) لرسم الـ Paths.", "إرجاع \`true\` دائماً في دالة \`shouldRepaint\` مما يهدر الـ CPU."],
+      greenFlags: ["ذكر تقنية \`RepaintBoundary\` لتغليف הـ CustomPaint الجاهز لمنع الـ Parent من إجباره على إعادة الرسم."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-widgets-trees"],
+      nextSteps: [{ id: "flutter-animations-implicit-explicit", title: "Animations" }],
+      related: ["flutter-performance-profiling"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "القيام بعمليات حسابية ثقيلة جداً أو إنشاء כائنات (Objects) جديدة داخل دالة הـ \`paint()\`.",
+        whyWrong: "لأن دالة \`paint()\` قد تُستدعى 60 مرة في الثانية (60fps) إذا كان هناك تحريك (Animation). إنشاء Objects هنا سيسبب ضغطاً مهولاً على הـ Garbage Collector.",
+        correctApproach: "تعريف خصائص الـ \`Paint\` وتجهيز الـ \`Path\` المبدئي في الكونستراكتور (Constructor) أو خارج דالة الـ paint وتمريرها جاهزة إن أمكن."
+      }
+    ],
+    answerStrategy: {
+      structure: ["تعريف הـ CustomPainter ووظيفته (اللوحة والفرشاة).", "أهم الدالتين: \`paint\` و \`shouldRepaint\`.", "متى نستخدمه (الـ Charts والأشكال الغير هندسية التقليدية)."],
+      timeAllocation: { junior: "1 دق", mid: "1.5 دق", senior: "2 دق" },
+      keyPhrases: ["Canvas and Paint", "Sub-pixel accuracy", "ShouldRepaint optimization", "Graphic charts"]
+    },
+    quickRevision: {
+      bulletPoints: ["الـ CustomPaint للرسم الحر بالرياضيات.", "Canvas = الورقة، Paint = القلم.", "بيحل مشاكل الـ UI اللي الـ Container والـ ClipRRect مش قادرين عليها.", "دالة shouldRepaint مهمة جداً للأداء عشان الفلاتر ميعدش رسم حاجة متغيرتش."],
+      memoryHook: "CustomPainter = تحويل המبرمج לـ فنان تشكيلي.",
+      cheatSheet: "دائماً اذكر إن الـ CustomPainter أقوى في الـ Performance من تجميع 100 ودجت فوق بعض لتكوين شكل واحد مخصص."
+    },
+    companyTags: ["Any FinTech (Charts)", "Companies with custom heavy UX"],
+    egyptianMarket: { popularity: "Moderate", salaryImpact: "High" }
+  },
+
+  // CARD 109
+  {
+    id: "flutter-isolates-vs-web-workers",
+    number: 109,
+    title: "Isolates vs Web Workers (Flutter Web)",
+    titleAr: "عزل العمليات في الموبايل والويب",
+    level: "Senior",
+    frequency: "Rarely Asked / Deep Dive",
+    tags: ["Advanced", "Performance", "Web"],
+    definition: {
+      summary: "كما نستخدم الـ Isolates في تطبيقات الموبايل لمنع توقف الـ UI أثناء العمليات الثقيلة، في بيئة الويب الـ (Isolates) غير موجودة حقيقياً، وتتم محاكاتها أو استبدالها بـ Web Workers.",
+      detailed: "1. **Mobile (Isolates)**: الدارت يعمل بمفهوم الإيسوليتس، كل واحدة لها ذاكرتها المنعزلة. عملية ضخمة تفصل لـ Background Isolate والـ UI يظل سلساً.\n2. **Web Reality**: المتصفحات لا تفهم الـ Isolates. سابقاً، كانت الـ \`compute\` أو إنشاء Isolate في فلاتر ويب يتجاهلها المتصفح ويعملها في الـ Main Thread، مما كان يؤدي لـ (Jank) وتجميد للمتصفح.\n3. **Modern Workaround**: حالياً يتم الاستفادة من (Web Workers) في الـ JavaScript لعمل مسارات معالجة خلفية (Background Threads) موازية لتعويض غياب الـ Isolates.",
+      analogy: "زي مدير شركة (Main Thread).. في الموبايل، المدير بيأجر مبنى تاني لعمال الداتا (Isolates). لكن في الويب القديم، المدير كان مضطر يشغل عمال الداتا دول معاه في نفس الأوضة فالدنيا كانت بتزحتم وتوقف. الويب الحديث وفر (Web Workers) كأنها خيمة جنب الأوضة نقدر نحط فيها العمال دي.",
+      keyPoints: [
+        "Dart Isolates do not translate 1:1 to browser JS",
+        "Browsers use single-threaded JS by default",
+        "Web Workers provide true background execution in JS",
+        "Avoid heavy JSON parsing directly on the Web UI thread"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// في تطبيقات फلاتر ويب المعقدة جداً، قد تضطر لاستخدام حزمة مثل 'flutter_web_plugins' 
+// أو التعامل مباشرة مع الـ JS Interop لاستخدام الـ Web Workers لمعالجة ملفات ميديا ضخمة 
+// بالبراوزر بدون تجميد الشاشة. 
+
+// استخدم الـ compute أو Isolate.run() بشكل طبيعي في كودك الموحد،
+// فلاتر سيحاول محاكاتها أو استخدام Web Workers متى أمكنه ذلك مستقبلاً.
+Future<List<Data>> parseData(String json) async {
+  // فلاتر الموبايل هيعمل Isolate بجد، فلاتر ويب (تباعاً للتحديثات) بيحققها كأنها Promise 
+  // أو بيفردها على الـ Event Loop، فتظل ثقيلة نسبياً على الويب.
+  return await Isolate.run(() => heavyJsonParsing(json));
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture & Platform differences",
+        question: "Is 'compute()' running truly in parallel when your Flutter app is compiled to the Web?",
+        questionAr: "هل تعمل دالة 'compute()' بالتوازي الحقيقي (Parallel) عندما يتم تصدير تطبيقك للويب؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "تاريخياً (وقبل دعم الـ WebAssembly و الـ JS interop العميق): **لا**.",
+            "الجافاسكريبت Single-threaded بطبيعته، لذا كان פلاتر ينفذ الـ compute على نفس الـ Main Thread الخاص بالشاشة مما يسبب تعليقاً في الـ UI.",
+            "أو إذا كنت تستهدف WebAssembly (Wasm) الجديد الذي أصبح פلاتر يدعمه، فإن الأمور تتجه لدعم الـ Multithreading الحقيقي في الويب قريباً."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["اختبار عمق فهمك لبيئة عمل פلاتر، وكيف يترجم كود الـ Dart لبيئات التشغيل المختلفة (Native ARM vs JS)."],
+      redFlags: ["الاعتقاد بأن الجافاسكريبت تدعم الـ Threads بالشكل التقليدي."],
+      greenFlags: ["ذكر الـ Web Workers و الـ Wasm (WebAssembly) ومستقبل فلاتر مع الويب."]
+    },
+    linkedCards: {
+      prerequisites: ["dart-isolates-event-loop"],
+      nextSteps: [],
+      related: ["flutter-web-rendering"] // Suggesting a future Web deep dive card
+    },
+    commonPitfalls: [
+      {
+        mistake: "توقع أداء مطابق تماماً بين تطبيق الموبايل ותطبيق الويب في العمليات الحسابية الضخمة لمجرد استخدام الـ Isolates.",
+        whyWrong: "تترجم الـ Isolates لشيء مختلف في الـ JS، وقد تكون أبطأ أو تسبب تجميداً غير متوقع في الويب.",
+        correctApproach: "تحويل الحسابات الضخمة المعقدة ببيئة الويب للسيرفر (Backend) أو كتابة Custom Web Workers بلغة JS وربطها بالدارت إذا استلزم الأمر."
+      }
+    ],
+    answerStrategy: {
+      structure: ["توضيح أن الـ Isolates قوة للنيتف.", "الإشارة لضعف الجافاسكريبت المبني على Thread واحد.", "كيف يعالج الويب ذلك بالـ Web Workers واعداً بالـ Wasm."],
+      timeAllocation: { junior: "1 دق", mid: "1.5 دق", senior: "2 دق" },
+      keyPhrases: ["Single-threaded JS", "Web Workers", "WebAssembly (Wasm)", "compute on Web"]
+    },
+    quickRevision: {
+      bulletPoints: ["في الموبايل: Isolates بتشتغل صح في خلفية التطبيق.", "في الويب: الـ JavaScript مش بتفهم Isolates، وبتعتمد على حاجة اسمها Web Workers.", "استخدام \`compute\` زمان في الويب كان بيعلق الشاشة لأنه بيمشي في الـ Main Thread."],
+      memoryHook: "Isolates للويب = عمالة وهمية محتاجة نظام جديد (Web Workers).",
+      cheatSheet: "دائماً لو بتعمل ابلكيشن Web فيه حسابات رياضية قوية جداً، استخدم لغة Backend ترميلها الداتا ترجعلك محسوبة بدل ما توقف المتصفح للمستخدم."
+    },
+    companyTags: ["Startups heavily reliant on Flutter Web", "Tech giants"],
+    egyptianMarket: { popularity: "Low", salaryImpact: "High" }
+  },
+
+  // CARD 110
+  {
+    id: "flutter-linting-formatting",
+    number: 110,
+    title: "Linting & Code Formatting",
+    titleAr: "جودة وتنسيق الكود (Lints & Format)",
+    level: "Junior",
+    frequency: "Must Know",
+    tags: ["Best Practices", "Clean Code", "Tools"],
+    definition: {
+      summary: "هي مجموعة القواعد (Rules) والأدوات التي تُجبر فريق العمل كله على كتابة كود دارت بنفس الشكل المنظم وبدون أخطاء خفية (Bad Practices).",
+      detailed: "1. **Dart Format (`dart format`)**: أداة تقوم بإعادة ترتيب الكود والمسافات والإزاحات فورياً ليصبح مقروءاً وموحداً للجميع، بشرط واحد: (أن تضع فواصل ',' بنهاية المتغيرات).\n2. **Linting (`analysis_options.yaml`)**: ملف يشبه الدستور للمشروع. يقرؤه الـ Dart Analyzer ليضع لك (خطوط زرقاء أو حمراء) لو خرقت قاعدة. (مثال: استخدام var بدلاً من النمط الصريح إذا أردت منعه).\n3. **flutter_lints**: حزمة تُضاف افتراضياً لأي مشروع פلاتر جديد، تضع القواعد الرسمية التي ينصح بها الفريق لمنع الأخطاء الشائعة (مثل تجاهل הـ await، أو استخدام const).",
+      analogy: "زي مريلة المدرسة وقوانين المعلم.. الـ Formatting هو مريلة المدرسة (شكلنا كلنا واحد ومفيش كود شكله يوجع العين).. والـ Linting هو قوانين المعلم (ممنوع تتأخر، ممنوع تتكلم وإنت بتكتب)، بيضربك بالقلم على إيدك (خط أزرق) لما تغلط.",
+      keyPoints: [
+        "Trailing commas are magic for formatting",
+        "analysis_options.yaml defines custom rules",
+        "flutter_lints provides community standards",
+        "Linter helps catch bugs before compiling"
+      ],
+      codeExample: {
+        language: "yaml",
+        code: `# === شكل ملف analysis_options.yaml ===
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # نقدر نفتح أو نقفل قواعد معينة من هنا
+    prefer_const_constructors: true
+    avoid_print: true
+    prefer_final_locals: true # يجبرك تخلي أي متغير مش بيتغير final
+    always_specify_types: false`
+      }
+    },
+    questions: [
+      {
+        type: "Teamwork & Clean Code",
+        question: "Why does \`dart format\` sometimes put everything on a single long line, and other times correctly breaks it down into multiple lines?",
+        questionAr: "لماذا تقوم أداة الـ format أحياناً بوضع الـ widgets في سطر واحد طويل، وأحياناً تفصلهم لعدة أسطر منظمة؟",
+        difficulty: 1,
+        expectedAnswer: {
+          points: [
+            "السر يكمن في وجود **الفاصلة (Trailing Comma)**.",
+            "الـ Formatter مبرمج على أنه إذا وجد فاصلة \`,\` بعد آخر عنصر، فإنه يعتبرها إشارة قوية (Hint) ليقوم بفرد الكود على أسطر متعددة بشكل شجري مريح للعين.",
+            "بدون الفاصلة، يحاول الـ Formatter عصر الكود في سطر واحد قدر الإمكان (حتى حد طول السطر الأقصى)."
+          ],
+          timeToAnswer: "1 min"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["تحديد ما إذا كنت تعمل بعقلية 'العمل تيم'، أم أنك مبرمج مستقل يكتب كوداً لا يستطيع أحد قراءته."],
+      redFlags: ["الاعتراف بإغلاق القواعد المهمة في הـ linter فقط لتجنب الخطوط الزرقاء، بدلاً من إصلاح الكود المكتوب.", "تسليم (PR) إلى جيت هاب وكود غير منسق إطلاقاً."],
+      greenFlags: ["معرفة الفرق بين הـ Linter والـ Formatter. الإشارة لحزم صارمة مثل \`very_good_analysis\`."]
+    },
+    linkedCards: {
+      prerequisites: [],
+      nextSteps: [{ id: "flutter-clean-architecture", title: "Clean Architecture" }], // Because clean logic applies here
+      related: ["flutter-ci-cd-actions"] // usually run in CI
+    },
+    commonPitfalls: [
+      {
+        mistake: "تجاهل الـ Warnings الزرقاء وعدم حلها قبل عملية الرفع (Push).",
+        whyWrong: "هذه التحذيرات (Lints) تُنبهك لأشياء مثل: استخدام context بشكل غير استرشادي، أو عدم استخدام \`const\` مما يثقل أداء الرسم، تجاهلها يراكم الـ Technical Debt.",
+        correctApproach: "الالتزام بحل 100% من الـ Lints قبل إقفال הـ Ticket الخاص بك، أو استخدام CI/CD لإلغاء الرفع إذا فشل فحص الـ lint."
+      }
+    ],
+    answerStrategy: {
+      structure: ["وصف الـ Format كترتيب بصري (Trailing Commas!).", "وصف الـ Lints كقواعد صارمة تمنع أخطاء الأداء.", "ذكر ملف \`analysis_options.yaml\` كمقر لهذه القوانين."],
+      timeAllocation: { junior: "1.5 دق", mid: "1 دق", senior: "1 دق" },
+      keyPhrases: ["analysis_options", "Trailing commas", "Technical Debt", "Consistent codebase"]
+    },
+    quickRevision: {
+      bulletPoints: ["Linting: بيمنع الأخطاء زي (avoid_print, prefer_const).", "Formatting: بيرتب الكود بتاعك بظغطة لزر (عشان التيم يرتاح).", "المفتاح السحري لترتيب الويدجتس في فلاتر: حط فاصلة (,) في نهاية القوس.", "الملف المتحكم: \`analysis_options.yaml\`."],
+      memoryHook: "Linting ديكتاتورية القواعد، Formatting تناسق الديكور.",
+      cheatSheet: "دائماً اربط سؤال الـ Linting بالـ CI/CD، وقول إنك بتخلي جيت هاب يرفض أي التزام (Commit) لو فيه Lint error لتحصين المشروع من الإهمال."
+    },
+    companyTags: ["Any Software Team (Mandatory requirement)"],
+    egyptianMarket: { popularity: "Crucial", salaryImpact: "Moderate" }
+  },
+
+  // CARD 111
+  {
+    id: "flutter-clean-architecture",
+    number: 111,
+    title: "Clean Architecture in Flutter",
+    titleAr: "البنية النظيفة (Clean Architecture)",
+    level: "Senior",
+    frequency: "Crucial",
+    tags: ["Architecture", "System Design", "Testing"],
+    definition: {
+      summary: "هي طريقة لتقسيم الكود إلى طبقات (Layers) مستقلة تماماً عن بعضها. الهدف الأساسي هو فصل واجهة المستخدم (UI) وقواعد البيانات (Data) عن المنطق الأساسي للتطبيق (Domain/Business Logic).",
+      detailed: "1. **Presentation Layer**: تحتوي على الـ UI (Widgets) وإدارة الحالة (Bloc/Riverpod). لا تعرف شيئاً عن الإنترنت أو قواعد البيانات.\n2. **Domain Layer**: الطبقة الأهم والمرتبطة بمجال البزنس (الكيانات Entities، حالات الاستخدام UseCases، والواجهات Repositories Interfaces). مكتوبة بـ Dart صافي بدون أي علاقة بـ فلاتر.\n3. **Data Layer**: مخصصة لجلب البيانات (APIs, SQLite) وتحويلها (Models). تعتمد على الـ Domain وتنفذ واجهاتها.",
+      analogy: "زي المطعم الكبير.. الـ Presentation هو الجرسون (بياخد الطلب ويسلم الأكل للطاولة). الـ Domain هو الشيف (بيعرف إزاي يطبخ الوصفة السرية). الـ Data هو متعهد التموين (بيجيب اللحمة من الجزار أو الخضار من السوق). الشيف ملوش دعوة الخضار جه منين، المهم يسلمه للجرسون.",
+      keyPoints: [
+        "Separation of Concerns (SoC)",
+        "Domain Layer is the core and depends on nothing",
+        "Presentation and Data depend on Domain (Dependency Rule)",
+        "Highly testable and scalable"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// === Domain Layer (Core Logic - No Flutter Imports) ===
+class User {
+  final String name;
+  User(this.name);
+}
+
+abstract class UserRepository {
+  Future<User> getUser(int id);
+}
+
+class GetUserUseCase {
+  final UserRepository repository;
+  GetUserUseCase(this.repository);
+
+  Future<User> execute(int id) => repository.getUser(id);
+}
+
+// === Data Layer (Implementation) ===
+class UserRepositoryImpl implements UserRepository {
+  final ApiClient api;
+  UserRepositoryImpl(this.api);
+
+  @override
+  Future<User> getUser(int id) async {
+    final response = await api.fetch('/users/$id');
+    return UserModel.fromJson(response); // UserModel extends User
+  }
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture",
+        question: "Why does the Domain layer contain Repository 'Interfaces' (abstract classes) while the Data layer contains the implementation?",
+        questionAr: "لماذا تحتوي طبقة הـ Domain على الـ (Interfaces) الخاصة بالـ Repository، بينما توجد الـ (Implementation) في طبقة הـ Data؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "لتطبيق مبدأ انعكاس الاعتمادية (Dependency Inversion Principle - SOLID).",
+            "طبقة הـ Domain هي المركز (Core) ويجب ألا تعتمد على أي مكتبة خارجية. بوضع الواجهة (Interface) فيها، نحن نجبر طبقة הـ Data أن تأتي وتنفذ شروط الشيف (الـ Domain) بدلاً من أن يضطر الشيف لانتظار المورد.",
+            "هذا يسمح بتغيير قاعدة البيانات (من Firebase إلى MySQL مثلاً) في طبقة הـ Data دون تغيير حرف واحد في المنطق (Domain)."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["التأكد أنك لست مجرد 'كاتب UI' (UI Developer)، بل 'مهندس برمجيات' قادر على بناء تطبيق لا ينهار عند تغيير مكتبات الـ API."],
+      redFlags: ["كتابة 호출 API (http.get) داخل الـ UI أو داخل הـ Bloc مباشرة.", "استدعاء مكتبة \`flutter/material.dart\` داخل طبقة הـ Domain المشتركة للمنطق."],
+      greenFlags: ["ذكر الـ SOLID Principles (خاصة D - Dependency Inversion). الإشارة لـ ResoCoder كمرجع شهير."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-repository-pattern", "solid-principles-in-dart"], // Future cards or existing
+      nextSteps: [{ id: "flutter-dependency-injection", title: "Dependency Injection (DI)" }],
+      related: ["state-management-comparison"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "تعقيد التطبيقات الصغيرة (Over-engineering).",
+        whyWrong: "تطبيق Clean Architecture على برنامج بسيط مثل 'To-Do List' أو شاشة واحدة سيتطلب إنشاء 10 مجلدات وملفات Interfaces لعملية واحدة، مما يشتت الجهد بلا فائدة.",
+        correctApproach: "استخدام Clean Architecture في المشاريع الكبيرة ذات فرق العمل المتعددة (Enterprise Apps) والتي تحتاج لـ Unit Tests مكثفة."
+      }
+    ],
+    answerStrategy: {
+      structure: ["تعريف الطبقات الثلاث (Presentation, Domain, Data).", "شرح قاعدة التبعية (Dependency Rule)، كل الأسهم تشير للـ Domain.", "تفسير متى نستخدمها (التطبيقات المعقدة)."],
+      timeAllocation: { junior: "1.5 دق", mid: "2 دق", senior: "2.5 دق" },
+      keyPhrases: ["Dependency Inversion", "Domain is independent", "Separation of concerns", "Highly testable"]
+    },
+    quickRevision: {
+      bulletPoints: ["Clean Arch: كود متقسم 3 طبقات.", "Presentation: شكل الشاشات.", "Domain: المخ والمحتوى الأصلي.", "Data: منجم الداتا من النت أو الموبايل.", "ممنوع الـ Domain يشوف الـ Data.. العكس هو اللي بيحصل."],
+      memoryHook: "الـ Domain هو اللواء اللي بيدي الأوامر (Interfaces)، والـ Data هو العسكري اللي بينفذ.",
+      cheatSheet: "دائماً الانترفيور بيسأل 'مين بيعتمد على مين؟' إجابتك الصارمة: Presentation و Data بيعتمدوا على Domain. الـ Domain لا يعتمد على أحد."
+    },
+    companyTags: ["Any Enterprise/FinTech", "Fawry", "Instabug", "Squadio"],
+    egyptianMarket: { popularity: "Crucial", salaryImpact: "High" }
+  },
+
+  // CARD 112
+  {
+    id: "flutter-dependency-injection",
+    number: 112,
+    title: "Dependency Injection (DI) & get_it",
+    titleAr: "حقن الاعتمادية (Dependency Injection)",
+    level: "Mid",
+    frequency: "Must Know",
+    tags: ["Architecture", "Design Patterns", "State Management"],
+    definition: {
+      summary: "هو نمط برمجي (Design Pattern) يهدف إلى تمرير الكائنات (Objects) التي يحتاجها الكلاس من الخارج بدلاً من إنشائها بداخل الكلاس نفسه. وهو أساسي لكتابة كود سهل الاختبار (Testable).",
+      detailed: "1. **The Problem**: إذا كان كلاس \`UserBloc\` ينشئ \`ApiRepository()\` داخله، فلن تتمكن من وضع 'بيانات وهمية' (Mock) لاختباره.\n2. **The Solution (DI)**: نجعل الـ \`UserBloc\` يطلب הـ \`ApiRepository\` في الكونستراكتور (Constructor). من ينشئ الـ Bloc هو من 'يحقن' الـ Repository داخله.\n3. **Service Locators (get_it)**: هي مكتبة شهيرة في فلاتر تعمل كسجل (Registry) مركزي. تسجل فيها كل الـ Repositories والـ Blocs مرة واحدة (غالباً عند تشغيل التطبيق)، وتستدعيها من أي مكان بحرية.",
+      analogy: "زي لما تقعد في كافيه متقدرش تعمل الشاي بتاعك بنفسك جوه الكافيه (Tight Coupling). إنت بتطلب الشاي (Dependency)، والويتر بيحقنهولك على الطرابيزة جاهز (Injection). لو طلبت شاي دايت (Mock)، هيجيبلك دايت من غير ما تغير طريقتك في الشرب.",
+      keyPoints: [
+        "Constructor Injection is the most common type",
+        "Decouples object creation from object usage",
+        "Crucial for Unit Testing and Mocking",
+        "get_it is a Service Locator, often used to simulate DI"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// === الطريقة الخاطئة (بدون حقن) ===
+class LoginBloc {
+  // الكلاس معتمد بقوة على هذا الـ API القوي ولن تستطيع تغييره في التيست
+  final api = ApiClient(); 
+}
+
+// === الطريقة الصحيحة (Constructor Injection) ===
+class LoginBloc {
+  final ApiClient api;
+  // الـ api بيتحقن من بره
+  LoginBloc(this.api); 
+}
+
+// === استخدام مكتبة get_it ===
+final getIt = GetIt.instance;
+
+void setup() {
+  // بنحفظ نسخة واحدة (Singleton) في الميموري
+  getIt.registerLazySingleton<ApiClient>(() => ApiClient());
+  // بنحفظ الـ Bloc وبنحقن جواه הـ Api 
+  getIt.registerFactory<LoginBloc>(() => LoginBloc(getIt<ApiClient>()));
+}
+
+// في الـ UI:
+final bloc = getIt<LoginBloc>();`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture & Tools",
+        question: "What is the difference between an actual Dependency Injector and a Service Locator (like get_it)?",
+        questionAr: "ما هو الفرق بين حقن الاعتمادية الحقيقي (DI) وبين محدد الخدمات (Service Locator) مثل مكتبة get_it؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "**المبدأ**: كلاهما يهدفان لتقليل الارتباط (Decoupling) وتسهيل الاختبار.",
+            "**DI الحقيقي**: الكلاس لا يعلم عن مصدر مجيئ الكائن. يتم حقنه مباشرة من الإطار العمل (Framework) عبر الـ Constructor.",
+            "**Service Locator (get_it)**: الكلاس يقوم بـ 'طلب' (Request) الكائن من السجل المركزي (الـ Locator) صراحة \`GetIt.I.get<String>()\`. فهو يخفي دورة حياة الكائن لكنه يجعل الكلاس يعتمد على الـ Locator نفسه."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["إذا سُئلت عن הـ DI، فهم لا يريدونك أن تشرح \`get_it\` كأنها الكلمة المرادفة الوحيدة. يريدونك أن تفهم المبدأ الفعلي (Constructor Injection) الذي يُسهل الـ Mocking."],
+      redFlags: ["كتابة الكود بحيث كل كلاس يقوم بعمل \`new Repository()\` أو \`Repository()\` داخل دواله."],
+      greenFlags: ["ذكر أن فلاتر نفسه يستخدم الـ DI عبر (InheritedWidget / Provider) لتوصيل الـ Dependencies للشاشات."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-clean-architecture"],
+      nextSteps: [{ id: "solid-principles-in-dart", title: "SOLID Principles" }],
+      related: ["flutter-singleton-pattern"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "استخدام الـ Get_it للوصول لكل الكائنات واستدعائه في كل سطر في كل كلاس.",
+        whyWrong: "هذا يعيد بناء مشكلة (Global Variables) مما يجعل من الصعب تتبع من يستخدم ماذا (Hidden Dependencies).",
+        correctApproach: "استخدام get_it فقط لـ 'حقن' الكائنات (Injection) من الخارج (في شجرة الـ UI أو عبر الكونستراكتور)."
+      }
+    ],
+    answerStrategy: {
+      structure: ["تعريف הـ DI كمفهوم (الحقن عبر الكونستراكتور).", "الهدف الأساسي (سهولة الاختبار وتغيير الـ Implementation).", "كيف يطبق عملياً في فلاتر (get_it أو Provider)."],
+      timeAllocation: { junior: "1 دق", mid: "1.5 دق", senior: "2 دق" },
+      keyPhrases: ["Constructor Injection", "Decoupling objects", "Mocking for tests", "Service Locator"]
+    },
+    quickRevision: {
+      bulletPoints: ["الـ DI: متخلقش الكائن جوه، استلمه من بره.", "الهدف: عشان لما أحب أجرب الكود، أقدر أبعت نسخه وهمية (Mock).", "get_it: دولاب كبير بنعلق فيه الكائنات في بداية التطبيق عشان نسحبها من أي شاشة بسهولة."],
+      memoryHook: "DI = السيرنجة (الحقنة) اللي بندي بيها الأوامر للكلاس من بره.",
+      cheatSheet: "دائماً اربط הـ Dependency Injection بـ مصطلح (Unit Testing) لأن لولاه مستحيل تعمل Test محترم للكود بتاعك."
+    },
+    companyTags: ["Any Startup", "Companies using Riverpod/Bloc"],
+    egyptianMarket: { popularity: "Crucial", salaryImpact: "High" }
+  },
+
+  // CARD 113
+  {
+    id: "flutter-singleton-pattern",
+    number: 113,
+    title: "Singleton Pattern in Dart",
+    titleAr: "نمط النسخة الواحدة (Singleton)",
+    level: "Mid",
+    frequency: "Frequent",
+    tags: ["Design Patterns", "Core Concepts"],
+    definition: {
+      summary: "هو نمط تصميم (Design Pattern) يضمن أن كلاس معين له نسخة واحدة فقط (One Instance) تعيش في الذاكرة (Memory) طوال فترة تشغيل التطبيق.",
+      detailed: "1. **Creation**: يُبنى السنجلتون عن طريق جعل الـ Constructor خاصاً (Private) જેથી لا يقدر أحد على إنشاء نسخة جديدة من الخارج.\n2. **Access**: نوفر متغير ثابت (static) يصل من خلاله الجميع لنفس النسخة.\n3. **Usage**: يُستخدم عادة مع الكائنات التي تُعتبر 'مكلفة' في الإنشاء، أو التي نحتاج مشاركة بياناتها في כל أنحاء التطبيق، مثل (مدير قواعد البيانات، إعدادات المستخدم SharedPreferences، أو API Service).",
+      analogy: "السنجلتون زي (الملك) في الدولة. مستحيل يكون فيه غير ملك واحد بس. أي حد في الدولة محتاج أمر، بيروح لنفس الملك في القصر. لو قفلنا الباب وفتحناه (استدعينا الكلاس 100 مرة)، هو نفس الملك مفيش غيره قاعد على الكرسي.",
+      keyPoints: [
+        "Restricts instantiation to exactly one object",
+        "Private constructor and a static instance",
+        "Shared state across the application",
+        "Considered an anti-pattern by some (difficult to test)"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `class DatabaseManager {
+  // 1. المتغير الثابت اللي هيشيل النسخة الوحيدة
+  static final DatabaseManager _instance = DatabaseManager._internal();
+
+  // 2. الـ Constructor السري (Private) يمنع خلق نسخ من الخارج
+  DatabaseManager._internal() {
+    print("Database Initialized!");
+  }
+
+  // 3. طريقة الوصول للمتغير.. ممكنប្រើ Factory constructor للسهولة
+  factory DatabaseManager() {
+    return _instance;
+  }
+
+  void query() {
+    print("Executing query...");
+  }
+}
+
+void main() {
+  // كلاهما يشير لنفس الكائن في الذاكرة!
+  var db1 = DatabaseManager();
+  var db2 = DatabaseManager();
+  
+  print(identical(db1, db2)); // يطبع: true
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Concept & Best Practices",
+        question: "Why do some developers consider the Singleton pattern an 'Anti-pattern'?",
+        questionAr: "لماذا يعتبر بعض المطورين نمط الـ Singleton 'نمطاً سيئاً' (Anti-pattern) يجب تجنبه؟",
+        difficulty: 2,
+        expectedAnswer: {
+          points: [
+            "1. **صعوبة الاختبار (Testing)**: السنجلتون يحتفظ بالحالة (State) بين الـ tests. إجراء اختبار ثاني قد يفشل لأن الاختبار الأول عدّل في السنجلتون.",
+            "2. **الاعتمادية المخفية (Hidden Dependencies)**: الكلاسات تعتمد على السنجلتون بشكل مخفي داخل الكود، وليس كـ Parameters واضحة.",
+            "3. الحل البديل والأفضل هو الاعتماد على הـ Dependency Injection وتمرير السنجلتون عبر الـ Constructor."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["معرفة ما إذا كنت تعرف كيفية برمجة السنجلتون بالدارت (باستخدام factory والـ private constructor)، وكيف تتجنب شروره وتوابعه."],
+      redFlags: ["كتابة كود السنجلتون بطريقة الـ Java القديمة (بدون استخدام الـ factory keyword اللي بتوفرها Dart).", "استخدامه لحمل كل المتغيرات العشوائية في التطبيق."],
+      greenFlags: ["ذكر أن مكتبة \`get_it\` تقوم بدور فعال كسجل مركزي (Service Locator) يُغني عن كتابة Singleton لكل كلاس يدوياً."]
+    },
+    linkedCards: {
+      prerequisites: ["dart-factory-constructors"],
+      nextSteps: [{ id: "flutter-dependency-injection", title: "Dependency Injection" }],
+      related: ["dart-static-vs-final"] // Due to similar variable scopes
+    },
+    commonPitfalls: [
+      {
+        mistake: "عمل Singleton للمتحكمات المرتبطة بالشاشة (Controllers).",
+        whyWrong: "لأن الـ Singleton لا يموت أبدأ حتى يغلق التطبيق. إذا ربطته بشاشة (כـ LoginController)، فلن تُمسح بياناته للمستخدم الثاني، وسيظل يحتل الميموري للأبد.",
+        correctApproach: "استخدام הסنجلتون حصراً للخدمات العامة كـ HttpClient أو الـ ThemeManager."
+      }
+    ],
+    answerStrategy: {
+      structure: ["شرح الهدف (التوفير في الذاكرة ومركزية البيانات).", "شرح الكود السريع (Private constructor + Static variable).", "ذكر التحذيرات وعيوبه (التيست)."],
+      timeAllocation: { junior: "1 دق", mid: "1.5 دق", senior: "1 دق" },
+      keyPhrases: ["One shared instance", "Private constructor", "Global state", "Hard to mock"]
+    },
+    quickRevision: {
+      bulletPoints: ["الـ Singleton: كائن واحد ثابت طول ما الابلكيشن شغال.", "بنعمله בـ Constructor سري ونحفظ النسخة في static variable.", "ممتاز للـ SharedPrefs أو الـ Database.", "وحش جداً في عمل الـ Unit Testing لإنه مبيمسحش القديم."],
+      memoryHook: "السنجلتون = الشمس. مفيش غير شمس واحدة بتنور للـ App كله.",
+      cheatSheet: "دائماً الانترفيور بيسألك إزاي تعمله في دارت.. قولوا בستخدم الكلمة السحرية \`factory\` بترجع الـ \`_instance\`."
+    },
+    companyTags: ["Any Software House", "Robusta"],
+    egyptianMarket: { popularity: "High", salaryImpact: "Moderate" }
+  },
+
+  // CARD 114
+  {
+    id: "dart-factory-constructors",
+    number: 114,
+    title: "Factory Constructors",
+    titleAr: "الكونستراكتور المصنع (Factory)",
+    level: "Mid",
+    frequency: "Frequent",
+    tags: ["Dart", "Core Concepts", "Design Patterns"],
+    definition: {
+      summary: "علامة (Keyword) في دارت توضع قبل הـ Constructor وتعطيه قدرة استثنائية: 'أنه ليس مجبراً على خلق كائن جديد (New Instance)' في كل مرة يتم استدعاؤه.",
+      detailed: "1. **Normal Constructor**: عند استدعائه، يضمن مئات الأسطر في خلفية دارت أن يتم حجز مكان جديد في الميموري وبناء කائن جديد.\n2. **Factory**: يستطيع إرجاع كائن قديم مخزن في كاش (Cache/Singleton)، أو يمكنه أن يتخذ معطيات ويدرسها، ثم يقرر إرجاع كائن من כلاس آخر موروث (Subclass).\n3. **Use Case**: يستخدم بشدة في توليد الكائنات من الـ JSON (\`fromJson\`) لأننا نبني المنطق قبل حقن القيم.",
+      analogy: "الـ Constructor العادي عامل زي لما تروح لنجار وتدفع فلوس عشان تفصل كرسي חדيد. الـ Factory Constructor زي مدير معرض الموبيليا، بتطلب منه كرسي، ممكن يديك كرسي من المخزن (Singleton)، وممكن يقول دا جاهز اهو ويديك نوع تاني أحسن (Subclass)، وممكن يصنعه من الأول (Normal). هو المتحكم.",
+      keyPoints: [
+        "Can return an existing instance (Cache/Singleton)",
+        "Can return a subclass of the current class",
+        "Must explicitly use the `return` keyword",
+        "Doesn't have access to `this` before returning"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// === 1. Factory للتحكم في الكاش (Singleton) ===
+class Logger {
+  static final Map<String, Logger> _cache = {};
+  final String name;
+
+  // المصنع: هيشوف لو موجود هيرجعه، لو مش موجود هيصنعه ويسجله
+  factory Logger(String name) {
+    if (_cache.containsKey(name)) {
+      return _cache[name]!;
+    } else {
+      final logger = Logger._internal(name);
+      _cache[name] = logger;
+      return logger;
+    }
+  }
+
+  Logger._internal(this.name);
+}
+
+// === 2. Factory لإرجاع Subclasses (Polymorphism) ===
+abstract class Shape {
+  // المصنع بيقرر يرجع أني شكل بناءً على التايب
+  factory Shape(String type) {
+    if (type == 'circle') return Circle();
+    if (type == 'square') return Square();
+    throw 'Unknown shape';
+  }
+}
+class Circle implements Shape {}
+class Square implements Shape {}`
+      }
+    },
+    questions: [
+      {
+        type: "Language Feature",
+        question: "Why do we typically use \`factory\` for parsing JSON (e.g., \`User.fromJson\`) instead of a normal named constructor?",
+        questionAr: "لماذا نستخدم العادة \`factory User.fromJson()\` لمعالجة بيانات الـ JSON بدلاً من الكونستراكتور المسمى (Named Constructor) العادي؟",
+        difficulty: 2,
+        expectedAnswer: {
+          points: [
+            "في الكونستراكتور العادي يجب أن تُسند جميع قيم الـ \`final\` في مرحلة التهيئة (Initializer list \`:\`). وهذا صعب جداً إن كنت تريد إجراء حسابات أو دوال تفقدية (null checks) على הـ JSON قبل تعيينها.",
+            "الـ \`factory\` يسمح لك بإنشاء متغيرات وسيطة (Local variables)، وعمل شروط، بل وحتى إرجاع كائنات مجانية مخزنة في الداخل قبل كشفها للخارج، مما يعطيك مرونة كاملة في بناء الكائن."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["تحديد ما إذا كنت تفهم إمكانيات دارت العميقة أم أنك تعتمد الـ Generation التلقائي للـ JSON فقط بدون فهم ما يُكتب تحت الغطاء."],
+      redFlags: ["الاعتقاد بأن الـ Factory هو مجرد شكل تاني للـ Named Constructor بدون معرفة شرط الـ \`return\`."],
+      greenFlags: ["ذكر أمثلة واضحة كالسنجلتون، أو إرجاع \`Subclasses\` لتمثيل استجابات الـ API المختلفة (Success vs Error)."]
+    },
+    linkedCards: {
+      prerequisites: ["dart-oop-concepts"],
+      nextSteps: [{ id: "flutter-singleton-pattern", title: "Singleton Pattern" }],
+      related: ["json-serialization"] // Future topic potentially
+    },
+    commonPitfalls: [
+      {
+        mistake: "محاولة استخدام \`this\` داخل الـ Factory constructor.",
+        whyWrong: "على عكس الكونستراكتور العادي، הـ Factory يشبه دالة \`static\`. الكائن لم يُصنع بعد فلا يوجد \`this\` لكي تشير إليه.",
+        correctApproach: "استخدام الـ Factory للتحقق من الشروط، ثم استدعاء كونستراكتور عادي (مخفي Private غالباً) لإخراج الكائن وـ \`return\`."
+      }
+    ],
+    answerStrategy: {
+      structure: ["تعريف الـ Factory وشرطه الأساسي (return).", "أهم استخدامين (الكاش أو السنجلتون / وإرجاع كلاس فرعي بناء على شرط).", "علاقته القوية بالـ fromJson."],
+      timeAllocation: { junior: "1.5 دق", mid: "1 دق", senior: "1 دق" },
+      keyPhrases: ["Explicit return", "Returning subclasses", "Caching instances", "fromJson parsing"]
+    },
+    quickRevision: {
+      bulletPoints: ["الفاكتوري بيسمح للو كونستراكتور يرجع قيمة (Return) وده مستحيل في العادي.", "ميقدرش يشوف كلمة \`this\` جواه.", "استخدامه الأشهر: \`fromJson\` وعمل الـ Singleton.", "ممكن تطلب Object أب، والكلمة دي ترجعلك Object ابن بناء على الداتا."],
+      memoryHook: "فاكتوري = مدير المخزن. ممكن يديك حاجة مركونة وممكن يصنعلك من الصفر.",
+      cheatSheet: "دائماً افتكر إن הـ Factory حله السحري هو التغلب على قيود הـ Initializer list الخاصة بالـ final variables."
+    },
+    companyTags: ["Any Software House requiring heavy dart background"],
+    egyptianMarket: { popularity: "High", salaryImpact: "Moderate" }
+  },
+
+  // CARD 115
+  {
+    id: "flutter-repository-pattern",
+    number: 115,
+    title: "Repository Pattern",
+    titleAr: "نمط المستودع (Repository)",
+    level: "Mid",
+    frequency: "Must Know",
+    tags: ["Architecture", "Design Patterns", "Clean Code"],
+    definition: {
+      summary: "هو نمط برمجي يوفر واجهة موحدة (Single Source of Truth) لإدارة البيانات. يعزل الـ UI عن معرفة أي شيء حول مصدر هذه البيانات (هل جاءت من الإنترنت أم من الذاكرة المحلية؟).",
+      detailed: "1. **The Core Job**: يقوم הـ Repository بإخفاء التعقيد. الشاشة تطلب منه البيانات، وهو يقرر داخلياً: هل يجلبها من الـ API؟ أم أن الهاتف غير متصل فسيجلبها من الـ SQLite / Hive؟\n2. **Separation**: الـ Bloc/ViewModel يتصل بالـ Repository فقط، ولا يتصل أبداً بـ ApiClient أو DatabaseClient مباشرة.\n3. **Interface-Driven**: يتم تحديده عبر Abstract Class، مما يُسهل تغييره لاحقاً بدون التأثير على منطق التطبيق.",
+      analogy: "الريبو (Repository) زي أمين المخزن. مسؤول המبيعات (الشاشة) بيطلب منه 5 لابتوبات للزبون. المبيعات ملوش دعوة هل أمين المخزن جاب اللابتوبات دي من المخزن اللي ورا المحل (Local Database)، ولا عمل تليفون وطلبهم من المورد في الصين (Remote API). المهم اللابتوبات توصل.",
+      keyPoints: [
+        "Single Source of Truth for data",
+        "Abstracts away Data Sources (Remote vs Local)",
+        "Isolates the UI/Bloc from data fetching logic",
+        "Makes offline-first capabilities easy to implement"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// 1. الواجهة الموحدة
+abstract class ProductRepository {
+  Future<List<Product>> getProducts();
+}
+
+// 2. التنفيذ הפعلي (Implementation)
+class ProductRepositoryImpl implements ProductRepository {
+  final ApiClient remoteApi;
+  final LocalDb localDb;
+
+  ProductRepositoryImpl(this.remoteApi, this.localDb);
+
+  @override
+  Future<List<Product>> getProducts() async {
+    // المستودع هو من يقرر من أين يجلب البيانات
+    if (await isInternetAvailable()) {
+      final freshData = await remoteApi.fetchProducts();
+      await localDb.cache(freshData); // حفظ للحالات القادمة
+      return freshData;
+    } else {
+      // لو مفيش نت، بنجيب الكاش بدون علم الـ UI
+      return await localDb.getProducts(); 
+    }
+  }
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture",
+        question: "When should a Repository call multiple Data Sources (e.g., Remote and Local)?",
+        questionAr: "متى يجب أن يتصل المستودع (Repository) بمصادر بيانات متعددة (مثل سيرفر وذاكرة محلية)؟",
+        difficulty: 1,
+        expectedAnswer: {
+          points: [
+            "عند تنفيذ آلية الـ التخزين المؤقت (Caching) أو العمل بدون اتصال (Offline-first approach).",
+            "يحدد הـ Repository الاستراتيجية المناسبة: مثلاً يجلب البيانات من الذاكرة المحلية فوراً (لأسباب السرعة)، ثم يستدعي الـ API في الخلفية، وإذا أتي الرد يحدّث הـ Local Database وينبه البرنامج."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["تحديد ما إذا كنت تفهم الفروق בין הـ Repository والـ Data Source أم أنك تنشئهما لمجرد التقليد الأعمى."],
+      redFlags: ["جعل הـ UI يقرر أين يتم حفظ البيانات ومتى يجلب من الإنترنت."],
+      greenFlags: ["ذكر نمط (Offline-first) أو (Single Source of Truth) وارتباطه الوثيق بالـ Repository."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-clean-architecture"],
+      nextSteps: [{ id: "flutter-dependency-injection", title: "Dependency Injection" }],
+      related: ["flutter-state-management"] // Bloc usually uses the repo
+    },
+    commonPitfalls: [
+      {
+        mistake: "إدخال كود تحويل البيانات (UI formatting) بداخل הـ Repository.",
+        whyWrong: "الـ Repository مسؤوليته جلب البيانات وتغليفها في Models فقط. تحويل التاريخ إلى صيغة \"منذ 5 ساعات\" هو وظيفة הـ UI أو הـ ViewModel.",
+        correctApproach: "الاحتفاظ بالـ Repository نظيفاً كقناة مياه تجلب الداتا خامة ومرتبة كـ Objects."
+      }
+    ],
+    answerStrategy: {
+      structure: ["وصف הـ Repository (وسيط يخفي مصدر البيانات).", "شرح المثال الوظيفي (تحديد الجلب من النت أم الكاش).", "أهميته (يفصل הـ UI عن الـ Data ويجعل التغيير سهل)."],
+      timeAllocation: { junior: "1 دق", mid: "1.5 دق", senior: "1.5 دق" },
+      keyPhrases: ["Single Source of Truth", "Data source abstraction", "Offline-first", "Caching strategy"]
+    },
+    quickRevision: {
+      bulletPoints: ["الريبو: واجهة بتخفي وراها تفاصيل الداتا بتيجي منين.", "الـ Bloc بيكلم الريبو، والريبو يقرر يكلم نت ولا يكلم الداتا اللي متخزنة عالجهاز.", "ممتاز لعمل برامج شغالة Offline."],
+      memoryHook: "الريبو = أمين المخزن اللي بيورد البضاعة ومتسألوش جابها إزاي.",
+      cheatSheet: "دائماً اربط الـ Repository Pattern بميزة الـ (Offline Support)، دي الإجابة السحرية اللي بتثبت إنك فاهم لزمته."
+    },
+    companyTags: ["Instabug", "Swvl", "Any Clean Arch strict company"],
+    egyptianMarket: { popularity: "Crucial", salaryImpact: "Moderate" }
+  },
+  {
+    id: "116",
+    title: "Bloc vs Riverpod vs Provider",
+    titleAr: "الفرق بين Bloc و Riverpod و Provider",
+    level: "8",
+    category: "State Management Deep Dive",
+    tags: ["State Management", "Bloc", "Riverpod", "Provider"],
+    definition: {
+      summary: "مقارنة بين أشهر مكتبات إدارة الحالة (State Management) في Flutter من حيث الأداء، التعقيد الوظيفي، والأسلوب المتبع.",
+      detailed: "- **Provider**: أداة بسيطة تعتبر مجرد Wrapper فوق `InheritedWidget`. لا تقدم بنية (Architecture) صارمة، لكنها كافية للتطبيقات البسيطة والمتوسطة.\n- **Bloc/Cubit**: الأقوى في فصل الـ Logic عن الـ UI ويعتمد على الـ Streams والأحداث (Events). يفرض بنية صارمة جداً مما يجعله مثالياً للشركات الكبيرة.\n- **Riverpod**: البديل الحديث لـ Provider (من نفس المبتكر). يعالج عيوب Provider، لا يعتمد على الـ `BuildContext`، ويوفر أماناً ضد أخطاء الـ Runtime (Compile-safe).",
+      analogy: "تخيل إنك بتفتح مطعم:\n- `Provider`: مطعم شعبي، الناس بتطلب من الكاشير واللي جاهز بيطلع، سريع وسهل.\n- `Bloc`: مصنع ضخم، كل طلب له ورقة رسمية (Event) بتدخل على سيستم دقيق وتطلع بنتيجة (State) واضحة جداً.\n- `Riverpod`: مطعم حديث سمارت، بيراقب طلباتك ولوحدها ومفيش مجال للغلط، وبيشتغل من أي مكان في المطعم.",
+      keyPoints: [
+        "Provider is simple but lacks forced architecture and relies heavily on BuildContext",
+        "Bloc enforces strict unidirectional data flow and separates UI entirely",
+        "Riverpod is Compile-safe, no BuildContext needed, handles async states elegantly"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Riverpod Example
+final counterProvider = StateProvider<int>((ref) => 0);
+
+class CounterApp extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // No context needed to read the provider!
+    final count = ref.watch(counterProvider);
+    return Text(count.toString());
+  }
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Comparison",
+        question: "Why would a team choose Riverpod over Provider?",
+        questionAr: "لماذا قد يختار فريق العمل استخدام Riverpod بدلاً من Provider؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "لأن Riverpod يكتشف الأخطاء أثناء كتابة الكود (Compile-time) بدلاً من وقت التشغيل (ProviderNotFoundException).",
+            "لا يحتاج إلى BuildContext لقراءة الحالة، وهذا مفيد عند إدارة الحالة خارج الوجات.",
+            "التعامل مع الـ Futures والـ Streams أسهل بكثير وفيه حالات جاهزة (Loading, Error, Data)."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["قدرتك على تحليل المتطلبات واختيار الأداة المناسبة، مش مجرد إنك متعصب لـ State Management معينة."],
+      redFlags: ["القول بأن 'Bloc هو الأفضل دائماً' أو 'Provider سيء'. كل أداة لها استخدام."],
+      greenFlags: ["ذكر مزايا التعقيد القليل في Provider مقابل البنية الصارمة في Bloc مقابل حداثة وأمان Riverpod."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-state-management-basics"],
+      nextSteps: [{ id: "117", title: "GetX Architecture Controversy" }],
+      related: ["flutter-inherited-widget", "dart-streams"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "كتابة منطق معقد بداخل الـ View باستخدام Provider.",
+        whyWrong: "لأن Provider لا يجبرك على هيكلة الكود، فقد تقوم بإضافة Business Logic كامل داخل الـ build method.",
+        correctApproach: "استخدام ChangeNotifier وفصل اللوجيك تماماً عن الوجات، أو الترقية لـ Bloc للمشاريع الأضخم."
+      }
+    ]
+  },
+  {
+    id: "117",
+    title: "The GetX Controversy",
+    titleAr: "الجدل حول مكتبة GetX",
+    level: "8",
+    category: "State Management Deep Dive",
+    tags: ["State Management", "GetX", "Architecture"],
+    definition: {
+      summary: "GetX هي حزمة (Package) شاملة توفر State Management و Dependency Injection و Route Management، وهي محط جدل كبير في مجتمع Flutter.",
+      detailed: "مزايا GetX تتمثل في السهولة الشديدة واختصار الكود وعدم الحاجة للـ Context في التوجيه (Routing) أو إظهار الـ Dialogs. ولكن الجدل ينبع من كونها تحاول القيام بكل شيء بدلاً من أداء شيء واحد جيداً (Anti-Pattern)، وتقوم بتغيير سلوكيات Flutter الأساسية، مما يخلق ارتباطاً شديداً (Tight Coupling) بالحزمة، وهو خطر على صيانة التطبيقات الكبيرة.",
+      analogy: "GetX زي 'عدة الكشافة' (السويسرية) اللي فيها سكينة ومفك وقصافة. سريعة وعملية لو طالع رحلة يوم واحد (تطبيق صغير). لكن لو بتبني بيت (تطبيق ضخم) هتحتاج أدوات احترافية منفصلة مخصصة لكل حاجة.",
+      keyPoints: [
+        "Offers State Management, Routing, and localizations in one package",
+        "Highly debated due to creating an 'ecosystem within an ecosystem'",
+        "Tight coupling: Hard to remove GetX from an app once you rely on it",
+        "Breaks Flutter's widget tree constraints by omitting context"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// GetX State Management
+var count = 0.obs;
+void increment() => count++;
+
+// GetX Routing (No Context)
+Get.to(NextScreen());
+
+// GetX Snackbar (No Context)
+Get.snackbar('Hello', 'This is GetX');`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture",
+        question: "Is GetX an anti-pattern? Why do some senior developers avoid it?",
+        questionAr: "هل تعتبر GetX (نمطاً سيئاً - Anti-Pattern)؟ ولماذا يتجنبها بعض المطورين الكبار؟",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "نعم في بعض الجوانب، لأنها تنتهك مبدأ (Single Responsibility) عبر جمع كل شيء في حزمة واحدة.",
+            "الاعتماد الكامل عليها يجعل التطبيق غير قابل للصيانة بسهولة (Tight Coupling).",
+            "إخفاء الـ BuildContext يعتبر سحراً (Magic) قد يضر بفهم المطور لطريقة استضافة وجات Flutter الحقيقية."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["رؤية نضجك التقني وتقييمك المحايد للميزات مقابل العيوب (Trade-offs)."],
+      redFlags: ["التعصب الأعمى لـ GetX أو الهجوم الشرس عليها دون فهم أسباب استخدامها."],
+      greenFlags: ["إدراك أنها مثالية للـ MVPs والمشاريع الجانبية، لكنها محفوفة بالمخاطر للمشاريع المؤسسية الضخمة Enterprise."]
+    },
+    linkedCards: {
+      prerequisites: ["116"],
+      nextSteps: [{ id: "118", title: "Unit Testing Basics" }],
+      related: ["flutter-routing", "flutter-dependency-injection"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "استخدام GetX في كل صغيرة وكبيرة في التطبيق.",
+        whyWrong: "إذا توقف دعم مكتبة GetX، سيصبح تحديث التطبيق أو صيانته كابوساً لأن المكتبة متشعبة في الروابط، الحالة، والتنبيهات.",
+        correctApproach: "إذا استخدمتها، حاول عزلها قدر الإمكان، أو استخدام حلول منفصلة وموثوقة (مثل GoRouter للروابط و Bloc للحالة)."
+      }
+    ]
+  },
+  {
+    id: "118",
+    title: "Unit Testing & Mocking",
+    titleAr: "اختبار الوحدات والمحاكاة (Mocking)",
+    level: "8",
+    category: "Testing",
+    tags: ["Testing", "Unit Test", "Mocking", "Mockito", "Mocktail"],
+    definition: {
+      summary: "اختبار الوحدات (Unit Testing) هو اختبار أصغر كود ممكن (وظيفة أو فئة) بشكل معزول تماماً عن باقي أجزاء النظام لضمان قيامه بالعمل المطلوب بشكل صحيح.",
+      detailed: "في Flutter و Dart، نقوم باختبار الـ Logic (مثل الـ Repositories أو Bloc). ولأن هذه الأجزاء تعتمد على عوامل خارجية (مثل الـ API أو قواعد البيانات)، نستخدم تقنية (Mocking). المحاكاة (Mocking) هي استبدال النسخة الحقيقية بنسخة مزيفة يمكننا التحكم في مخرجاتها لاختبار الكود بمعزل عن الإنترنت الحقيقي (باستخدام حزم مثل Mockito أو Mocktail).",
+      analogy: "تخيل إنك بتختبر أداء سائق في مدرسة قيادة. إنت بتجيبه في (ساحة مغلقة - سيارة محاكاة) مش بتنزله الطريق الحقيقي المفتوح، عشان تقيم أداؤه هو شخصياً (Unit)، وبتعمل (Mock) للمواقف الصعبة زي المطبات من غير ما تعرضه لخطر حقيقي.",
+      keyPoints: [
+        "Tests a single unit of work (Function, Class, Method) in isolation",
+        "Fastest form of testing to execute",
+        "Uses 'setUp' to initialize variables and 'tearDown' to clean up",
+        "Vastly utilizes Mocking to fake Network APIs and Database returns"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Using flutter_test and mocktail
+class MockApiClient extends Mock implements ApiClient {}
+
+void main() {
+  late UserRepository repo;
+  late MockApiClient mockApi;
+
+  setUp(() {
+    mockApi = MockApiClient();
+    repo = UserRepository(mockApi);
+  });
+
+  test('fetchUser returns user when API call is successful', () async {
+    // Arrange (Setup the mock)
+    when(() => mockApi.get(any())).thenAnswer((_) async => {'id': 1, 'name': 'Ahmed'});
+
+    // Act
+    final user = await repo.fetchUser(1);
+
+    // Assert
+    expect(user.name, 'Ahmed');
+    verify(() => mockApi.get('/users/1')).called(1);
+  });
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Testing",
+        question: "Explain the AAA pattern in Unit Testing.",
+        questionAr: "اشرح نمط AAA في اختبار الوحدات.",
+        difficulty: 2,
+        expectedAnswer: {
+          points: [
+            "AAA stands for: Arrange, Act, Assert.",
+            "Arrange (الترتيب): تجهيز المعطيات، المتغيرات، وتحديد مخرجات الـ Mocks.",
+            "Act (الإجراء): استدعاء الدالة أو الفئة التي نريد اختبارها فعلياً.",
+            "Assert (التأكيد): التحقق من أن النتيجة التي عادت من الإجراء تطابق النتيجة المتوقعة."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["تأكيد فهمك لأهمية كتابة الكود بطريقة قابلة للاختبار (Testable Code) والاعتماد على الـ Dependency Injection لتسهيل الـ Mocking."],
+      redFlags: ["كتابة Unit Test يعتمد على استدعاء API حقيقي من الإنترنت."],
+      greenFlags: ["ذكر ترتيب AAA و فكرة الـ Code Coverage."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-dependency-injection"],
+      nextSteps: [{ id: "119", title: "Widget Testing" }],
+      related: ["flutter-clean-architecture"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "نسيان إعادة التعيين (Reset) لحالة الـ Mocks بين كل اختيار وآخر.",
+        whyWrong: "قد يؤدي لبقاء البيانات من الاختبار الأول والتأثير على نتيجة الاختبار الثاني (Flaky tests).",
+        correctApproach: "استخدام الدالة `setUp` أو `tearDown` لتصفير وتنظيف الـ Mocks قبل كل اختبار `test()`."
+      }
+    ]
+  },
+  {
+    id: "119",
+    title: "Widget Testing",
+    titleAr: "اختبار الـ Widgets في Flutter",
+    level: "8",
+    category: "Testing",
+    tags: ["Testing", "Widget Test", "pumpWidget", "Finders"],
+    definition: {
+      summary: "هو نوع من الاختبارات في Flutter يبني ويختبر جزءاً من واجهة المستخدم (Widget) ويتفاعل معها (مثل الضغط أو التمرير) للتحقق من تكوينها وشكلها بشكل برمجي.",
+      detailed: "يقف الـ Widget Test في المنتصف بين الـ Unit Test (السريع للوجيك) والـ Integration Test (البطيء للتطبيق الكامل). فهو يبني (Render) ويدجت واحدة أو شاشة في بيئة محاكاة ليسمح للمطور بالتحقق من ظهور نص معين، أو التأكد من أن زر 'Login' يظهر عندما تكون الحقول غير فارغة. يتم استخدام `WidgetTester` و دوال مثل `pump()` (لإعادة الرسم).",
+      analogy: "تخيل إنك بتختبر (كشاف الإضاءة) لمسرحية. الـ Unit Test بيفك المحرك من جوه ويقيس الكهربا. الـ Widget test بيشغل الكشاف ويوجهه على زرار، ويتأكد إن الزرار ده مرئي فعلاً وإن نقرة الكشاف شغالة سليم، بس من غير ما تشغل المسرحية كلها (Integration).",
+      keyPoints: [
+        "Tests individual Widgets without running the full application",
+        "Uses 'pumpWidget' to build the Widget",
+        "Uses 'Finders' (find.text, find.byType) to locate elements in the UI",
+        "Uses 'pumpAndSettle' to wait for animations to finish"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `testWidgets('MyWidget has a title and a working button', (WidgetTester tester) async {
+  // Build the widget
+  await tester.pumpWidget(const MaterialApp(home: CounterScreen()));
+
+  // Find elements
+  final titleFinder = find.text('Count: 0');
+  final buttonFinder = find.byIcon(Icons.add);
+
+  // Assert initial state
+  expect(titleFinder, findsOneWidget);
+
+  // Tap button and trigger frame rebuild
+  await tester.tap(buttonFinder);
+  await tester.pump();
+
+  // Assert final state
+  expect(find.text('Count: 1'), findsOneWidget);
+});`
+      }
+    },
+    questions: [
+      {
+        type: "Testing",
+        question: "What is the difference between tester.pump() and tester.pumpAndSettle()?",
+        questionAr: "ما هو الفرق بين tester.pump() و tester.pumpAndSettle()؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "tester.pump(): يطلب من الفلاتر إعادة رسم الواجهة بـ Frame واحد جديد (مثالي بعد الضغط على زرار لتغيير رقم).",
+            "tester.pumpAndSettle(): يعيد رسم الـ Frames متتالية حتى تنتهي جميع الإطارات (Animations) ولا يوجد شيء يتحرك في الشاشة للاستقرار."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["معرفة مهاراتك في التأكد من تماسك الواجهة (UI Integrity) وحل أخطاء الشاشات قبل الـ QA."],
+      redFlags: ["استخدام pumpAndSettle مع انيميشن مستمر (Infinite Animation) زي الـ Loading Indicator، مما يؤدي לـ Timeout error."],
+      greenFlags: ["استخدام Finders و Matchers بشكل دقيق."]
+    },
+    linkedCards: {
+      prerequisites: ["118"],
+      nextSteps: [{ id: "120", title: "Integration Testing" }],
+      related: ["flutter-widgets-basics"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "عدم تغليف الوجات الأساسية بـ MaterialApp و Scaffold عند اختبارها.",
+        whyWrong: "لأن الوجات تحتاج إلى Ancestors زي MediaQuery, Directionality, والـ Theme. بدونهم ستحصل على (No Directionality widget found).",
+        correctApproach: "استخدام pumpWidget وبناء MaterialApp بداخلها واختبار الودجت الخاص بك بداخل الـ home."
+      }
+    ]
+  },
+  {
+    id: "120",
+    title: "Integration Testing & Golden Tests",
+    titleAr: "اختبارات التكامل واختبارات التطابق الصوري (Golden)",
+    level: "8",
+    category: "Testing",
+    tags: ["Testing", "Integration Test", "Golden Test", "E2E"],
+    definition: {
+      summary: "اختبار التكامل (Integration Test) يختبر التطبيق ككل (End-to-End) على جهاز حقيقي أو محاكي، بينما Golden Tests تقوم بمقارنة مظهر الوجات بـ (صور مرجعية - Screenshots) للتأكد من عدم تغير الـ UI.",
+      detailed: "- **Integration Testing**: يقوم بتشغيل التطبيق بالكامل ليختبر رحلة المستخدم (User flow)، كالقيام بتسجيل الدخول الفعلي وتصفح المنتجات. يعتبر الأبطأ في التنفيذ ولكنه يعطي الموثوقية القصوى.\n- **Golden Tests**: يتم فيه تصوير الـ Widget إلى (صورة مرجعية)، وفي المستقبل عند تشغيل الاختبار، يقوم بتصوير الوجات مرة أخرى ومقارنتها بيكسل-بيكسل بالصورة القديمة لضمان عدم حدوث أي انحراف (Pixel-perfect UI).",
+      analogy: "الـ Integration Test زي المراقب اللي بيقعد في عربية المدرسة ويختبر الرحلة كاملة من أول ما تطلع من الجراج لحد ما توصل الطالب البيت. أما הـ Golden Tests فهي زي صورة البطاقة، بيصور الـ UI النهاردة واي مرة تتغير بيطابقها بالصورة القديمة عشان يتأكد إن ملامحها متغيرةش بالغلط.",
+      keyPoints: [
+        "Integration tests execute on real devices or emulators (E2E testing)",
+        "Crucial for catching errors between layers (e.g., UI to API communication)",
+        "Golden tests prevent UI regressions (Pixel changes)",
+        "Uses 'matchesGoldenFile' function"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// === Golden Test Example ===
+testWidgets('Verify Button Golden', (tester) async {
+  await tester.pumpWidget(MyAppButton());
+
+  // Matches current UI with the saved golden image
+  await expectLater(
+    find.byType(MyAppButton),
+    matchesGoldenFile('goldens/my_button.png'),
+  );
+});
+
+// === Integration Test (Main) ===
+void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('End-to-end flow Test', (tester) async {
+    app.main(); // Start the whole app
+    await tester.pumpAndSettle();
+    
+    await tester.tap(find.text('Login'));
+    await tester.pumpAndSettle();
+    
+    expect(find.text('Welcome!'), findsOneWidget);
+  });
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Testing",
+        question: "When should you use Golden Tests over normal Widget Tests?",
+        questionAr: "متى تفضل استخدام Golden Tests بدلاً من اختبارات الواجهة التقليدية؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "الـ Widget tests تفحص وجود عناصر معينة (زر، نص). لكنها لا تنقذك إذا تغير لون الزر، أو زاد الخط فجأة وخرب التصميم.",
+            "الـ Golden Tests ضرورية في فرق التصميم الدقيق (Design Systems) لضمان عدم تغير شكل (Typography, Colors, Layouts) بيكسل واحد عن غير قصد."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["توضيح متى تتخذ قرار كتابة كل نوع اختبار لمعرفتك بأن التكامل مكلف والوحدات رخيصة وسريعة (Testing Pyramid)."],
+      redFlags: ["اختبار כל التطبيق باستخدام Integration tests فقط (بطيء جداً وهش)."],
+      greenFlags: ["ذكر الـ CI/CD وأن Golden Tests قد تتباعد بسبب اختلاف نظام التشغيل (Windows vs MacOS font rendering)."]
+    },
+    linkedCards: {
+      prerequisites: ["118", "119"],
+      nextSteps: [],
+      related: ["flutter-ci-cd"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "تشغيل الـ Golden Tests على أجهزة مختلفة بنظام تشغيل مختلف و تفشل (Fail).",
+        whyWrong: "لأن عملية الـ Rendering للخطوط (Fonts) تختلف بيكسلات صغيرة جداً بين MacOS و Windows، فيرسب الاختبار.",
+        correctApproach: "تشغيل وإنشاء صور الـ Goldens على بيئة موحدة (مثل Docker container أو Mac فقط للجميع)، أو استخدام Tolerance للتجاوز عن بعض البيكسلات."
+      }
+    ]
+  },
+  {
+    id: "121",
+    title: "Improving App Performance",
+    titleAr: "تحسين أداء تطبيق Flutter",
+    level: "9",
+    category: "App Performance",
+    tags: ["Performance", "Optimization", "const", "build"],
+    definition: {
+      summary: "هي مجموعة الممارسات لتقليل استهلاك الذاكرة (Memory)، تسريع بناء الواجهات (Rendering)، وتقليل استهلاك البطارية.",
+      detailed: "للوصول لأفضل أداء في فلاتر، يجب: 1. استخدام كلمة `const` قدر الإمكان لمنع إعادة بناء الـ Widgets. 2. تجنب الـ Animations المعقدة في الـ `build` والانتقال לـ `AnimatedBuilder`. 3. استخدام `ListView.builder` للقوائم الطويلة. 4. فصل الـ Widgets الكبيرة إلى أجزاء صغيرة (Extract Widgets) بدلاً من استدعاء دوال (Extract Methods) للإرجاع. 5. استخدام الـ Isolates للعمليات الحسابية الثقيلة لعدم تجميد واجهة المستخدم (UI Thread).",
+      analogy: "تحسين الأداء زي إنك ترتب مطبخك: لو كل مرة عايز معلقة (Widget) هتروح تشتري واحدة من السوبر ماركت (بدون const)، هتتعب وتاخد وقت. لكن لو جبتهم مرة واحدة وحطيتهم في الدرج (const)، هتستخدمهم على طول والمطبخ هيفضل مرتب وسريع.",
+      keyPoints: [
+        "Use 'const' constructors aggressively",
+        "Extract Widgets instead of extracting as methods",
+        "Avoid heavy synchronous work in the main thread (Use Isolates)",
+        "Use the DevTools Performance View to detect UI jank"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// BAD: Rebuilds every time the parent rebuilds
+Widget buildHeader() {
+  return Text("Hello", style: TextStyle(fontSize: 20));
+}
+
+// GOOD: Flutter caches this and doesn't rebuild it
+class HeaderWidget extends StatelessWidget {
+  const HeaderWidget({Key? key}) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    return const Text("Hello", style: TextStyle(fontSize: 20));
+  }
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Performance",
+        question: "Why is extracting a UI component into a separate Widget class better than extracting it into a method?",
+        questionAr: "لماذا يُفضل فصل الـ UI في (Class) بدلاً من (دالة Method) ترجع Widget؟",
+        difficulty: 2,
+        expectedAnswer: {
+          points: [
+            "عندما تستخدم (Method)، إذا تم تحديث الفئة الأب (Parent)، سيتم إعادة رسم وتنفيذ جميع الدوال بداخلها.",
+            "عند استخدام (Class Widget) مستقل وإعطائه 'const' أو الاستفادة من الـ (Widget Tree caching)، فلاتر يكون ذكياً لتخطي إعادة رسم هذا المكون إذا لم تتغير مدخلاته."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["التأكد أنك لست مجرد مبرمج يركب شاشات، بل تهتم بتجربة المستخدم السلسة (60-120 fps)."],
+      redFlags: ["الجهل بأداة (Flutter DevTools) أو معمارية الـ Widget Tree وكيفية تجنب الـ Rebuilds."],
+      greenFlags: ["ذكر تقنيات متقدمة مثل RepaintBoundary أو استخدام CustomPainter للأشكال المعقدة بدلاً من وجات كثيرة متداخلة."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-widgets-basics"],
+      nextSteps: [{ id: "122", title: "ListView vs ListView.builder" }],
+      related: ["flutter-isolates"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "تجاهل التحذيرات (Lints) المتعلقة بـ const.",
+        whyWrong: "لأنها أسهل طريقة مجانية لتحسين الأداء. تجاهلها يعني أن التطبيق سيعيد بناء نصوص وأيقونات ثابتة مئات المرات بدون داع.",
+        correctApproach: "تفعيل (flutter_lints) والالتزام بحل كل تحذيرات الـ const rules."
+      }
+    ]
+  },
+  {
+    id: "122",
+    title: "ListView vs ListView.builder",
+    titleAr: "الفرق بين ListView و ListView.builder",
+    level: "9",
+    category: "App Performance",
+    tags: ["Performance", "ListView", "Lists", "Lazy Loading"],
+    definition: {
+      summary: "كلاهما يُستخدم لعرض القوائم، ولكن `ListView.builder` يمتلك ميزة (Lazy Loading) ولا يقوم ببناء العناصر إلا عند ظهورها على الشاشة.",
+      detailed: "عند استخدام `ListView` (أو `SingleChildScrollView` مع `Column`)، يقوم فلاتر ببناء جميع العناصر الموجودة في القائمة فوراً ووضعها في الذاكرة حتى لو كانت 1000 عنصر غير مرئية. أما `ListView.builder`، يسمح لفلاتر أن يبني (ينشئ) فقط العناصر المرئية حالياً على الشاشة بالإضافة للمخفية مباشرة (Cache Extent). وعند النزول للأسفل، يتم تدمير العناصر العلوية وإعادة تدويرها لبناء العناصر السفلية.",
+      analogy: "الـ `ListView` العادي زي إنك تطبخ 1000 وجبة مرة واحدة وتحطهم على الترابيزة للضيوف (مفيش مكان وهيبوظوا). الـ `builder` زي البوفيه المفتوح: بتطبخ وتطلع على قد سحب الضيوف، ولو حد طلب زيادة بتعمله (Lazy Loading)، فكده بتوفر مجهود ومكان.",
+      keyPoints: [
+        "ListView constructs all children at once (Bad for large lists)",
+        "ListView.builder constructs children lazily on demand (Good for infinite lists)",
+        "ListView.separated is like builder but with built-in dividers between items",
+        "Uses 'itemBuilder' and takes 'itemCount'"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// BAD: Loads 10,000 widgets into memory at once!
+ListView(
+  children: List.generate(10000, (index) => Text('Item $index')),
+);
+
+// GOOD: Only loaded when scrolled into view (Lazy)
+ListView.builder(
+  itemCount: 10000,
+  itemBuilder: (context, index) {
+    return Text('Item $index');
+  },
+);`
+      }
+    },
+    questions: [
+      {
+        type: "Performance",
+        question: "When would you prefer using a normal ListView over a ListView.builder?",
+        questionAr: "متى تفضل استخدام ListView العادية على ListView.builder؟",
+        difficulty: 1,
+        expectedAnswer: {
+          points: [
+            "عندما يكون لدينا عدد قليل جداً ومحدود من العناصر الثابتة (مثلاً 5 اختيارات في شاشة الإعدادات).",
+            "لا يوجد داعي لكتابة الكود الإضافي الخاص بـ itemCount و itemBuilder في حالة القوائم الصغيرة الثابتة."
+          ],
+          timeToAnswer: "1 min"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["قياس فهمك لمفهوم הـ (Lazy loading) وإدارة الموارد (Resource Management)."],
+      redFlags: ["استخدام SingleChildScrollView + Column مع بيانات تأتي من API (غير محدودة العدد)."],
+      greenFlags: ["معرفة ميزة الـ `cacheExtent` وكيفية التحكم في عدد العناصر المحملة مسبقاً قبل ظهورها."]
+    },
+    linkedCards: {
+      prerequisites: ["121"],
+      nextSteps: [{ id: "123", title: "Isolate and Event Loop" }],
+      related: ["flutter-widgets-basics"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "نسيان تمرير itemCount לـ ListView.builder.",
+        whyWrong: "بدون تحديده، ستستمر القائمة بلا نهاية، مما قد يسبب أخطاء OutOfBounds إذا حاول الكود الوصول لبيانات غير موجودة في المصفوفة الأساسية.",
+        correctApproach: "دائماً حدد itemCount = array.length، إلا إذا كنت تبني Infinite Scroll بآلية تحميل صفحات (Pagination)."
+      }
+    ]
+  },
+  {
+    id: "123",
+    title: "Isolate and Event Loop",
+    titleAr: "العزل (Isolate) ودورة الأحداث (Event Loop)",
+    level: "9",
+    category: "App Performance",
+    tags: ["Concurrency", "Isolate", "Event Loop", "compute", "Performance"],
+    definition: {
+      summary: "Dart هي لغة تعمل على خيط واحد (Single-threaded). الـ Event Loop هو ما ينظم تنفيذ الأكواد المتزامنة والغير متزامنة، والـ Isolates هي طريقة Dart لتشغيل الأكواد الحسابية الضخمة في خيوط منفصلة (Threads).",
+      detailed: "- **Event Loop**: ينظم الأحداث (كالضغط على زر) والـ (Futures) في طابور. إذا كان هناك عملية حسابية معقدة (مليون عملية جمع)، سيتعطل الطابور ويتجمد הـ UI (Jank).\n- **Isolate**: هو خيط تشغيل منفصل (Worker) يمتلك (Memory) خاص به تماماً لا يشاركها مع الـ Isolate الأساسي، ويتواصلان فقط عبر إرسال الرسائل (Messages/Ports). نستخدمه للحسابات العنيفة Parsing Large JSONs أو معالجة الصور لكي لا يتأثر سلاسة הـ UI.",
+      analogy: "الـ Event Loop زي (صراف البنك) اللي واقف على شباك واحد بيخلص المعاملات بالترتيب بسرعة. لكن لو جاله عميل معاه 10 مليون جنيه فكة عايز يعدهم (عملية ضخمة)، كل الطابور هيتعطل. الحل إيه؟ الصراف هينادي على (موظف تاني - Isolate) يقعد في أوضة تانية يعدهم براحته ولما يخلص يبعتله مسدج بالرقم النهائي، وبكده الطابور (الـ UI) يفضل ماشي.",
+      keyPoints: [
+        "Dart is Single-Threaded by default",
+        "Event Loop handles microtasks and events queues",
+        "Isolates do not share memory; they communicate via Ports",
+        "Use 'compute()' or 'Isolate.run()' for quick background processing"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// BAD: This freezes the UI for a few seconds!
+int heavyComputation() {
+  int sum = 0;
+  for (int i = 0; i < 1000000000; i++) sum++;
+  return sum;
+}
+
+// GOOD: Runs in a separate Isolate, UI stays smooth
+Future<int> runHeavyInIsolate() async {
+  // compute() is a helper to easily run a function in an Isolate
+  return await compute(heavyComputation, null);
+  // In Dart 2.19+, use Isolate.run(() => heavyComputation());
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Concurrency",
+        question: "Explain the difference between a Future/async and an Isolate.",
+        questionAr: "اشرح الفرق بين الـ Future/async والـ Isolate.",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "الـ Future أو Async لا ينشئ خيطاً (Thread) جديداً. هو مجرد ترتيب للأحداث في الخيط الواحد؛ بمعنى 'قم بعمل كذا، وأكمل باقي الطابور، وعندما ينتهي الأمر سأنجزه'.",
+            "الـ Isolate ينشئ خيطاً حقيقياً مختلفاً في المعالج (CPU Thread) بذاكرة منفصلة للقيام بعمليات حسابية دون إشغال الخيط الأساسي الخاص بالـ UI."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["معرفة الفرق الحقيقي بين الـ Concurrency (تعدد المهام في وقت واحد - Event Loop) والـ Parallelism (التوازي الفعلي - Isolates)."],
+      redFlags: ["الاعتقاد بأن أي دالة تبدأ بـ Future فهي تعمل في الخلفية ولا تجمد التطبيق."],
+      greenFlags: ["ذكر التحديثات الأخيرة في دارت مثل Isolate.run() ومدى سهولتها مقارنة בـ Ports."]
+    },
+    linkedCards: {
+      prerequisites: ["dart-futures"],
+      nextSteps: [{ id: "124", title: "Networking: Dio vs http" }],
+      related: ["flutter-ui-rendering"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "عمل Isolate لكل عملية بسيطة (مثل استدعاء API عادي).",
+        whyWrong: "الـ Isolates تكلفتها عالية (Overhead) عند الإنشاء لأنها تحجز ذاكرة جديدة. استدعاء הـ API هو عملية I/O لا تجهد المعالج (CPU) بل تنتظر الشبكة فقط، والـ Event Loop (الـ Futures) كافية جداً وممتازة لها.",
+        correctApproach: "استخدام Isolates حصرياً لعمليات הـ Parsing (JSON الضخم) أو הـ Image Processing أو التشفير الثقيل."
+      }
+    ]
+  },
+  {
+    id: "124",
+    title: "Networking: Dio vs http",
+    titleAr: "الشبكات: الفرق بين حزمة Dio و http",
+    level: "9",
+    category: "Networking",
+    tags: ["Networking", "API", "Dio", "http"],
+    definition: {
+      summary: "مقابلة بين مكتبتي التعامل مع الشبكات الأبرز في Flutter لطلب الـ APIs والبيانات.",
+      detailed: "حزمة `http` التابعة لدعم Dart الأساسي هي الأصغر والأبسط وتقدم المهام الأساسية (GET, POST). بينما `Dio` هي حزمة قوية جداً من طرف ثالث تقدم ميزات متقدمة خارج الصندوق لا توجد في `http`، مثل: Interceptors (الاعتراضات)، Download/Upload Progress (متابعة نسبة التحميل)، FormData (رفع الملفات المعقدة)، وإلغاء الطلبات المتزامنة.",
+      analogy: "حزمة `http` زي العجلة، هتوصلك للمكان اللي إنت عايزه، بسيطة وصيانتها سهلة. أما `Dio` زي العربية الفل-أوبشن، فيها تكييف وGPS ومتابعة للاستهلاك (Progress) وتحكم في الطريق (Interceptors). لو مشوارك بسيط، العجلة تكفي، لكن للسفر (تطبيق ضخم) هتحتاج العربية.",
+      keyPoints: [
+        "http plugin: lightweight, maintained by dart.dev, good for simple requests",
+        "Dio plugin: full-featured, supports Interceptors, global configuration, Form-Data",
+        "Dio natively handles JSON-parsing automatically for the response",
+        "Dio supports Request Cancellation (CancelToken)"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// === Using HTTP ===
+final response = await http.get(Uri.parse('https://api.com/users'));
+if (response.statusCode == 200) {
+  // Manual decoding
+  final data = jsonDecode(response.body); 
+}
+
+// === Using DIO ===
+final dio = Dio(BaseOptions(baseUrl: 'https://api.com/'));
+// No need for manual jsonDecode!
+final response = await dio.get('/users'); 
+print(response.data); // data is already a Map/List`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture",
+        question: "Is it a good idea to directly use Dio inside your UI layer?",
+        questionAr: "هل من الجيد استخدام كائن Dio مباشرة بداخل طبقة واجهة المستخدم (UI)؟",
+        difficulty: 2,
+        expectedAnswer: {
+          points: [
+            "لا، هذا يكسر مبدأ الـ Separation of Concerns.",
+            "يجب تغليف عمليات הـ API داخل Data Layer أو (Repository) وتجهيزها في Models وإرجاعها לـ Bloc.",
+            "هذا يسهل التعديل مستقبلاً إذا قررت الشركة تغيير Dio والعودة לـ http أو graphql دون تعديل مئات الشاشات المكتوبة بـ Flutter."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["تقييم خبرتك في التعامل مع הـ APIs وتجهيز البنية التحتية لتطبيقات الـ Enterprise."],
+      redFlags: ["الاعتماد على http في مشاريع ضخمة بها رفع ملفات وشاشات تقدم (Progress)، وإعادة اختراع العجلة بكتابة كود معقد يدوياً."],
+      greenFlags: ["إبراز الفهم لخيارات النطاق العالي مثل الـ Timeout configurations والـ Interceptors."]
+    },
+    linkedCards: {
+      prerequisites: ["123"],
+      nextSteps: [{ id: "125", title: "Interceptors in Dio" }],
+      related: ["flutter-clean-architecture"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "إنشاء Instance جديد من `Dio()` قبل كل طلب API مباشر (Dio().get(...)).",
+        whyWrong: "هذا يضيع موارد التطبيق ولا يسمح لك بالاستفادة من الـ BaseOptions الشاملة (مثل وضع Token موحدة للكل) או الـ Connection pooling.",
+        correctApproach: "استخدام Singleton او تمرير الـ Dio عن طريق Dependency Injection لاستخدامه طوال دورة حياة التطبيق."
+      }
+    ]
+  },
+  {
+    id: "125",
+    title: "Interceptors in Dio",
+    titleAr: "المعترضات (Interceptors) في Dio",
+    level: "9",
+    category: "Networking",
+    tags: ["Networking", "Dio", "API", "Interceptors", "Tokens"],
+    definition: {
+      summary: "هي طريقة لاعتراض أو تعديل الطلبات (Requests) أو الإجابات (Responses) أو الأخطاء (Errors) قبل وصولها للخادم أو قبل وصولها إلى كود التطبيق الأساسي.",
+      detailed: "في Dio، يمكنك إضافة Interceptors للقيام بمهام دورية. مثلاً: في `onRequest` يمكنك أخذ الـ Token من الذاكرة اللوكال وإضافته للـ Headings تلقائياً لكل طلب بدلاً من كتابته 100 مرة. وفي `onResponse` يمكنك تسجيل (Log) النتائج للمراقبة. وفي `onError` يمكنك التقاط رقم الخطأ (مثلاً 401 Unauthorized) وتوجيه المستخدم لتسجيل الدخول من جديد وتجديد הـ Token (Refresh Token).",
+      analogy: "الـ Interceptor زي (بوابة التفتيش والجمارك) في المطار. أي طلب (مسافر) خارج من الموبايل للنت هيتفتش ويتختم باسبوره (يتحطله الـ Token). وأي رد (بضاعة) راجعة من النت هتتفحص، ولو فيها مشكلة أو باظت (Error) بتتصادر وتبعت رسالة للمدير (UI Message) من البوابة مباشرة.",
+      keyPoints: [
+        "Sits between your app and the network",
+        "onRequest: Add Headers, Auth Tokens, Base URLs dynamically",
+        "onResponse: Parse global data, logs, map responses",
+        "onError: Handle Global API errors like 401 or timeout and trigger 'Refresh Token' logic"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `dio.interceptors.add(
+  InterceptorsWrapper(
+    onRequest: (options, handler) async {
+      // 1. Add Token to Headers automatically
+      final token = await getLocalToken();
+      options.headers['Authorization'] = 'Bearer $token';
+      return handler.next(options); 
+    },
+    onResponse: (response, handler) {
+      // 2. Global Logging
+      print('Received: \${response.statusCode}');
+      return handler.next(response); 
+    },
+    onError: (DioException e, handler) {
+       // 3. Global Error Handling
+       if(e.response?.statusCode == 401) {
+         // handle refresh token automatically
+       }
+       return handler.next(e);
+    },
+  )
+);`
+      }
+    },
+    questions: [
+      {
+        type: "Networking",
+        question: "How would you handle a 'Refresh Token' logic transparently to the user?",
+        questionAr: "كيف تدير منطق 'تجديد الرمز - Refresh Token' بشكل خفي دون أن يشعر المستخدم؟",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "باستخدام (Interceptor). عندما يأتي الرد بخطأ 401 (غير مصرح)، نقوم بإيقاف (Pause/Lock) كل الطلبات القادمة.",
+            "نرسل طلب خلفي (Background Request) للـ API للحصول على الـ Token الجديد باستخدام الـ Refresh token المحفوظ.",
+            "إذا نجح، نقوم بتحديث הـ Token في הـ Storage، ونحدث الـ Headers للطلبات، ثم نقوم بفتح القفل وإعادة المحاولة للطلب الفاشل (Retry Request) دون أن يشعر المستخدم (UI) بأي خطأ."
+          ],
+          timeToAnswer: "3 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["أنت كمرشح Senior/Mid، هل قمت بحل مشاكل الأمن (Security & Tokens) المعقدة أم لا؟"],
+      redFlags: ["كتابة كود فحص הـ Token بداخل כל Repository على حدة (تكرار هائل للكود)."],
+      greenFlags: ["ذكر كلمة Queuing أو Locking أثناء تجديد הـ Token حتى لا تقوم 5 طلبات متزامنة بتجديد التوكن في نفس اللحظة."]
+    },
+    linkedCards: {
+      prerequisites: ["124"],
+      nextSteps: [],
+      related: ["flutter-clean-architecture"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "عمل Refresh Token logic بداخل الـ Bloc أو הـ UI Component.",
+        whyWrong: "لأن عملية الـ Auth State يجب أن تكون مدعومة من جذور الشبكة (Network layer). اگر قمت بوضعها في طبقة التقديم (UI)، لن يمكنك تكرارها بسهولة لشاشات أخرى وسيتداخل منطق الواجهة مع منطق الشبكة.",
+        correctApproach: "اجعل الـ Interceptor هو المدير الخفي لهذا التجديد، وابعث Event לـ AuthBloc فقط אם انتهى عمر הـ Refresh Token تماماً (لإجبار تسجيل خروج)."
+      }
+    ]
+  },
+  {
+    id: "126",
+    title: "JSON Serialization: Manual vs Code Gen",
+    titleAr: "تحويل البيانات (JSON Serialization): يدوي أم مولد كود؟",
+    level: "9",
+    category: "Networking",
+    tags: ["Networking", "JSON", "json_serializable", "Code Generation"],
+    definition: {
+      summary: "هي عملية تحويل الـ JSON (Map) إلى Dart Objects والعكس، وتتم إما يدوياً أو باستخدام أدوات توليد الكود.",
+      detailed: "1. **Manual Serialization**: تقوم بكتابة دالة `fromJson` و `toJson` بنفسك. جيدة للمشاريع الصغيرة، لكنها عرضة للأخطاء (Typo) وصعبة الصيانة.\n2. **Code Generation (e.g., json_serializable)**: تستخدم Annotation مثل `@JsonSerializable()` وتقوم الأداة بتوليد الكود الممل (Boilerplate) نيابة عنك. هي الأفضل للمشاريع الكبيرة لضمان الدقة والسرعة وتجنب أخطاء الكتابة.",
+      analogy: "تخيل إنك بتملا استمارة بيانات (JSON) وبتحولها لملف موظف (Object). اليدوي: إنت اللي بتنقل كل خانة بإيدك، لو سرحت للحظة هتكتب رقم التليفون مكان الاسم. المولد (Auto): جهاز سكنر بياخد النسخة ويطلعلك الملف جاهز ومظبوط 100% بدون تدخل منك.",
+      keyPoints: [
+        "Manual is quick for small tasks but unscalable",
+        "Code generation ensures type safety and prevents typos",
+        "json_serializable is the industry standard for production apps",
+        "Requires 'build_runner' to generate the .g.dart files"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Using json_serializable
+@JsonSerializable()
+class User {
+  final String name;
+  final String email;
+
+  User(this.name, this.email);
+
+  // This boilerplate is generated automatically!
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  Map<String, dynamic> toJson() => _$UserToJson(this);
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture",
+        question: "When should you switch from manual JSON parsing to an automated tool?",
+        questionAr: "متى يجب عليك الانتقال من التحويل اليدوي إلى استخدام أدوات آلية؟",
+        difficulty: 2,
+        expectedAnswer: {
+          points: [
+            "عندما يتجاوز عدد الـ Models في التطبيق 5-10 ملفات.",
+            "عندما يكون الـ JSON معقد ومتداخل (Nested Objects).",
+            "لتقليل الوقت الضائع في صيانة الدوال اليدوية كلما تغير الـ API من جهة الـ Backend."
+          ],
+          timeToAnswer: "1 min"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل تهتم بجودة الكود (Code Quality) وتقليل الـ Human Errors؟"],
+      redFlags: ["الاصرار على الطريقة اليدوية في مشاريع ضخمة جداً."],
+      greenFlags: ["ذكر حزم أخرى مثل Freezed التي تجمع بين التجميد (Immutability) والتحويل (Serialization)."]
+    },
+    linkedCards: {
+      prerequisites: ["124"],
+      nextSteps: [{ id: "127", title: "Local Databases Comparison" }],
+      related: ["flutter-clean-architecture"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "نسيان تشغيل `watch` أو `build` في الـ build_runner بعد تعديل الـ Model.",
+        whyWrong: "سيؤدي ذلك لظهور أخطاء Compile-time لأن ملفات الـ .g.dart قديمة ولا تطابق التعديلات الجديدة.",
+        correctApproach: "تشغيل `dart run build_runner watch` أثناء العمل ليتم التحديث تلقائياً."
+      }
+    ]
+  },
+  {
+    id: "127",
+    title: "Local Databases Comparison",
+    titleAr: "مقارنة قواعد البيانات المحلية (Local Storage)",
+    level: "9",
+    category: "Data Storage",
+    tags: ["Storage", "SQLite", "Hive", "SharedPrefs", "SecureStorage"],
+    definition: {
+      summary: "هناك عدة طرق لتخزين البيانات محلياً، تختلف حسب نوع وحجم البيانات ومستوى الأمان المطلوب.",
+      detailed: "1. **Shared Preferences**: للقيم البسيطة (Key-Value) كالإعدادات.\n2. **Flutter Secure Storage**: مثل SharedPreferences ولكن مشفرة، للـ Tokens والبيانات الحساسة.\n3. **SQLite (sqflite)**: قاعدة بيانات علائقية كاملة، ممتازة للبيانات الضخمة والمعقدة والروابط بين الجداول.\n4. **Hive**: قاعدة بيانات NoSQL سريعة جداً مكتوبة بـ Dart، تعمل بشكل رائع للـ Caching والبيانات الغير مرتبطة بجداول معقدة.",
+      analogy: "تخيل تخزين أغراضك:\n- `SharedPrefs`: جيب بنطلونك (للمفاتيح والعملات البسيطة).\n- `SecureStorage`: خزنة بكلمة سر (للباسبور والفلوس).\n- `SQLite`: أرشيف حكومي ضخم بملفات ورفوف منظمة (للملفات المرتبطة ببعض).\n- `Hive`: شنطة سفر سريعة الفتح، بترمي فيها الهدوم وتطلعها في ثانية (لبيانات سريعة ومتنوعة).",
+      keyPoints: [
+        "SharedPrefs is for simple flags (settings, theme)",
+        "SecureStorage encrypts data automatically",
+        "SQLite is relational, supports SQL queries, ACID compliant",
+        "Hive is ultra-fast NoSQL and works on Web without special config"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Typical SQL query in sqflite
+await db.rawQuery('SELECT * FROM Users WHERE id = ?', [1]);
+
+// Typical Hive access
+var box = Hive.box('settings');
+box.put('theme', 'dark');`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture",
+        question: "Which database would you choose for a WhatsApp-like chat application? Why?",
+        questionAr: "أي قاعدة بيانات تختار لتطبيق محادثات مثل واتساب؟ ولماذا؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "يفضل SQLite (sqflite) لأن المحادثات والرسائل والملفات تمتلك روابط معقدة (Relations).",
+            "تحتاج إلى البحث السريع والفرز (Sorting) ودعم الـ ACID لضمان عدم ضياع أي رسالة أثناء الحفظ العشوائي."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["قدرتك على الاختيار التقني الصحيح بناءً على حالة الاستخدام (Use Case)."],
+      redFlags: ["استخدام Shared Preferences لتخزين قائمة كاملة من 1000 منتج (ستكون بطيئة جداً)."],
+      greenFlags: ["ذكر Realm أو Isar كبدائل حديثة وقوية لـ Hive و SQLite."]
+    },
+    linkedCards: {
+      prerequisites: ["121"],
+      nextSteps: [{ id: "128", title: "WebSockets vs REST" }],
+      related: ["flutter-clean-architecture"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "حفظ صور كاملة (Base64) داخل SharedPreferences.",
+        whyWrong: "هذا يبطئ التطبيق بشكل مرعب وقد يسبب تجميد UI لأن SharedPreferences تحمل جميع بياناتها في الذاكرة عند البدء.",
+        correctApproach: "حفظ الصور كملفات في الـ Disk وحفظ المسار (Path) فقط في قاعدة البيانات."
+      }
+    ]
+  },
+  {
+    id: "128",
+    title: "WebSockets vs REST",
+    titleAr: "الفرق بين WebSockets و REST",
+    level: "9",
+    category: "Networking",
+    tags: ["Networking", "WebSocket", "REST", "Real-time"],
+    definition: {
+      summary: "REST هو نظام طلب ورد (Request-Response) تقليدي، بينما WebSocket هو اتصال مفتوح دائم يسمح بإرسال واستقبال البيانات في أي لحظة (Real-time).",
+      detailed: "- **REST**: العميل يطلب، الخادم يرد، ثم ينقطع الاتصال. مثالي لجلب قائمة منتجات أو تفاصيل ملف شخصي.\n- **WebSocket**: العميل والخادم يفتحان قناة اتصال واحدة تظل مفتوحة. يمكن للخادم إرسال بيانات للعميل دون أن يطلبها (Server Push). مثالي للدردشة، تتبع السيارة في الخريطة، أو أسعار البورصة اللحظية.",
+      analogy: "REST زي لما تبعت جواب (Letter) لواحد وتقعد تستنى رده، الجواب بيروح ويجي وخلاص. الـ WebSocket زي مكالمة تليفون مفتوحة (Phone Call)، إنتو الاتنين سامعين بعض وبتردوا على بعض في نفس اللحظة من غير ما تقفلوا الخط.",
+      keyPoints: [
+        "REST is stateless and follows HTTP methods (GET, POST)",
+        "WebSocket is stateful and bidirectional (Bi-directional)",
+        "REST overhead is higher for frequent updates due to headers",
+        "WebSockets are efficient for high-frequency data (Live updates)"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Simple WebSocket usage in Dart
+final channel = WebSocketChannel.connect(
+  Uri.parse('wss://echo.websocket.events'),
+);
+
+channel.stream.listen((message) {
+  print('New server update: $message');
+});
+
+channel.sink.add('Hello Server!');`
+      }
+    },
+    questions: [
+      {
+        type: "Networking",
+        question: "When would WebSockets be overkill?",
+        questionAr: "متى يكون استخدام WebSockets مبالغاً فيه وغير ضروري؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "عندما لا يحتاج التطبيق إلى تحديثات لحظية (مثلاً تطبيق مدونة أو أخبار بسيطة).",
+            "عندما تكون الموارد على السيرفر محدودة (فتح آلاف قنوات الـ Socket يستهلك RAM السيرفر بشكل كبير مقارنة بـ REST)."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["معرفة مهاراتك في هندسة التواصل (Communication Architecture) وكيف تتعامل مع الـ Streams."],
+      redFlags: ["استخدام REST مع Timer (Polling) كل ثانية لجلب رسائل الشات (تكرار الطلبات يهلك البطارية والسيرفر)."],
+      greenFlags: ["ذكر Socket.io أو Pusher كحلول لإدارة الـ WebSockets بسهولة."]
+    },
+    linkedCards: {
+      prerequisites: ["dart-streams"],
+      nextSteps: [{ id: "129", title: "Security & SSL Pinning" }],
+      related: ["124"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "نسيان غلق الـ WebSocket sink عند إغلاق الشاشة أو التطبيق (dispose).",
+        whyWrong: "يؤدي ذلك لـ Memory Leaks واستهلاك مستمر للإنترنت والبطارية في الخلفية بدون داعٍ.",
+        correctApproach: "دائماً استدعِ `channel.sink.close()` بداخل الـ dispose الخاص بالـ Widget أو الـ Bloc."
+      }
+    ]
+  },
+  {
+    id: "129",
+    title: "SSL Pinning & App Security",
+    titleAr: "تثبيت الشهادة (SSL Pinning) وأمن التطبيق",
+    level: "9",
+    category: "Security",
+    tags: ["Security", "SSL Pinning", "HTTPS", "Man-in-the-middle"],
+    definition: {
+      summary: "هي عملية أمنية تجعل التطبيق يرفض الاتصال بأي سيرفر إلا إذا كانت شهادة الـ SSL الخاصة به مطابقة تماماً للنسخة المخزنة بداخل التطبيق.",
+      detailed: "تحمي هذه التقنية التطبيق من هجمات (Man-in-the-middle). فبدلاً من الوثوق بأي شهادة يوفرها نظام التشغيل، يثق التطبيق فقط في (البصمة - Fingerprint) الخاصة بسيرفرك. إذا حاول شخص اعتراض الاتصال بشهادة مزيفة، سيتوقف التطبيق عن العمل فوراً ولن يتم تسريب البيانات.",
+      analogy: "تخيل إنك بتسلم شنطة فلوس لواحد في المطار. الطريقة العادية: بتثق في أي حد لابس (يونيفورم المطار الرسمي). الـ SSL Pinning: إنت معاك (صورة باسبوره) الحقيقي، لو جه واحد لابس اليونيفورم بس وشه مش زي الصورة، مش هتسلم الفلوس وهتمشي، حتى لو اليونيفورم أصلي.",
+      keyPoints: [
+        "Prevents MITM (Man-in-the-middle) attacks",
+        "Trusts a specific certificate or public key instead of the OS root CAs",
+        "Commonly implemented in Dio using SslCertificateInterceptor or custom HttpClient",
+        "Security vs Flexibility: If certificate expires, app must be updated!"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Conceptual Dio SSL Pinning
+(dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate = (client) {
+  SecurityContext context = SecurityContext(withTrustedRoots: false);
+  // Add your server's .pem or .crt certificate here
+  context.setTrustedCertificatesBytes(myCertificateBytes);
+  return HttpClient(context: context);
+};`
+      }
+    },
+    questions: [
+      {
+        type: "Security",
+        question: "What is the biggest risk of implementing SSL Pinning?",
+        questionAr: "ما هو أكبر خطر عند تنفيذ الـ SSL Pinning؟",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "خطر انتهاء صلاحية الشهادة (Certificate Expiration).",
+            "إذا انتهت صلاحية الشهادة على السيرفر وتم تغييرها، سيتوقف التطبيق عن العمل تماماً لجميع المستخدمين ولن يتمكنوا من فتحه إلا بعد إصدار تحديث جديد للتطبيق بالشهادة الجديدة (Update is mandatory)."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["التأكد من أنك تعمل على تطبيقات آمنة (Banking, Fintech) وتدرك المخاطر الجسيمة لتسريب البيانات."],
+      redFlags: ["الجهل التام بـ SSL Pinning بالرغم من العمل في شركة حساسة."],
+      greenFlags: ["ذكر حل (Public Key Pinning) بدلاً من الشهادة الكاملة لتقليل الحاجة للتحديثات المتكررة."]
+    },
+    linkedCards: {
+      prerequisites: ["124"],
+      nextSteps: [{ id: "130", title: "App Size Optimization" }],
+      related: ["flutter-secure-storage"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "تخزين الشهادة في ملف سهل الوصول إليه بداخل الأصول (Assets) بدون تشفير إضافي أو obfuscation.",
+        whyWrong: "يسهل على المهاجمين استبدالها إذا تم فك ضغط الـ APK.",
+        correctApproach: "استخدام Obfuscation وتخزين الشهادة كـ Hex أو Bytes بداخل الكود المترمج."
+      }
+    ]
+  },
+  {
+    id: "130",
+    title: "App Size & Obfuscation",
+    titleAr: "حجم التطبيق وتغمية الكود (Obfuscation)",
+    level: "9",
+    category: "Optimization",
+    tags: ["Optimization", "App Size", "Obfuscation", "Security"],
+    definition: {
+      summary: "هي تقنيات لتقليل حجم ملف الـ APK/IPA النهائي وحماية الكود من المتسللين عبر تحويل أسماء الدوال والمتغيرات إلى رموز غير مفهومة.",
+      detailed: "1. **Obfuscation**: تحويل `fetchUserData()` إلى `a1()`. هذا يجعل عملية الـ Reverse Engineering للتطبيق صعبة جداً.\n2. **Size Optimization**: تشمل استخدام صور بصيغة `.webp` بدلاً من `.png` للتوفير، استخدام SVG للأيقونات، وتفعيل خاصية (Split APK) لإنتاج نسخ مخصصة لكل نوع معالج (arm64, arm-v7).",
+      analogy: "زي واحد بيبعت رسالة سرية (أبلكيشن). الأول بيصغر الحروف ويشيل المسافات الزيادة عشان الورقة تبقى صغيرة (Size). التاني بيكتبها بشفرة هو بس اللي فاهمها، ولو حد سرق الورقة مش هيفهم الكود مكتوب فيه إيه (Obfuscation).",
+      keyPoints: [
+        "Obfuscation makes reverse engineering significantly harder",
+        "Enable split-per-abi to reduce user download size",
+        "Use '--obfuscate --split-debug-info' flags during build",
+        "Analyze app size using 'flutter build apk --analyze-size'"
+      ],
+      codeExample: {
+        language: "bash",
+        code: `# Build with obfuscation and size analysis
+flutter build apk --obfuscate --split-debug-info=./debug --split-per-abi --analyze-size`
+      }
+    },
+    questions: [
+      {
+        type: "Optimization",
+        question: "How do you identify what is making your Flutter app heavy?",
+        questionAr: "كيف يمكنك تحديد الأشياء التي تجعل حجم تطبيق فلاتر ضخماً؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "باستخدام أمر `--analyze-size` عند البناء، سيصدر فلاتر ملف JSON يوضح بدقة نسبة كل جزء (Assets, Code, Engine) من إجمالي الحجم.",
+            "غالباً ما تكون الصور (Assets) والخطوط (Fonts) هي السبب، والحل هو ضغطها أو تحميلها من الإنترنت عند الحاجة."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["تأكيد أنك مبرمج محترف تهتم بـ User Acquisition؛ لأن المستخدم ينفر من التحميل إذا كان حجم التطبيق 200MB."],
+      redFlags: ["عدم معرفة أن فلاتر تدعم Split APK وتنتج ملفات صغيرة."],
+      greenFlags: ["ذكر فكرة (Dynamic Delivery) أو تحميل الـ Assets أونلاين."]
+    },
+    linkedCards: {
+      prerequisites: ["121"],
+      nextSteps: [{ id: "131", title: "Custom Painters & Canvas" }],
+      related: ["flutter-build-system"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "نسيان حفظ ملف `mapping.txt` بعد عملية الـ Obfuscation.",
+        whyWrong: "بدون هذا الملف، إذا حدث كراش (Crash) عند مستخدم، ستظهر لك التقارير برموز مثل `a.b.c:12` ولن تفهم أين الخطأ الحقيقي.",
+        correctApproach: "احتفظ بالـ Mapping file لكل إصدار ترفعه للمتجر لفك تشفير تقارير الأخطاء."
+      }
+    ]
+  },
+  {
+    id: "131",
+    title: "Custom Painters & Canvas",
+    titleAr: "الرسم المخصص (Custom Painters) والكانفاس",
+    level: "9",
+    category: "Advanced UI",
+    tags: ["UI", "CustomPainter", "Canvas", "Graphics"],
+    definition: {
+      summary: "هي طريقة للرسم اليدوي المباشر على الشاشة باستخدام الإحداثيات (Coordinates) والأشكال الهندسية، بعيداً عن الـ Widgets الجاهزة.",
+      detailed: "عندما لا تكفي الـ Widgets العادية (مثل Container أو Stack) لعمل شكل معقد جداً (مثل رسم بياني منحني أو شكل هندسي غير منتظم)، نستخدم `CustomPainter`. نوفر دالة `paint` التي تعطيك `Canvas` (لوحة الرسم) و `Paint` (الفرشاة) لرسم خطوط، دوائر، مسارات (Paths)، وصور بدقة عالية وأداء ممتاز.",
+      analogy: "الـ Widgets العادية زي مكعبات (Lego)، بتركبها فوق بعض عشان تطلع شكل. الـ CustomPainter زي (لوحة كانفاس وفرشاة)، إنت اللي بترسم كل خط ونقطة وميل بإيدك عشان تطلع لوحة فنية مش موجودة في المكعبات الجاهزة.",
+      keyPoints: [
+        "Used for highly complex/non-standard UIs",
+        "Uses Canvas API (drawLine, drawPath, drawCircle)",
+        "Must implement shouldRepaint for performance optimization",
+        "Runs on the engine floor, making it very performant"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `class MyPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()..color = Colors.blue..strokeWidth = 5;
+    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}`
+      }
+    },
+    questions: [
+      {
+        type: "UI/UX",
+        question: "When should you NOT use a CustomPainter?",
+        questionAr: "متى يجب عليك ألا تستخدم CustomPainter؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "إذا كان يمكن تحقيق التصميم باستخدام الـ Widgets العادية (Container, Stack, ClipPath).",
+            "لأن الـ CustomPainter يحتاج مجهود أكبر في الصيانة والحسابات الرياضية للإحداثيات وتفاعلات اللمس (Hit Testing)."
+          ],
+          timeToAnswer: "1.5 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل تمتلك مهارات رياضية وتصميمية عميقة لبناء ماركات (Brands) فريدة وتصميمات معقدة؟"],
+      redFlags: ["عدم القدرة على شرح كيفية تحسين الأداء (Repainting) بداخل الرسام المخصص."],
+      greenFlags: ["ذكر استخدام Rive أو Lottie كبدائل للرسومات المتحركة المعقدة."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-widgets-basics"],
+      nextSteps: [{ id: "132", title: "Method Channels" }],
+      related: ["121"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "إرجاع `true` دائماً في دالة `shouldRepaint`.",
+        whyWrong: "يؤدي ذلك لإعادة رسم اللوحة في كل إطار (Frame) حتى لو لم تتغير البيانات، مما يستهلك المعالج والبطارية.",
+        correctApproach: "قارن البيانات القديمة بالجديدة وأرجع `true` فقط إذا كان هناك تغيير فعلي يستدعي الرسم."
+      }
+    ]
+  },
+  {
+    id: "132",
+    title: "Method Channels (Native Integration)",
+    titleAr: "قنوات التواصل مع النظام (Method Channels)",
+    level: "10",
+    category: "Platform Integration",
+    tags: ["Native", "Android", "iOS", "Kotlin", "Swift", "MethodChannel"],
+    definition: {
+      summary: "هي جسر تواصل يسمح لـ Flutter باستدعاء كود مكتوب بلغات النظام الأم (Kotlin/Java للاندرويد، Swift/Obj-C للـ iOS).",
+      detailed: "عندما تحتاج لميزة موجودة في نظام التشغيل وليس لها باكج جاهزة (مثل بصمة وجه متقدمة جداً، أو تواصل مع هاردوير خاص)، تفتح (نفق) يسمى `MethodChannel`. ترسل رسالة من Dart باسم دالة معينة، يستقبلها كود النظام الأم، ينفذها، ثم يرسل الرد مرة أخرى لـ Flutter.",
+      analogy: "تخيل إنك في مطعم صيني في مصر. الشيف في المطبخ بيكلم صيني (Native Code) وإنت بره بتتكلم عربي (Flutter/Dart). الـ Method Channel هي (المترجم) اللي بياخد طلبك بالعربي ويوصله للشيف بالصيني ويرجعلك بالأكلة (النتيجة) اللي طلبتها.",
+      keyPoints: [
+        "Asynchronous communication between Dart and Native",
+        "Used for platform-specific APIs (Battery level, Sensors, etc.)",
+        "Requires knowledge of Kotlin/Swift or hiring native devs",
+        "Data is serialized using StandardMessageCodec"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Dart Side
+static const platform = MethodChannel('samples.flutter.dev/battery');
+final int result = await platform.invokeMethod('getBatteryLevel');
+
+// Native Side (Kotlin)
+MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler {
+  call, result -> if (call.method == "getBatteryLevel") { ... }
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Native",
+        question: "Why should you use an EventChannel instead of a MethodChannel?",
+        questionAr: "لماذا قد تستخدم EventChannel بدلاً من MethodChannel؟",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "تستخدم MethodChannel لطلب واحد ورد واحد (One-time).",
+            "تستخدم EventChannel لبث البيانات المستمر (Streaming)، مثل قراءة نبضات القلب المستمرة أو إحداثيات الـ GPS المتغيرة لحظياً من النظام للأبلكيشن."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل أنت مطور فلاتر 'شامل' (Full-track) يفهم كيف يعمل الموبايل من الداخل أم مجرد شخص يحرك Widgets؟"],
+      redFlags: ["الخوف من فتح مجلد `android` أو `ios` والتعديل فيه."],
+      greenFlags: ["معرفة بـ Pigeon كأداة لتوليد كود الـ Native Channels بشكل آمن النوع (Type-safe)."]
+    },
+    linkedCards: {
+      prerequisites: ["dart-async"],
+      nextSteps: [{ id: "133", title: "Flutter Web & Responsive" }],
+      related: ["flutter-architecture"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "إرسال كميات ضخمة جداً من البيانات (مثل صور خام) عبر الميثود تشانل.",
+        whyWrong: "عملية التشفير وفك التشفير (Serialization) بين Dart والـ Native بطيئة جداً للملفات الضخمة وتسبب تعليق (Jank) في الواجهة.",
+        correctApproach: "أرسل مسار الملف (File Path) وتعامل معه مباشرة في الجانبين."
+      }
+    ]
+  },
+  {
+    id: "133",
+    title: "Flutter Web: Responsive vs Adaptive",
+    titleAr: "فلاتر للويب: الفرق بين المتجاوب والمتكيف",
+    level: "9",
+    category: "Web & Multi-platform",
+    tags: ["Web", "Responsive", "Adaptive", "Layout"],
+    definition: {
+      summary: "فلاتر تسمح بتشغيل نفس الكود على الويب، ولكنها تتطلب تفكيراً مختلفاً في كيفية ظهور الواجهة على الشاشات الكبيرة والصغيرة.",
+      detailed: "1. **Responsive (متجاوب)**: تغيير حجم وتصميم الواجهة بناءً على حجم الشاشة (استخدام `LayoutBuilder`).\n2. **Adaptive (متكيف)**: تغيير سلوك وشكل الـ Widgets بناءً على (نوع الجهاز)؛ مثلاً: إظهار Material Switch على أندرويد و Cupertino Switch على آيفون، أو إظهار Menu بار في الويب و NavigationBar في الموبايل.",
+      analogy: "- الـ Responsive زي (الاستيك): بيمط ويصغر حسب المساحة المتاحة.\n- الـ Adaptive زي (الحرباء): بتغير جلدها تماماً وشكلها حسب البيئة (موبايل، تابلت، كمبيوتر) عشان تبان طبيعية في مكانها.",
+      keyPoints: [
+        "Use LayoutBuilder and MediaQuery for responsiveness",
+        "Use kIsWeb and Platform checks for adaptiveness",
+        "Flutter Web uses CanvasKit or HTML rendering",
+        "SEO is a challenge in Flutter Web compared to HTML-based sites"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `LayoutBuilder(
+  builder: (context, constraints) {
+    if (constraints.maxWidth > 600) {
+      return TabletLayout(); // Responsive switch
+    }
+    return MobileLayout();
+  },
+);`
+      }
+    },
+    questions: [
+      {
+        type: "Web/Architecture",
+        question: "When would you NOT recommend Flutter for a web project?",
+        questionAr: "متى لا تنصح باستخدام فلاتر لمشروع ويب؟",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "للمواقع التي تعتمد بشكل كلي على الـ SEO (مثل المدونات، المجلات الإخبارية، ومواقع التجارة العامة).",
+            "للمواقع التي تحتاج سرعة تحميل أولية (Initial Load) فائقة، لأن فلاتر ويب تحمل محرك الرسم بالكامل في البداية."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["مدى نضجك في اختيار الأداة المناسبة للمكان المناسب."],
+      redFlags: ["الاعنقاد بأن فلاتر ويب هي بديل مثالي لـ React أو Next.js في كل الحالات."],
+      greenFlags: ["ذكر أن فلاتر ويب ممتازة للـ Dashboards والـ Enterprise Apps (التي تستلزم تسجيل دخول)."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-widgets-basics"],
+      nextSteps: [{ id: "134", title: "Flutter Desktop" }],
+      related: ["121"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "استخدام HTML-only rendering لتطبيق به رسومات معقدة أو Animation.",
+        whyWrong: "سيظهر التطبيق بأداء سيء وخطوط غير واضحة. ",
+        correctApproach: "استخدام CanvasKit (Skia WebAssembly) للحصول على أفضل جودة وأداء، مع مراعاة زيادة حجم ملف التحميل قليلاً."
+      }
+    ]
+  },
+  {
+    id: "134",
+    title: "Flutter Desktop Basics",
+    titleAr: "أساسيات فلاتر لسطح المكتب (Desktop)",
+    level: "9",
+    category: "Multi-platform",
+    tags: ["Desktop", "Windows", "MacOS", "Linux", "Native Plugins"],
+    definition: {
+      summary: "فلاتر الآن مستقرة جداً لبناء تطبيقات لأنظمة Windows, MacOS, و Linux، مع إمكانية الوصول لميزات النظام الخاصة بالحواسيب.",
+      detailed: "تطبيقات الديسكطوب تختلف عن الموبايل في: أحجام الشاشات العملاقة، التفاعل بالماوس والكيبورد (Hotkeys)، القوائم العلوية (Context Menus)، والتعامل مع الملفات (File Picker) بشكل أوسع. فلاتر توفر ثباتاً ممتازاً وأداءً قريباً جداً من البرامج الأصلية المكتوبة بـ C++ أو Swift.",
+      analogy: "تخيل إنك بتنقل محل موبايلات ليكون (مول تجاري ضخم). الواجهات لازم تتغير؛ مش هينفع تستخدم زراير الموبايل الضخمة في شاشة كمبيوتر 24 بوصة. كمان لازم تضيف (أمن) ومداخل ومخارج جديدة (الماوس والكيبورد والقوائم) اللي مكانتش مهمة في المحل الصغير.",
+      keyPoints: [
+        "Native C++ / Swift / CMake integration",
+        "Supports Menu bars and Tray icons",
+        "Multi-window support is maturing (bitsdojo_window)",
+        "Focus on 'Navigation Rail' instead of BottomNavigationBar"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Contextual Menu Example (Conceptual)
+if (Platform.isWindows || Platform.isMacOS) {
+  return NavigationRail(
+    destinations: [...],
+    selectedIndex: 0,
+  );
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture",
+        question: "What is the biggest UI consideration when moving from Mobile to Desktop?",
+        questionAr: "ما هو أكبر اعتبار في واجهة المستخدم (UI) عند الانتقال من المحمول إلى سطح المكتب؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "استغلال المساحة العرضية (Horizontal Space) بدلاً من الطولية.",
+            "إضافة دعم صريح للاختصارات (Keyboard Shortcuts) واستجابة حركة الماوس (Hover effects).",
+            "تحويل القوائم السفلية (Bottom Nav) إلى قوائم جانبية (Side Rail) لتناسب الشاشات العريضة."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل يمكنك بناء تطبيق للشركات (Enterprise Solution) يعمل على كل المنصات باحترافية؟"],
+      redFlags: ["إخراج تطبيق ويندوز يبدو وكأنه موبايل 'مشدود' (Stretched mobile app)."],
+      greenFlags: ["ذكر استخدام FFI (Foreign Function Interface) للتواصل المباشر مع مكتبات C مكتوبة للديسكطوب."]
+    },
+    linkedCards: {
+      prerequisites: ["133"],
+      nextSteps: [{ id: "135", title: "Localization & RTL" }],
+      related: ["flutter-architecture"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "الاعتماد على اللمس (Touch events) فقط وعدم مراعاة الـ Click/Right Click.",
+        whyWrong: "مستخدم الكمبيوتر سيجد صعوبة في التفاعل مع التطبيق وسيشعر أنه غريب عن بيئة النظام.",
+        correctApproach: "استخدام `SelectionArea` لجعل النصوص قابلة للنسخ و `MouseRegion` لتفاعلات الماوس."
+      }
+    ]
+  },
+  {
+    id: "135",
+    title: "Localization (l10n) & RTL",
+    titleAr: "اللغات (Localization) ودعم العربية (RTL)",
+    level: "8",
+    category: "Internationalization",
+    tags: ["l10n", "Internationalization", "RTL", "Arabic", "ARB"],
+    definition: {
+      summary: "هي عملية جعل التطبيق يدعم لغات متعددة وتنسيقات زمنية ومكانية مختلفة، مع مراعاة اتجاه الكتابة (يمين لليسار أو العكس).",
+      detailed: "في فلاتر، نستخدم ملفات `.arb` (JSON-like) لتخزين الترجمات. يتم توليد كود تلقائي يسمح بالوصول للترجمات عبر `AppLocalizations.of(context)`. الأهم في لغتنا العربية هو دعم (RTL - Right to Left) حيث يقلب فلاتر الواجهة تلقائياً إذا استخدمنا `Directionality` و `start/end` بدلاً من `left/right`.",
+      analogy: "تخيل إنك بتفرش (شقة). لو إنت في مصر، الأوكر (المقابض) والفرش بيكون مريح للي داخل بيمينه (RTL). لو في انجلترا، العكس (LTR). المهندس الشاطر بيصمم الشقة بحيث لو قررت تقلبها في أي وقت، كل حاجة تتنقل لمكانها المنطقي أوتوماتيك بضغطة زرار.",
+      keyPoints: [
+        "Use .arb files for clean, scalable translations",
+        "Enable 'generate: true' in pubspec.yaml",
+        "Avoid hardcoded strings at all costs",
+        "Use start/end (logical properties) for flexible padding/margins"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// in example_en.arb
+"hello": "Hello {name}"
+
+// in UI
+Text(AppLocalizations.of(context)!.hello('Mohamed'));`
+      }
+    },
+    questions: [
+      {
+        type: "UI/UX",
+        question: "How do you handle icons that imply direction (like an arrow) in RTL?",
+        questionAr: "كيف تتعامل مع الأيقونات التي تعبر عن اتجاه (مثل السهم) في حالة اللغات التي تكتب من اليمين؟",
+        difficulty: 2,
+        expectedAnswer: {
+          points: [
+            "باستخدام خاصية `matchTextDirection: true` في الـ `Icon` أو `ImageWidget`.",
+            "هذا سيجعل السهم يلف تلقائياً (Flip) عند تغيير لغة التطبيق للعربية ليشير للاتجاه الصحيح منطقياً."
+          ],
+          timeToAnswer: "1 min"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل أنت مستعد لمشاريع عالمية (Multi-national) أم تبرمج لنفسك فقط؟"],
+      redFlags: ["استخدام 'Left' و 'Right' بدلاً من 'Start' و 'End' مما يفسد الواجهة العربية."],
+      greenFlags: ["ذكر كيفية التعامل مع الأرقام (هندية vs عربية) والعملات والتواريخ عبر باكج `intl`."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-widgets-basics"],
+      nextSteps: [{ id: "136", title: "Navigation & Deep Linking" }],
+      related: ["flutter-clean-architecture"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "كتابة نصوص عربية مباشرة (Hardcoded) بداخل الكود.",
+        whyWrong: "مستحيل تقريباً ترجمة التطبيق للغات أخرى لاحقاً، وستضطر للبحث في آلاف الملفات لتغيير كلمة واحدة.",
+        correctApproach: "ضع كل الكلمات في ملفات الترجمة (.arb) ونادِ عليها بالـ Key الخاص بها."
+      }
+    ]
+  },
+  {
+    id: "136",
+    title: "Navigation 2.0 & Deep Linking",
+    titleAr: "التنقل المتقدم (Navigation 2.0) والروابط العميقة",
+    level: "10",
+    category: "Navigation",
+    tags: ["Navigation", "GoRouter", "Router", "Deep Linking", "Navigator 2.0"],
+    definition: {
+      summary: "هو نظام تنقل تعريفي (Declarative) يسمح بالتحكم الكامل في الـ Stack الخاص بالصفحات عبر عنوان URL، مما يسهل دعم الويب والروابط العميقة.",
+      detailed: "بينما يعتمد Navigator 1.0 على `push` و `pop` (الأمر اليدوي)، يعتمد Navigator 2.0 (Router) على جعل حالة التطبيق هي المتحكمة في الصفحات المعروضة. باستخدام مكتبات مثل `go_router` أو `auto_route` أصبح من السهل ربط كل صفحة بمسار (Path) محدد، مما يسمح للمستخدم بفتح التطبيق من رابط خارجي (Deep Link) ليصل مباشرة لصفحة منتج بعينه.",
+      analogy: "Navigator 1.0 زي السلم: بتطلع درجة درجة وتبص تحتك تشوف إنت فين. Navigator 2.0 زي (الأسانسير بلوحة تحكم): إنت بتدوس على رقم الدور (الرابط) والأسانسير هو اللي بيقرر يطلعك فين وبيرتب الأدوار اللي تحته أوتوماتيك.",
+      keyPoints: [
+        "Declarative approach instead of Imperative",
+        "Essential for Flutter Web (Browser URL sync)",
+        "Deep Linking: Opening app from a URL (e.g., https://myapp.com/product/123)",
+        "GoRouter is the recommended package by the Flutter team"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `final GoRouter _router = GoRouter(
+  routes: [
+    GoRoute(
+      path: '/details/:id',
+      builder: (context, state) => DetailsPage(id: state.params['id']!),
+    ),
+  ],
+);`
+      }
+    },
+    questions: [
+      {
+        type: "Navigation",
+        question: "What is a 'Deep Link' and how is it different from a 'Universal Link'?",
+        questionAr: "ما هو الـ Deep Link وما الفرق بينه وبين الـ Universal Link؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "الـ Deep Link هو مصطلح عام للروابط التي تفتح محتوى داخلي في التطبيق (مثل myapp://page).",
+            "الـ App Link (في أندرويد) أو הـ Universal Link (في iOS) هي روابط HTTPS عادية (مثل google.com) يتم التحقق منها ملكيتها للسيرفر، وإذا كانت مثبتة تفتح التطبيق مباشرة بدلاً من المتصفح."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل يمكنك بناء تطبيقات تدعم الويب وقابلة للمشاركة (Shareable Links) بداخلها؟"],
+      redFlags: ["الارتباك عند سؤالك عن كيفية عمل 'الرجوع' (Back button) في المتصفح مع فلاتر ويب."],
+      greenFlags: ["ذكر استخدام Redirection logic بداخل الراوتر للتحقق من تسجيل الدخول (Auth Guard)."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-widgets-basics"],
+      nextSteps: [{ id: "137", title: "App Lifecycle" }],
+      related: ["133"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "تعقيد نظام التنقل في تطبيق صغير وبسيط جداً باستخدام Navigator 2.0.",
+        whyWrong: "بينما هو قوي جداً، إلا أن إعداده يأخذ وقتاً طويلاً وكوداً كثيراً قد لا تحتاجه إذا كان تطبيقك 3 صفحات فقط.",
+        correctApproach: "استخدم `go_router` لأنه يبسط Navigator 2.0 جداً ويجعله خياراً ممتازاً حتى للمشاريع المتوسطة."
+      }
+    ]
+  },
+  {
+    id: "137",
+    title: "App Lifecycle & Background Tasks",
+    titleAr: "دورة حياة التطبيق والمهام الخلفية",
+    level: "9",
+    category: "System",
+    tags: ["Lifecycle", "Background", "WorkManager", "AppLifecycleListener"],
+    definition: {
+      summary: "هي الحالات التي يمر بها التطبيق (نشط، في الخلفية، مغلق) وكيفية تنفيذ كود حتى لو لم يكن التطبيق مفتوحاً أمام المستخدم.",
+      detailed: "1. **Lifecycle**: نستخدم `AppLifecycleListener` لمعرفة متى ذهب المستخدم لشاشة أخرى (Paused) أو أغلق الشاشة (Inactive). هذا ضروري لحفظ البيانات أو إيقاف الموسيقى.\n2. **Background Tasks**: تنفيذ مهام في الخلفية (مثل مزامنة البيانات كل ساعة) يتطلب استخدام Isolates أو مكتبات مثل `workmanager` للتواصل مع منبهات النظام (Alarm Manager/JobScheduler).",
+      analogy: "- دورة الحياة زي (موظف الاستقبال): بيبقى فايق (Resumed) لما حد قدامه، أو نايم (Paused) لو مفيش حد، أو مروح (Detached) لو اليوم خلص.\n- المهام الخلفية زي (جهاز التسجيل): بتشغله وتسيبه هو هيسجل (ينفذ المهمة) لوحده حتى لو إنت مش في المكان.",
+      keyPoints: [
+        "States: Resumed, Inactive, Paused, Detached",
+        "Use AppLifecycleListener (new in Flutter 3.13) for cleaner monitoring",
+        "Background tasks are limited by OS battery optimization",
+        "Requires Isolate or separate entry point for background execution"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Monitoring lifecycle with AppLifecycleListener
+late final AppLifecycleListener _listener;
+_listener = AppLifecycleListener(
+  onStateChange: (state) => print('Current state: $state'),
+  onPause: () => print('App Paused'),
+);`
+      }
+    },
+    questions: [
+      {
+        type: "System",
+        question: "Can Flutter run code while the app is completely terminated?",
+        questionAr: "هل يمكن لفلاتر تشغيل كود بينما التطبيق مغلق تماماً (Terminated)؟",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "نعم، باستخدام الـ (Background Fetch) أو (WorkManager).",
+            "يقوم النظام بإيقاظ جزء صغير من المحرك (Headless Isolate) لتنفيذ المهمة ثم إغلاقه مرة أخرى، بمرات تكرار يحددها نظام التشغيل حسب استهلاك البطارية."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل تدرك قيود الأندرويد والـ iOS فيما يخص البطارية واستهلاك الـ RAM في الخلفية؟"],
+      redFlags: ["الاعتقاد بأن الـ Timer يستمر في العمل للأبد حتى لو أغلق المستخدم الموبايل."],
+      greenFlags: ["ذكر استخدام Firebase Cloud Messaging (FCM) كطريقة لإيقاظ التطبيق من السيرفر عند الضرورة."]
+    },
+    linkedCards: {
+      prerequisites: ["122"],
+      nextSteps: [{ id: "138", title: "CI/CD & Deployment" }],
+      related: ["123"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "محاولة تحديث الـ UI من داخل مهمة خلفية (Background Task).",
+        whyWrong: "المهمة الخلفية تعمل غالبا في Isolate منفصل تماماً عن الواجهة، ولا يوجد UI أصلاً عندما يكون التطبيق في الخلفية العميقة.",
+        correctApproach: "قم بتحديث قاعدة البيانات (Local DB) أو الـ SharedPreferences، وعندما يفتح المستخدم التطبيق سيقرأ البيانات الجديدة ويحدث الواجهة."
+      }
+    ]
+  },
+  {
+    id: "138",
+    title: "CI/CD for Flutter",
+    titleAr: "المكاملة والتسليم المستمر (CI/CD) للفلاتر",
+    level: "10",
+    category: "DevOps",
+    tags: ["CI/CD", "GitHub Actions", "Codemagic", "Fastlane", "Deployment"],
+    definition: {
+      summary: "هي عملية أتمتة اختبار وبناء ورفع التطبيق للمتاجر تلقائياً عند كل ضغطة `push` للكود.",
+      detailed: "1. **CI (Continuous Integration)**: فحص الكود (Linter) وتشغيل الاختبارات (Tests) تلقائياً لضمان عدم وجود أخطاء.\n2. **CD (Continuous Deployment)**: بناء ملف الـ APK/IPA ورفعه للمتاجر (Google Play / App Store) أو لخدمات الاختبار (Firebase App Distribution). أشهر الأدوات هي GitHub Actions و Codemagic و Fastlane.",
+      analogy: "تخيل إنك صاحب مصنع (أبلكيشن). الـ CI زي (ضابط الجودة): بيقف على السير ويفحص كل قطعة طالعة. الـ CD زي (شركة الشحن): بتاخد الكرتونة اللي اتفحصت وتوصلها للزبائن في المحلات (المتاجر) أوتوماتيك من غير ما إنت تتحرك من مكتبك.",
+      keyPoints: [
+        "Automated linting and testing on every PR",
+        "Reduced human error in building release files",
+        "Fastlane automates screenshots and metadata uploads",
+        "GitHub Actions is powerful and highly customizable for free"
+      ],
+      codeExample: {
+        language: "yaml",
+        code: `# Simple GitHub Action snippet
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+      - run: flutter test
+      - run: flutter build apk --release`
+      }
+    },
+    questions: [
+      {
+        type: "Engineering",
+        question: "Why would you use Fastlane in a Flutter project?",
+        questionAr: "لماذا قد تستخدم Fastlane في مشروع فلاتر؟",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "لأتمتة المهام الرتيبة مثل رفع الشهادات (Certificates) وإدارة الـ Provisioning Profiles في iOS.",
+            "لأخذ لقطات شاشة (Screenshots) تلقائية لكل اللغات والقياسات ورفعها للمتجر بضغطة زر واحدة."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل تمتلك عقلية (Senior) تهتم بتقليل الوقت الضائع في العمليات اليدوية؟"],
+      redFlags: ["الاعتقاد بأن المبرمج هو من يجب أن يبني الـ APK على جهازه ويرسلها للعميل بيده دائماً."],
+      greenFlags: ["ذكر أهمية (Versioning) و (Tagging) التلقائي في الـ GitHub Actions."]
+    },
+    linkedCards: {
+      prerequisites: ["120"],
+      nextSteps: [{ id: "140", title: "Deployment Guidelines" }],
+      related: ["flutter-build-system"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "وضع مفاتيح التشفير (Keys) والـ Passwords الخاصة بالمتجر بداخل الكود بشكل مكشوف في GitHub.",
+        whyWrong: "أي شخص يصل للكود يمكنه سرقة هويتك ورفع نسخ خبيثة من تطبيقك.",
+        correctApproach: "استخدم (Secrets/Environment Variables) في GitHub/Codemagic لإخفاء البيانات الحساسة."
+      }
+    ]
+  },
+  {
+    id: "139",
+    title: "Firebase integration & Ecosystem",
+    titleAr: "دمج فيربيز (Firebase) وبيئة عملها",
+    level: "8",
+    category: "Backend-as-a-Service",
+    tags: ["Firebase", "FCM", "Crashlytics", "Analytics", "Remote Config"],
+    definition: {
+      summary: "هي مجموعة خدمات من جوجل توفر حلولاً سريعة للخادم (Backend) دون الحاجة لكتابة كود سيرفر معقد.",
+      detailed: "أشهر خدماتها للفلاتر:\n1. **FCM (Cloud Messaging)**: لإرسال الإشعارات.\n2. **Crashlytics**: لمعرفة أسباب توقف التطبيق (Crashes) عند المستخدمين الحقيقيين.\n3. **Analytics**: لمعرفة سلوك المستخدم في التطبيق.\n4. **Remote Config**: لتغيير ميزة في التطبيق (مثلاً اللون أو سعر المنتج) دون الحاجة لإصدار تحديث جديد للمتجر.",
+      analogy: "فيربيز زي (بوفيه مفتوح جاهز): بدل ما تروح تشتري خضار وتطبخ وتغسل أطباق (Back-end من الصفر)، إنت بتروح تختار الأكل اللي يعجبك (الخدمات) وتاكله فوراً، وهي بتوفرلك كل المطبخ والأدوات جاهزة.",
+      keyPoints: [
+        "Official 'flutterfire' CLI for easy setup",
+        "Real-time database and Firestore for NoSQL storage",
+        "Authentication supports Google, Apple, and Phone Login easily",
+        "Firebase Local Emulator for offline development"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Initializing Firebase
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(MyApp());
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Backend",
+        question: "Difference between Firebase Authentication and Firebase Firestore?",
+        questionAr: "ما الفرق بين Firebase Authentication و Firebase Firestore؟",
+        difficulty: 1,
+        expectedAnswer: {
+          points: [
+            "Authentication مسؤولة فقط عن تسجيل الدخول والتأكد من هوية المستخدم.",
+            "Firestore هي قاعدة البيانات التي تخزن معلومات المستخدم الفعلية (الاسم، الطلبات، التعليقات)."
+          ],
+          timeToAnswer: "1 min"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل تستطيع تسريع عملية التطوير (fast-to-market) باستخدام أدوات جاهزة وموثوقة؟"],
+      redFlags: ["نسيان إعداد `google-services.json` للاندرويد أو الـ `Plist` للـ iOS."],
+      greenFlags: ["ذكر استخدام Cloud Functions لتنفيذ كود برمجي على السيرفر رداً على أحداث معينة."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-widgets-basics"],
+      nextSteps: [{ id: "140", title: "App Review Guidelines" }],
+      related: ["127"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "استخدام Firestore بدون تفعيل الـ (Rules) الأمنية.",
+        whyWrong: "يسمح ذلك لأي شخص بقرصنة بياناتك ومسح قاعدة البيانات بالكامل لأنها متاحة للجميع (Public).",
+        correctApproach: "اكتب قواعد أمان (Security Rules) تسمح فقط للمستخدم المسجل بقراءة وكتابة بياناته الخاصة."
+      }
+    ]
+  },
+  {
+    id: "140",
+    title: "Deployment & Review Guidelines",
+    titleAr: "النشر وإرشادات مراجعة المتاجر",
+    level: "9",
+    category: "Deployment",
+    tags: ["AppStore", "PlayStore", "Review", "Guidelines", "Legal"],
+    definition: {
+      summary: "هي القواعد التي تفرضها آبل وجوجل لقبول نشر تطبيقك في متاجرهم، وتشمل الجوانب التقنية والقانونية والأخلاقية.",
+      detailed: "أهم القواعد هي:\n1. **Privacy Policy**: يجب وجود رابط لسياسة الخصوصية.\n2. **Account Deletion**: آبل تفرض وجود زر لحذف الحساب بداخل التطبيق إذا كان يدعم التسجيل.\n3. **Content**: عدم وجود محتوى مضلل أو عنصري.\n4. **App Quality**: ألا يكون التطبيق 'موقع ويب' بسيط بداخل المتصفح (Webview-only)، بل يجب أن يوفر تجربة Native حقيقية.",
+      analogy: "نشر التطبيق زي (امتحان رخصة السواقة). مش كفاية إنك بتعرف تسوق (تكتب كود)، لازم تلتزم بقواعد المرور (Guidelines) ويكون معاك طفاية حريق وشنطة إسعافات (Privacy/Legal)، ولو المرور شافك بتخالف، هيسحب منك الرخصة (Reject).",
+      keyPoints: [
+        "Apple is stricter than Google regarding design and UI",
+        "Mandatory 'App Tracking Transparency' for iOS ads",
+        "Must provide test account credentials for reviewers",
+        "Metadata (Screenshots, Description) must accurately represent the app"
+      ],
+      codeExample: {
+        language: "markdown",
+        code: `### App Store Checklist:
+- Privacy Policy URL
+- Support URL
+- Account Deletion Button (Required for Apple)
+- High-res Icons and Screenshots`
+      }
+    },
+    questions: [
+      {
+        type: "Production",
+        question: "Why would Apple reject a Flutter app that works perfectly on Android?",
+        questionAr: "لماذا قد ترفض آبل تطبيق فلاتر يعمل بشكل مثالي على أندرويد؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "بسبب استخدام 'Material Design' فج في الـ iOS (آبل تفضل تجربة الـ Cupertino).",
+            "بسبب عدم وجود زر 'Sign in with Apple' إذا كان التطبيق يدعم تسجيل الدخول عبر طرف ثالث (مثل جوجل أو فيسبوك).",
+            "بسبب غياب زر حذف الحساب أو رابط سياسة الخصوصية."
+          ],
+          timeToAnswer: "3 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل أنت مطور 'ناضج' (Production-ready) يفهم الخطوات الأخيرة للوصول للجمهور؟"],
+      redFlags: ["التفاجئ بمصطلح 'App Review' أو عدم معرفة أن رفع التطبيق قد يستغرق أياماً للمراجعة."],
+      greenFlags: ["ذكر كيفية التعامل مع (Refunds) أو اشتراكات (In-App Purchases) بشكل قانوني."]
+    },
+    linkedCards: {
+      prerequisites: ["138"],
+      nextSteps: [{ id: "141", title: "System Design for Flutter" }],
+      related: ["129"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "استخدام ميزة (Hot Update) لتغيير شكل التطبيق أو وظائفه بشكل جذري دون تحديث المتجر.",
+        whyWrong: "هذا يخالف اتفاقية آبل وجوجل وقد يؤدي لحذف حساب المطور بالكامل.",
+        correctApproach: "استخدم التحديثات البرمجية للميزات الصغيرة (Remote Config) أما التغييرات الجذرية فيجب أن تمر عبر المتجر."
+      }
+    ]
+  },
+  {
+    id: "141",
+    title: "Design Patterns in Flutter",
+    titleAr: "أنماط التصميم (Design Patterns) في فلاتر",
+    level: "10",
+    category: "Architecture",
+    tags: ["Design Patterns", "Singleton", "Factory", "Observer", "Architecture"],
+    definition: {
+      summary: "هي حلول برمجية نموذجية لمشاكل متكررة في تصميم البرمجيات، تساعد في جعل الكود أكثر تنظيماً وقابلية للصيانة.",
+      detailed: "أهم الأنماط في فلاتر:\n1. **Singleton**: ضمان وجود نسخة واحدة فقط من كلاس معينة (مثل DatabaseService).\n2. **Factory**: كلاس مسؤولة عن إنشاء كائنات أخرى بناءً على مدخلات (مثل إنشاء Widget تناسب الأندرويد أو الآيفون).\n3. **Observer**: إخطار عدة أطراف عند تغير بيانات معينة (مثل الـ Stream أو ChangeNotifier).",
+      analogy: "أنماط التصميم زي (الكتالوج): بدل ما تخترع طريقة لتركيب باب، إنت بتشوف الكتالوج بيقول إيه (النمط) وتنفذه. ده بيضمن إن أي نجار تاني (مبرمج) يجي وراك يفهم إنت عملت إيه بسرعة.",
+      keyPoints: [
+        "Singleton: One instance per app",
+        "Factory: Decouples object creation from usage",
+        "Observer: Basis for state management (Streams)",
+        "Composition over Inheritance: Preferred in Flutter"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `class DatabaseService {
+  static final DatabaseService _instance = DatabaseService._internal();
+  factory DatabaseService() => _instance; // Singleton pattern
+  DatabaseService._internal(); // Private constructor
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture",
+        question: "When should you avoid using a Singleton?",
+        questionAr: "متى يجب عليك تجنب استخدام الـ Singleton؟",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "عندما تجعل الاختبار (Testing) صعباً، لأنها تحتفظ بحالتها بين الاختبارات وتصعب عملية الـ Mocking.",
+            "إذا كانت تسبب (Global State) مبالغ فيه يجعل من الصعب تتبع أين وكيف تتغير البيانات."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل برمجت مشاريع كبيرة تعتمد على أسس هندسية متينة أم مجرد كود عشوائي؟"],
+      redFlags: ["عدم معرفة الفرق بين الـ Factory والـ Constructor العادي."],
+      greenFlags: ["ذكر أن Flutter نفسه مبني على نمط الـ Composite (Widgets compose other widgets)."]
+    },
+    linkedCards: {
+      prerequisites: ["dart-classes-basics"],
+      nextSteps: [{ id: "142", title: "Testing Strategies" }],
+      related: ["flutter-clean-architecture"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "عمل كل الـ Services كـ Singletons بدون داعٍ.",
+        whyWrong: "يؤدي ذلك لزيادة استهلاك الذاكرة لأنها لا تُحذف أبداً وصعوبة بالغة في عمل Unit Tests مستقلة.",
+        correctApproach: "استخدم Dependency Injection (مثل GetIt أو Provider) لإدارة كائناتك بشكل أذكى."
+      }
+    ]
+  },
+  {
+    id: "142",
+    title: "Testing Strategies (Unit, Widget, Integration)",
+    titleAr: "استراتيجيات الاختبار (الوحدة، الودجت، والتكامل)",
+    level: "9",
+    category: "Quality Assurance",
+    tags: ["Testing", "Unit Test", "Widget Test", "Integration Test", "Mocking"],
+    definition: {
+      summary: "هي عملية كتابة كود برمي يتأكد من أن كود التطبيق يعمل كما هو متوقع، لضمان استقرار التطبيق بعد التحديثات.",
+      detailed: "1. **Unit Test**: اختبار دالة أو كلاس واحدة (Dart only).\n2. **Widget Test**: اختبار الـ Logic البصري لـ Widget معينة دون تشغيل التطبيق بالكامل (استخدام `testWidgets`).\n3. **Integration Test**: اختبار دورة كاملة في التطبيق (مثلاً: تسجيل دخول كامل) على جهاز حقيقي أو محاكي.",
+      analogy: "تخيل إنك بتصنع (مروحة). الـ Unit Test هو إنك تجرب الموتور لوحده. الـ Widget Test هو إنك تجرب ريش المروحة مع الموتور وشغلها. الـ Integration Test هو إنك تحط المروحة في أوضة وتشغلها في الكهرباء وتشوفها بتبرد المكان فعلاً ولا لأ.",
+      keyPoints: [
+        "Unit tests: Fastest, run in VM",
+        "Widget tests: Interaction testing without full app",
+        "Integration tests: Full environment testing (flutter_test/Patrol)",
+        "The Testing Pyramid: More unit tests, fewer integration tests"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `testWidgets('Counter increments', (tester) async {
+  await tester.pumpWidget(MyApp());
+  await tester.tap(find.byIcon(Icons.add));
+  await tester.pump();
+  expect(find.text('1'), findsOneWidget);
+});`
+      }
+    },
+    questions: [
+      {
+        type: "Testing",
+        question: "What is 'Mocking' and why is it used in testing?",
+        questionAr: "ما هو الـ Mocking ولماذا يُستخدم في الاختبارات؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "هو استبدال كلاس حقيقية (مثل API service) بنسخة وهمية (Mock) للتحكم في ردود أفعالها.",
+            "يُستخدم لعزل الكود الذي نختبره عن العوامل الخارجية (مثل الإنترنت أو قواعد البيانات) ولتسريع الاختبارات."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل تثق في الكود الخاص بك؟ وكيف تضمن عدم تعطل التطبيق عند إضافة ميزة جديدة؟"],
+      redFlags: ["التفاخر بأنك 'تختبر التطبيق بيدك' بدلاً من كتابة اختبارات آلية."],
+      greenFlags: ["ذكر استخدام مكتبات مثل Mockito أو Mocktail لإدارة الـ Mocks."]
+    },
+    linkedCards: {
+      prerequisites: ["dart-basics"],
+      nextSteps: [{ id: "143", title: "Performance Profiling" }],
+      related: ["138"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "إهمال كتابة الاختبارات بدعوى ضيق الوقت.",
+        whyWrong: "في المستقبل، سيضيع أضعاف هذا الوقت في محاولة العثور على أخطاء ظهرت بسبب تغيير ميزة أخرى (Regression bugs).",
+        correctApproach: "اتبع منهجية الـ TDD (Test Driven Development) أو على الأقل اختبر العمليات الحساسة (مثلاً عمليات الشراء)."
+      }
+    ]
+  },
+  {
+    id: "143",
+    title: "Performance Profiling (DevTools)",
+    titleAr: "تحليل الأداء وأدوات المطورين (DevTools)",
+    level: "10",
+    category: "Optimization",
+    tags: ["Performance", "DevTools", "Memory Leak", "FPS", "Profiling"],
+    definition: {
+      summary: "هي عملية مراقبة استهلاك التطبيق للموارد (RAM, CPU, GPU) باستخدام أدوات متقدمة لاكتشاف البطء أو التهنيج.",
+      detailed: "يوفر Flutter DevTools عدة أدوات:\n1. **Flutter Inspector**: لفحص شجرة الـ Widgets.\n2. **Performance View**: لمراقبة معدل الإطارات (FPS) واكتشاف الـ Junction (التعليق الملحوظ).\n3. **Memory View**: لاكتشاف الـ Memory Leaks (بيانات محجوزة في الرام لا تُحذف).\n4. **Network View**: لمراقبة طلبات الـ HTTP وحجم البيانات.",
+      analogy: "الـ DevTools هي (جهاز السونار ودراسة الحالة) للدكتور. بدل ما بتخمن المريض تعبان ليه، بتشوف قدامك نبضات القلب والضغط (FPS/Memory) وبتقدر تحدد مكان الوجع (التعليق) بالضبط عشان تعالجه.",
+      keyPoints: [
+        "Record performance in Profile mode (not Debug)",
+        "Look for red bars in the frame charts to find Jank",
+        "Use 'Highlight Repaint Rainbow' to see overpainting areas",
+        "The timeline shows exactly which function is taking too long"
+      ],
+      codeExample: {
+        language: "bash",
+        code: `# Run app in profile mode for accurate metrics
+flutter run --profile`
+      }
+    },
+    questions: [
+      {
+        type: "Performance",
+        question: "Difference between UI thread and Raster thread?",
+        questionAr: "ما الفرق بين خيط الواجهة (UI thread) وخيط الرسوم (Raster thread)؟",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "الـ UI thread هو المكان الذي يتم فيه تنفيذ كود الـ Dart وبناء شجرة الـ Widgets.",
+            "الـ Raster (GPU) thread هو المسؤول عن تحويل الصور والأشكال لبيكسلات على الشاشة.",
+            "إذا كان أحدهما بطيئاً، سيسقط معدل الإطارات (FPS) وتظهر التعليقات (Jank)."
+          ],
+          timeToAnswer: "3 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل تستطيع حل مشاكل الأداء الصعبة أم أنك تنتظر الصدفة؟"],
+      redFlags: ["الاعتماد على جهاز كمبيوتر خارق (Mac M3) للاختبار وعدم فحص الأداء على أجهزة ضعيفة."],
+      greenFlags: ["شرح كيفية قراءة الـ (Memory Snapshots) لاكتشاف الـ Memory Leaks."]
+    },
+    linkedCards: {
+      prerequisites: ["121"],
+      nextSteps: [{ id: "144", title: "Security Best Practices" }],
+      related: ["122"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "تحليل الأداء في الـ Debug mode.",
+        whyWrong: "الـ Debug mode يحتوي على كود إضافي للفحص (Assertion checks) مما يجعله بطيئاً بطبعه، ولن تعطيك الأرقام فيه انطباعاً صحيحاً عن التطبيق الحقيقي نهائياً.",
+        correctApproach: "دائماً استخدم Profile mode (أو Release mode) عند قياس الأداء."
+      }
+    ]
+  },
+  {
+    id: "144",
+    title: "Security Best Practices",
+    titleAr: "أفضل ممارسات الحماية والأمن",
+    level: "10",
+    category: "Security",
+    tags: ["Security", "Obfuscation", "SSL Pinning", "Root Detection"],
+    definition: {
+      summary: "هي مجموعة من التقنيات لحماية بيانات المستخدم ومنع القراصنة من سرقة كود التطبيق أو التلاعب بالبيانات المرسلة للسيرفر.",
+      detailed: "أهم ركائز الحماية:\n1. **Obfuscation**: تمويه الكود ليصبح غير قابل للقراءة عند فك ضغطه.\n2. **Secure Storage**: حفظ كلمات السر في مكان محمي (Keystore للجوال، Keychain للآيفون) وليس في SharedPreferences.\n3. **SSL Pinning**: التأكد من أن التطبيق يتحدث مع السيرفر الحقيقي فقط وليس وسيطاً (Man-in-the-middle).\n4. **Root/Jailbreak Detection**: منع التطبيق من العمل على أجهزة تم اختراق حمايتها.",
+      analogy: "حماية التطبيق زي (تأمين بنك). الـ Obfuscation زي (تشفير الخزنة): لو حد وصلها مش هيفهم إيه اللي جواها. الـ Secure Storage هي الـ (خزنة نفسها). والـ SSL Pinning هو (عسكري الأمن) اللي بيتأكد من هوية أي حد يدخل البنك.",
+      keyPoints: [
+        "Obfuscation using --obfuscate flag",
+        "Use flutter_secure_storage instead of SharedPreferences for tokens",
+        "SSL Pinning prevents 'Man-in-the-middle' attacks",
+        "Never hardcode API keys or secrets in Dart files"
+      ],
+      codeExample: {
+        language: "bash",
+        code: `# Building with obfuscation
+flutter build apk --obfuscate --split-debug-info=./debug_info`
+      }
+    },
+    questions: [
+      {
+        type: "Security",
+        question: "Why shouldn't you store auth tokens in SharedPreferences?",
+        questionAr: "لماذا لا يجب تخزين مفاتيح الدخول (Tokens) في SharedPreferences؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "لأن ملف SharedPreferences في أندرويد هو ملف XML عادي يمكن لأي شخص يمتلك صلاحيات Root قراءته بسهولة.",
+            "الـ Secure Storage يستخدم تشفيراً من نظام التشغيل نفسه (Hardware-backed) مما يجعله مستحيلاً تقريباً على الاختراق."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل أنت مهنت بمصلحة العميل وسلامة بيانات المستخدمين أم أنك تهتم فقط بالواجهة؟"],
+      redFlags: ["الاعتقاد بأن فلاتر محمية 'أوتوماتيكياً' لأنها Build لمصادر native."],
+      greenFlags: ["ذكر استخدام مكتبات التشفير مثل (Encrypt) لتشفير البيانات المخزنة محلياً يدوياً."]
+    },
+    linkedCards: {
+      prerequisites: ["126"],
+      nextSteps: [{ id: "145", title: "State Management Comparison" }],
+      related: ["128"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "ترك الـ Debugging Logs مفتوحة في الـ Release build.",
+        whyWrong: "تظهر في الـ Logs بيانات حساسة (مثل الـ URL أو الـ Headers) مما يسهل على أي مخترق فهم كيفية عمل السيرفر الخاص بك.",
+        correctApproach: "استخدم `kDebugMode` لإظهار الـ Print فقط في حالة التطوير، أو استخدم الـ Logger package."
+      }
+    ]
+  },
+  {
+    id: "145",
+    title: "State Management Comparison",
+    titleAr: "مقارنة تقنيات إدارة الحالة (State Management)",
+    level: "9",
+    category: "Architecture",
+    tags: ["State Management", "Provider", "Bloc", "Riverpod", "GetX"],
+    definition: {
+      summary: "هي مقارنة بين الأدوات المختلفة التي تنظم كيف تتحرك البيانات وتتحدث الواجهة في فلاتر، واختيار الأنسب منها للمشروع.",
+      detailed: "1. **Provider**: رسمي ومدعوم، سهل التعلم، ولكنه يعتمد على `BuildContext`.\n2. **Bloc (Business Logic Component)**: الأكثر طلباً في الشركات، يفصل تماماً بين الواجهة والمنطق عبر الـ Events و الـ States، ولكنه يتطلب كوداً كثيراً (Boilerplate).\n3. **Riverpod**: تطور لـ Provider، آمن برمجياً (Compile-safe) ولا يحتاج لـ `context`.\n4. **GetX**: سهل جداً وسريع، يوفر حلولاً شاملة (State, Routing, Service Location)، ولكنه يبتعد قليلاً عن معايير فلاتر الأصلية.",
+      analogy: "تخيل إنك (مدرب فريق كورة). الـ State management هي (خطة اللعب): الـ Bloc زي الخطة الدفاعية الصارمة (كل واحد له مكان ومهمة محددة جداً). الـ Provider زي اللعب المفتوح (سهل بس محتاج تركيز). الـ GetX زي (الكرة الشراب في الحارة): سريعة وسهلة وأي حد يلعبها بس مش دايماً بتنفع في الماتشات العالمية.",
+      keyPoints: [
+        "Choice depends on team size and project complexity",
+        "Bloc is best for complex business logic and large teams",
+        "Riverpod is the modern choice for clean architecture",
+        "Avoid using too many 'Global' states if possible"
+      ],
+      codeExample: {
+        language: "markdown",
+        code: `| Pattern  | Difficulty | Boilerplate | Recommended for |
+|----------|------------|-------------|-----------------|
+| Provider | Low        | Low         | Medium Apps     |
+| Bloc     | High       | High        | Enterprise Apps |
+| Riverpod | Medium     | Low         | Clean Arch      |
+| GetX     | Low        | Very Low    | Fast Mockups    |`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture/State",
+        question: "Why is separation of concerns important in State Management?",
+        questionAr: "لماذا يعد 'فصل المسؤوليات' مهماً في إدارة الحالة؟",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "ليكون الكود قابلاً للاختبار (Testable) بشكل مستقل عن الـ UI.",
+            "ليكون من السهل تغيير الـ UI بالكامل (مثلاً من قائمة لشبكة) دون لمس منطق العمل (Business Logic).",
+            "لسهولة الصيانة عندما يعمل مبرمجين مختلفين على نفس الصفحة."
+          ],
+          timeToAnswer: "3 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل أنت متعصب لأداة واحدة أم أنك محترف يختار الأداة الأفضل حسب الحاجة؟"],
+      redFlags: ["الاعتقاد بأن GetX هو الحل الوحيد المثالي لكل شيء في الحياة."],
+      greenFlags: ["ذكر أن `setState` ما زالت مفيدة جداً للحالات المحلية البسيطة جداً (Local State)."]
+    },
+    linkedCards: {
+      prerequisites: ["flutter-widgets-basics"],
+      nextSteps: [{ id: "146", title: "Advanced Dart" }],
+      related: ["60", "65", "70", "75"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "إدارة كل حركة في التطبيق (كالـ Validation) عبر Global State Manager.",
+        whyWrong: "يؤدي ذلك لإعادة بناء (Rebuild) أجزاء ضخمة من الشجرة بدون داعٍ ويجعل الكود معقداً.",
+        correctApproach: "استخدم `StatefulWidget` للحالات التي تخص الـ Widget نفسها فقط، والـ Global States للأمور التي تخص التطبيق بالكامل (محتوى السلة، بيانات المستخدم)."
+      }
+    ]
+  },
+  {
+    id: "146",
+    title: "Advanced Dart Features (Mixins, Extensions, Records)",
+    titleAr: "مميزات دارت المتقدمة (Mixins, Extensions, Records)",
+    level: "9",
+    category: "Dart",
+    tags: ["Dart", "Mixins", "Extensions", "Records", "Patterns"],
+    definition: {
+      summary: "هي قدرات حديثة في لغة Dart تجعل الكود أكثر اختصاراً وقوة، وتسمح بإضافة وظائف لكلاسات موجودة مسبقاً دون تعديلها.",
+      detailed: "1. **Mixins**: طريقة لإعادة استخدام كود في عدة كلاسات دون وراثة (Multiple Inheritance).\n2. **Extensions**: إضافة دوال جديدة لكلاسات جاهزة (مثل إضافة دالة `isValidEmail` لكلاس الـ `String`).\n3. **Records**: (جديد في Dart 3) تسمح للدالة بإرجاع أكثر من قيمة في وقت واحد بسهولة.\n4. **Pattern Matching**: طريقة قوية لفحص البيانات والتحكم في مسار الكود.",
+      analogy: "دارت المتقدمة زي (السويس آرمي نايف): Mixin زي (المفك) اللي بتركبه في أي يد. Extension زي (الاستيكر) اللي بتلزقه على حاجة وتخلي ليها شكل جديد. Records زي (الشنطة) اللي بتشيل فيها موبايل ومحفظة ومفاتيح وتطلعهم كلهم مرة واحدة.",
+      keyPoints: [
+        "Use Mixins for cross-cutting concerns (e.g., logging)",
+        "Extensions make utility functions more readable",
+        "Records avoid creating small helper classes for multiple returns",
+        "Sealed classes (Dart 3) for exhaustive switch statements"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Records example
+(String, int) getUser() => ('Ahmed', 25);
+var (name, age) = getUser(); // Matching
+
+// Extension example
+extension StringExt on String {
+  bool get isCapitalized => this[0] == this[0].toUpperCase();
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Dart",
+        question: "Difference between a Mixin and an Interface in Dart?",
+        questionAr: "ما الفرق بين الـ Mixin والـ Interface في دارت؟",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "الـ Interface في دارت هو أي كلاس، ويجب عليك إعادة كتابة (Override) كل دوالها.",
+            "الـ Mixin يسمح لك بمشاركة التنفيذ الفعلي (Implementation) للدوال، أي أنك لا تحتاج لإعادة كتابة الكود، بل تستخدمه مباشرة بكلمة `with`."
+          ],
+          timeToAnswer: "3 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل تتابع تحديثات اللغة وتستخدم أحدث الطرق لجعل الكود أنظف وأسرع؟"],
+      redFlags: ["عدم سماعك عن Dart 3 أو ميزات الـ Null Safety المتقدمة."],
+      greenFlags: ["ذكر استخدام الـ Sealed classes لضمان تغطية كل الحالات في الـ UI."]
+    },
+    linkedCards: {
+      prerequisites: ["dart-classes-basics"],
+      nextSteps: [{ id: "147", title: "Concurrency & Isolates" }],
+      related: ["base-dart"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "الإسراف في استخدام الـ Extensions في كل مكان.",
+        whyWrong: "يجعل الكود مبهماً للمطورين الجدد الذين لن يفهموا من أين تأتي هذه الدوال، وقد يسبب تضارباً في الأسماء (Naming conflicts).",
+        correctApproach: "استخدم الـ Extensions للعمليات الشائعة جداً والمكررة فقط."
+      }
+    ]
+  },
+  {
+    id: "147",
+    title: "Concurrency, Isolates & Compute",
+    titleAr: "التزامن، الـ Isolates، ودالة Compute",
+    level: "10",
+    category: "performance",
+    tags: ["Concurrency", "Isolates", "Compute", "Async", "Multi-threading"],
+    definition: {
+      summary: "هي كيفية تشغيل مهام ثقيلة في خلفية المعالج دون التأثير على نعومة واجهة التطبيق (60/120 FPS).",
+      detailed: "فلاتر تعمل بخيط واحد (Single Thread). إذا قمت بعملية معالجة صور ثقيلة على هذا الخيط، سيتوقف التطبيق (Freeze). الحل هو الـ **Isolates**: وهي وحدات عمل منفصلة لها ذاكرتها الخاصة.\n- **compute()**: دالة سهلة لتشغيل وظيفة في Isolate آخر وإرجاع النتيجة.\n- **Isolate.spawn()**: للطرق المتقدمة التي تحتاج تواصل مستمر عبر الـ Ports.",
+      analogy: "التطبيق زي (طباخ واحد في مطبخ). لو الطباخ ده قعد يقطع البصل (عملية ثقيلة)، مش هيعرف يقلب الزيت (الـ UI) والاكل هيتحرق. الـ Isolate هو إنك تجيب (مساعد شيف) في مطبخ تاني خالص يقطع البصل ويبعتلك البصل جاهز (النتيجة) وإنت تكمل طبخك بسلام.",
+      keyPoints: [
+        "Dart is single-threaded by default using an Event Loop",
+        "Isolates do not share memory (no race conditions)",
+        "Use compute for short, heavy tasks (JSON parsing large lists)",
+        "Communication between isolates uses SendPort and ReceivePort"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Using compute to parse JSON in background
+Future<List<User>> loadUsers() async {
+  final jsonString = await getJsonFromServer();
+  return compute(parseUsers, jsonString); // Runs in separate Isolate
+}
+
+List<User> parseUsers(String json) => ...;`
+      }
+    },
+    questions: [
+      {
+        type: "Performance",
+        question: "Why don't Isolates share memory like threads in Java/C++?",
+        questionAr: "لماذا لا تتشارك الـ Isolates الذاكرة مثل الـ Threads في جافا أو C++؟",
+        difficulty: 5,
+        expectedAnswer: {
+          points: [
+            "لتجنب مشاكل الـ (Shared State) والـ (Deadlocks) التي تسبب كوارث برمجية.",
+            "للسماح للـ Garbage Collector بالعمل في كل Isolate بشكل مستقل دون إيقاف التطبيق بالكامل (No stop-the-world pauses)."
+          ],
+          timeToAnswer: "4 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل تستطيع بناء تطبيقات تتعامل مع كميات بيانات ضخمة دون أن يشعر المستخدم ببطء؟"],
+      redFlags: ["الاعتقاد بأن الـ `async/await` تفتح خيطاً جديداً (Thread) أوتوماتيكياً."],
+      greenFlags: ["شرح كيفية عمل الـ Event Loop في دارت."]
+    },
+    linkedCards: {
+      prerequisites: ["122"],
+      nextSteps: [{ id: "148", title: "Platform Views" }],
+      related: ["143"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "محاولة استخدام الـ `BuildContext` أو الـ UI Widgets داخل الـ Isolate.",
+        whyWrong: "الـ Isolate لا يملك وصولاً لذاكرة الـ UI، وسيفشل الكود فوراً.",
+        correctApproach: "أرسل البيانات الخام (Raw data) فقط للـ Isolate، وخذ منه النتائج الخام، ثم حدث الواجهة في الخيط الرئيسي."
+      }
+    ]
+  },
+  {
+    id: "148",
+    title: "Platform Views (Google Maps, WebView)",
+    titleAr: "واجهات المنصات (Platform Views)",
+    level: "9",
+    category: "Native Integration",
+    tags: ["PlatformViews", "Google Maps", "WebView", "Native", "AndroidView"],
+    definition: {
+      summary: "هي تقنية تسمح بوضع (Widgets) أصلية من أندرويد أو آيفون (Native) داخل شجرة فلاتر.",
+      detailed: "عندما تحتاج لميزة معقدة جداً وموجودة بالفعل بـ Java/Swift (مثل خرائط جوجل أو متصفح الويب)، يتم استخدام `AndroidView` أو `UiKitView`. يقوم فلاتر بحجز مساحة على الشاشة ويطلب من النظام رسم الواجهة الأصلية بداخلها.",
+      analogy: "الـ Platform View زي (شباك في حيطة): التطبيق كله مبني بطوب فلاتر، بس إنت سبت مكان (شباك) عشان تشوف منه ميزة تانية من بره (Native) زي خرائط جوجل.",
+      keyPoints: [
+        "Essential for Google Maps, WebViews, and high-end Video Players",
+        "Higher performance cost than pure Flutter widgets",
+        "Hybrid Composition vs Texture Layer: different ways to render",
+        "Keyboard issues are common in Platform Views"
+      ],
+      codeExample: {
+        language: "dart",
+        code: `// Simple WebView widget usage
+Widget build(BuildContext context) {
+  return WebView(
+    initialUrl: 'https://flutter.dev',
+  );
+}`
+      }
+    },
+    questions: [
+      {
+        type: "Engineering",
+        question: "When should you avoid using Platform Views?",
+        questionAr: "متى يجب عليك تجنب استخدام الـ Platform Views؟",
+        difficulty: 3,
+        expectedAnswer: {
+          points: [
+            "عندما يمكنك بناء نفس الواجهة باستخدام فلاتر (Pure Widgets)، لأن الـ Platform view تستهلك RAM أكثر وتبطئ الـ scrolling.",
+            "إذا كنت ستحتاج لوضع عدد كبير منها في قائمة واحدة (List)؛ سيؤدي ذلك لتعليق التطبيق (Jank)."
+          ],
+          timeToAnswer: "2 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل تفهم كيف يتم الرسم (Rendering) خلف الكواليس؟"],
+      redFlags: ["الارتباك عند سؤالك عن الفرق في الأداء بين Google Maps و Flutter widgets."],
+      greenFlags: ["ذكر استخدام الـ Method Channels للتواصل مع هذه الواجهات الأصلية."]
+    },
+    linkedCards: {
+      prerequisites: ["132"],
+      nextSteps: [{ id: "149", title: "Flutter Internals" }],
+      related: ["131"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "توقع أن الـ Platform view ستتعامل مع الـ Touch events بنفس سلاسة فلاتر دائماً.",
+        whyWrong: "هناك تأخير بسيط (Latency) في إرسال اللمسات من فلاتر للنظام الأصلي والعكس.",
+        correctApproach: "استخدم مكتبات موجهة لفلاتر (Flutter-first) إذا كانت متاحة (مثلاً استخدام `video_player` بدلاً من native player لو أمكن)."
+      }
+    ]
+  },
+  {
+    id: "149",
+    title: "Flutter Internals (Engine, Skia, Impeller)",
+    titleAr: "بنية فلاتر الداخلية (Engine, Skia, Impeller)",
+    level: "10",
+    category: "Architecture",
+    tags: ["Engine", "Skia", "Impeller", "Rendering", "C++"],
+    definition: {
+      summary: "هي الطبقة العميقة تحت كود الـ Dart، المسؤولة عن تحويل الـ Widgets إلى رسومات حقيقية على الشاشة.",
+      detailed: "1. **Framework (Dart)**: الطبقة التي نكتب فيها (Widgets, Animation).\n2. **Engine (C++)**: محرك فلاتر الذي يحتوي على المحرك الرسومي.\n3. **Skia**: المحرك القديم للرسم.\n4. **Impeller**: المحرك الحديث (iOS أولاً ثم Android) الذي يحل مشكلة الـ (Shader Compilation Jank) ويقدم أداءً مذهلاً.",
+      analogy: "فلاتر زي (لعبة فيديو): الـ Dart هو (سيناريو اللعبة وشخصياتها). الـ Engine هو (محرك اللعبة - Unreal Engine مثلاً). الـ Impeller هو (كارت الشاشة الجديد) اللي بيخلي الرسوم ناعمة جداً ومفيهاش تقطيع.",
+      keyPoints: [
+        "Skia uses just-in-time shader compilation (causes jank)",
+        "Impeller pre-compiles shaders (solves jank)",
+        "Flutter doesn't use native OEM widgets, it draws everything pixel by pixel",
+        "Layer tree is sent from Dart to Engine for compositing"
+      ],
+      codeExample: {
+        language: "bash",
+        code: `# Checking if Impeller is enabled (on iOS)
+flutter run --enable-impeller`
+      }
+    },
+    questions: [
+      {
+        type: "Architecture",
+        question: "How does Flutter draw on the screen?",
+        questionAr: "كيف يقوم فلاتر بالرسم على الشاشة؟",
+        difficulty: 4,
+        expectedAnswer: {
+          points: [
+            "يقوم بتحويل شجرة الـ Widgets إلى RenderObjects.",
+            "الـ RenderObjects تكون شجرة طبقات (Layer Tree).",
+            "يتم إرسالها للمحرك (Skia/Impeller) الذي يستخدم الـ GPU لرسم كل بيكسل."
+          ],
+          timeToAnswer: "3 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل أنت مطور 'سطحي' أم أنك تفهم التكنولوجيا التي تعمل بها بعمق؟"],
+      redFlags: ["الاعتقاد بأن فلاتر يحول الكود لـ Java/Swift UI widgets."],
+      greenFlags: ["شرح عملية الـ Rendering Pipeline (Animate -> Build -> Layout -> Paint)."]
+    },
+    linkedCards: {
+      prerequisites: ["121"],
+      nextSteps: [{ id: "150", title: "Career & Portfolio Tips" }],
+      related: ["122"]
+    },
+    commonPitfalls: [
+      {
+        mistake: "القلق المبالغ فيه بشأن الأداء في تطبيقات بسيطة.",
+        whyWrong: "محرك فلاتر سريع جداً بطبعه لدرجة أن 90% من التطبيقات لا تحتاج لهذه المعرفة العميقة لتعمل بسلاسة.",
+        correctApproach: "ركز على كتابة كود نظيف، والجأ للمحرك والتحسينات العميقة فقط عندما تلاحظ مشكلة حقيقية."
+      }
+    ]
+  },
+  {
+    id: "150",
+    title: "Career Advice & Interview Tips",
+    titleAr: "نصائح مهنية للمقابلات الشخصية",
+    level: "8",
+    category: "Career",
+    tags: ["Career", "Interview", "Portfolio", "Soft Skills", "Success"],
+    definition: {
+      summary: "هي استراتيجيات للنجاح في الحصول على وظيفة مبرمج فلاتر، تتجاوز مجرد معرفة الكود.",
+      detailed: "1. **Portfolio**: ابني 3 مشاريع كاملة ومرفوعة على GitHub بـ (Clean Architecture).\n2. **Communication**: اشرح 'لماذا' اخترت هذا الحل وليس فقط 'كيف' يعمل.\n3. **Problem Solving**: في الاختبار التقني، فكر بصوت عالٍ حتى لو لم تصل للحل النهائي.\n4. **Continuous Learning**: اذكر آخر مقال قرأته أو تحديث تابعته في فلاتر.",
+      analogy: "المقابلة زي (نهائي كاس): التمرين (الكود) مهم، بس الروح والثقة والتركيز في المباراة (المقابلة) هما اللي بيجيبوا الكاس (الوظيفة).",
+      keyPoints: [
+        "Quality over Quantity in GitHub",
+        "Soft skills are as important as technical skills",
+        "Be honest about what you don't know",
+        "Explain your logic before writing code"
+      ],
+      codeExample: {
+        language: "markdown",
+        code: `### Star Method for Questions:
+- **S**ituation: Describe the context.
+- **T**ask: What was the goal?
+- **A**ction: What did YOU do?
+- **R**esult: What was the positive outcome?`
+      }
+    },
+    questions: [
+      {
+        type: "Behavioral",
+        question: "How do you handle a bug you can't solve for days?",
+        questionAr: "كيف تتعامل مع 'بقة' (Bug) لا تستطيع حلها لعدة أيام؟",
+        difficulty: 2,
+        expectedAnswer: {
+          points: [
+            "البحث في التوثيق الرسمي و StackOverflow.",
+            "تبسيط المشكلة في مشروع جديد صغير (Minimal Reproducible Example).",
+            "طلب المساعدة من زملاء الفريق أو المجتمعات البرمجية.",
+            "أخذ استراحة والعودة بعقل صافٍ."
+          ],
+          timeToAnswer: "3 mins"
+        }
+      }
+    ],
+    interviewerMind: {
+      whatTheyWant: ["هل أنت شخص مريح في العمل (Team player) ومستعد للتعنم؟"],
+      redFlags: ["التكبر أو ادعاء معرفة كل شيء."],
+      greenFlags: ["إظهار الشغف (Passion) تجاه حل المشاكل وليس فقط كتابة الكود."]
+    },
+    linkedCards: {
+      prerequisites: ["01"],
+      nextSteps: [],
+      related: []
+    },
+    commonPitfalls: [
+      {
+        mistake: "إهمال الـ LinkedIn والـ Personal Brand.",
+        whyWrong: "أغلب الفرص الممتازة تأتي عبر العلاقات والظهور الاحترافي وليس فقط التقديم التقليدي.",
+        correctApproach: "شارك ما تتعلمه، وحدث بروفايلك باستمرار، وتواصل مع الشركات باحترام."
+      }
+    ]
+  },
 ];
 
 export const getCardById = (id: string): Card | undefined => {
