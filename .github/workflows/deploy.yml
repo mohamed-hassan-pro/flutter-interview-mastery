@@ -43,6 +43,11 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Debug Build Output
+        run: |
+          echo "Checking dist/index.html content:"
+          cat dist/index.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
