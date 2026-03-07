@@ -272,7 +272,7 @@ function AnimatedRoutes() {
 
 function App() {
   return (
-    <Router basename="/flutter-interview-mastery">
+    <Router>
       <AnimatedRoutes />
     </Router>
   );
