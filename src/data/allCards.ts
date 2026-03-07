@@ -20,23 +20,31 @@ export const getCardsByLevel = (level: string): Card[] =>
     allCards.filter(c => c.level === level);
 
 export const getCardsByTag = (tag: string): Card[] =>
-    allCards.filter(c => c.tags.includes(tag));
+    allCards.filter(c => c.tags && Array.isArray(c.tags) && c.tags.includes(tag));
 
 export const getCardsByCompany = (company: string): Card[] =>
-    allCards.filter(c => c.companyTags.includes(company));
+    allCards.filter(c => c.companyTags && Array.isArray(c.companyTags) && c.companyTags.includes(company));
 
 export const getCardsByFrequency = (freq: string): Card[] =>
     allCards.filter(c => c.frequency === freq);
 
 export const getAllTags = (): string[] => {
     const tags = new Set<string>();
-    allCards.forEach(c => c.tags.forEach(t => tags.add(t)));
+    allCards.forEach(c => {
+        if (c.tags && Array.isArray(c.tags)) {
+            c.tags.forEach(t => tags.add(t));
+        }
+    });
     return Array.from(tags).sort();
 };
 
 export const getAllCompanies = (): string[] => {
     const companies = new Set<string>();
-    allCards.forEach(c => c.companyTags.forEach(co => companies.add(co)));
+    allCards.forEach(c => {
+        if (c.companyTags && Array.isArray(c.companyTags)) {
+            c.companyTags.forEach(co => companies.add(co));
+        }
+    });
     return Array.from(companies).sort();
 };
 
@@ -61,8 +69,8 @@ export const searchCards = (query: string): Card[] => {
         c.title.toLowerCase().includes(q) ||
         (c.titleAr ?? '').includes(q) ||
         (c.definition?.summary ?? '').toLowerCase().includes(q) ||
-        c.tags.some(t => t.toLowerCase().includes(q)) ||
-        c.companyTags.some(co => co.toLowerCase().includes(q))
+        (c.tags && Array.isArray(c.tags) && c.tags.some(t => t.toLowerCase().includes(q))) ||
+        (c.companyTags && Array.isArray(c.companyTags) && c.companyTags.some(co => co.toLowerCase().includes(q)))
     );
 };
 

@@ -61,13 +61,13 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
 
     if (newFilters.company !== 'All') {
       filtered = filtered.filter((card) =>
-        card.companyTags.includes(newFilters.company)
+        card.companyTags && Array.isArray(card.companyTags) && card.companyTags.includes(newFilters.company)
       );
     }
 
     if (newFilters.tags.length > 0) {
       filtered = filtered.filter((card) =>
-        newFilters.tags.some((tag) => card.tags.includes(tag))
+        card.tags && Array.isArray(card.tags) && newFilters.tags.some((tag) => card.tags.includes(tag))
       );
     }
 
