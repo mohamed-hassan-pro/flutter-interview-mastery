@@ -30,7 +30,6 @@ import { StudyMode } from '@/pages/StudyMode';
 import { QuizMode } from '@/pages/QuizMode';
 
 function Dashboard() {
-  console.log("Dashboard component rendering...");
   const [filteredCards, setFilteredCards] = useState<Card[]>(cards);
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('map');
   const { currentLanguage, darkMode, toggleLanguage, toggleDarkMode, studiedCards } = useProgressStore();
@@ -272,7 +271,6 @@ function AnimatedRoutes() {
 }
 
 function App() {
-  console.log("App component rendering...");
   return (
     <Router>
       <AnimatedRoutes />

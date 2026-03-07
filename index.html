@@ -2,30 +2,6 @@
 <html lang="en">
 
 <head>
-  <script>
-    window.onerror = function (msg, url, line, col, error) {
-      console.log("Global Error: " + msg + " at " + url + ":" + line);
-      alert("Error: " + msg + " (L" + line + ")");
-      return false;
-    };
-    window.addEventListener('unhandledrejection', function (event) {
-      console.log("Unhandled Rejection: " + event.reason);
-      alert("Rejection: " + event.reason);
-    });
-    console.log("Diagnostic script loaded");
-  </script>
-  <style>
-    #debug-mount {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-      background: red;
-      color: white;
-      padding: 5px;
-      z-index: 9999;
-      font-size: 10px;
-    }
-  </style>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Flutter Interview Mastery</title>
