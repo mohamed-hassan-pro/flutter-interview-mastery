@@ -151,7 +151,7 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
           {/* Level Filter */}
           <div>
             <label className={`text-sm font-bold mb-2 block text-slate-900 dark:text-slate-100 ${isArabic ? 'arabic-text' : ''}`}>
-              {isArabic ? 'المستوى' : 'Level'}
+              {isArabic ? 'مستوى الصعوبة' : 'Difficulty Level'}
             </label>
             <Select
               value={filters.level}
@@ -172,7 +172,7 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
           {/* Company Filter */}
           <div>
             <label className={`text-sm font-bold mb-2 block text-slate-900 dark:text-slate-100 ${isArabic ? 'arabic-text' : ''}`}>
-              {isArabic ? 'الشركة' : 'Company'}
+              {isArabic ? 'أسئلة شركات معينة' : 'Company Specific'}
             </label>
             <Select
               value={filters.company}
@@ -195,7 +195,7 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
           {/* Frequency Filter */}
           <div>
             <label className={`text-sm font-bold mb-2 block text-slate-900 dark:text-slate-100 ${isArabic ? 'arabic-text' : ''}`}>
-              {isArabic ? 'التكرار' : 'Frequency'}
+              {isArabic ? 'مدى أهمية السؤال' : 'Importance'}
             </label>
             <Select
               value={filters.frequency}
@@ -217,7 +217,7 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
           {/* Tags Filter */}
           <div>
             <label className={`text-sm font-bold mb-2 block text-slate-900 dark:text-slate-100 ${isArabic ? 'arabic-text' : ''}`}>
-              {isArabic ? 'الوسوم' : 'Tags'}
+              {isArabic ? 'مواضيع محددة' : 'Specific Topics'}
             </label>
             <div className="flex flex-wrap gap-2">
               {allTags.slice(0, 10).map((tag) => (
@@ -236,7 +236,7 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
           {/* Study Status */}
           <div>
             <label className={`text-sm font-bold mb-2 block text-slate-900 dark:text-slate-100 ${isArabic ? 'arabic-text' : ''}`}>
-              {isArabic ? 'حالة الدراسة' : 'Study Status'}
+              {isArabic ? 'حالة المذاكرة' : 'Study Status'}
             </label>
             <Select
               value={filters.showStudied.toString()}
@@ -265,7 +265,7 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
               className="rounded border-slate-300"
             />
             <label htmlFor="weakOnly" className={`text-sm font-medium cursor-pointer ${isArabic ? 'arabic-text' : ''}`}>
-              {isArabic ? 'المناطق الضعيفة فقط' : 'Weak areas only'}
+              {isArabic ? 'أسئلة صعبة أحتاج مراجعتها' : 'Hard questions I need to review'}
             </label>
           </div>
 
@@ -279,7 +279,7 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
               className="rounded border-slate-300"
             />
             <label htmlFor="dueOnly" className={`text-sm font-medium cursor-pointer ${isArabic ? 'arabic-text' : ''}`}>
-              {isArabic ? 'للمراجعة اليوم' : 'Due for review'}
+              {isArabic ? 'لازم أراجعها ضروري اليوم' : 'Must review urgently today'}
             </label>
             {dueCards.length > 0 && (
               <Badge variant="destructive" className="ml-auto h-5 px-1.5 text-[10px]">

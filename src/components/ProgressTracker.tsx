@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   Star,
   Award,
-  Zap,
   RotateCcw
 } from 'lucide-react';
 
@@ -81,7 +80,7 @@ export function ProgressTracker({ totalCards }: ProgressTrackerProps) {
         {/* Strong Areas */}
         <Card className="p-3">
           <div className="flex items-center gap-2 mb-1">
-            <Zap className="w-4 h-4 text-green-500" />
+            <TrendingUp className="w-4 h-4 text-green-500" />
             <span className={`text-[10px] uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400 ${isArabic ? 'arabic-text' : ''}`}>
               {isArabic ? 'نقاط القوة' : 'Strong Areas'}
             </span>

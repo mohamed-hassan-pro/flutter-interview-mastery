@@ -6,6 +6,9 @@ import { CardGrid } from '@/components/CardGrid';
 import { SearchBar } from '@/components/SearchBar';
 import { FilterPanel } from '@/components/FilterPanel';
 import { ProgressTracker } from '@/components/ProgressTracker';
+import { Hero } from '@/components/Hero';
+import { MapLayout } from '@/components/MapLayout';
+import { SyncModal } from '@/components/SyncModal';
 import { useProgressStore } from '@/store/useProgressStore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +30,7 @@ import { QuizMode } from '@/pages/QuizMode';
 
 function Dashboard() {
   const [filteredCards, setFilteredCards] = useState<Card[]>(cards);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('map');
   const { currentLanguage, darkMode, toggleLanguage, toggleDarkMode, studiedCards } = useProgressStore();
   const isArabic = currentLanguage === 'ar';
 
@@ -41,6 +44,11 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors">
+      <Hero
+        onStart={() => window.scrollTo({ top: 800, behavior: 'smooth' })}
+        onQuiz={() => window.location.hash = '#/quiz'}
+      />
+
       {/* Header */}
       <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -54,7 +62,7 @@ function Dashboard() {
                   {isArabic ? 'إتقان مقابلات Flutter' : 'Flutter Interview Mastery'}
                 </h1>
                 <p className={`text-xs text-readable-muted ${isArabic ? 'arabic-text mt-0.5' : ''}`}>
-                  {isArabic ? '150+ كارد للسوق المصري' : '150+ cards for Egyptian market'}
+                  {isArabic ? '150+ أفضل توبيك' : '150+ Best Topics'}
                 </p>
               </div>
             </div>
@@ -80,6 +88,7 @@ function Dashboard() {
                   <Moon className="w-5 h-5" />
                 )}
               </Button>
+              <SyncModal />
             </div>
           </div>
 
@@ -158,18 +167,22 @@ function Dashboard() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="cursor-pointer" onClick={() => setViewMode('grid')}>
-                    {isArabic ? 'شبكة' : 'Grid'}
+                  <Badge variant={viewMode === 'map' ? 'default' : 'outline'} className="cursor-pointer" onClick={() => setViewMode('map')}>
+                    {isArabic ? 'خريطة المواضيع' : 'Map'}
                   </Badge>
-                  <Badge variant="outline" className="cursor-pointer" onClick={() => setViewMode('list')}>
-                    {isArabic ? 'قائمة' : 'List'}
+                  <Badge variant={viewMode === 'grid' ? 'default' : 'outline'} className="cursor-pointer" onClick={() => setViewMode('grid')}>
+                    {isArabic ? 'شبكة' : 'Grid'}
                   </Badge>
                 </div>
               </div>
             </div>
 
             {/* Cards */}
-            <CardGrid cards={filteredCards} compact={viewMode === 'grid'} />
+            {viewMode === 'map' ? (
+              <MapLayout cards={filteredCards} />
+            ) : (
+              <CardGrid cards={filteredCards} compact={true} />
+            )}
           </div>
         </div>
       </main>
@@ -185,11 +198,6 @@ function Dashboard() {
                 </div>
                 <h3 className="font-bold text-lg">Flutter Mastery</h3>
               </div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mx-auto md:mx-0">
-                {isArabic
-                  ? "مرجع شامل ومبسط للمطورين العرب. زكاة العلم نشره — شاركه مع زمايلك ❤️"
-                  : "Comprehensive and simplified reference for developers. The best way to learn is by sharing ❤️"}
-              </p>
             </div>
 
             <div className="space-y-4">
@@ -222,16 +230,16 @@ function Dashboard() {
 
             <div className="space-y-4">
               <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 py-1.5 px-4 rounded-full">
-                🎁 {isArabic ? 'هدية رمضان 2026' : 'Ramadan 2026 Gift'}
+                🎁 {isArabic ? 'هدية بمناسبة إتمامي 20 عاماً' : 'Gift for turning 20 years old'}
               </Badge>
-              <p className="text-xs text-slate-400 italic">
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 {isArabic ? 'صُنع بحب بواسطة محمد حسن مبدع' : 'Created with love by Mohamed Hassan'}
               </p>
             </div>
           </div>
 
           <div className="pt-8 border-t border-slate-100 dark:border-slate-700/50 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-            <p>© 2026 Flutter Interview Mastery. {isArabic ? 'للمجتمع العربي' : 'For the community'}</p>
+            <p>© 2026 Flutter Interview Mastery.</p>
             <div className="flex gap-6">
               <a href="#" className="hover:text-purple-500 transition-colors">{isArabic ? 'عن المشروع' : 'About'}</a>
               <a href="#" className="hover:text-purple-500 transition-colors">{isArabic ? 'المساهمة' : 'Contribute'}</a>
