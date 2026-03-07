@@ -13613,13 +13613,21 @@ export const getCardsByCompany = (company: string): Card[] => {
 
 export const getAllTags = (): string[] => {
   const tags = new Set<string>();
-  cards.forEach(card => card.tags.forEach(tag => tags.add(tag)));
+  cards.forEach(card => {
+    if (card.tags && Array.isArray(card.tags)) {
+      card.tags.forEach(tag => tags.add(tag));
+    }
+  });
   return Array.from(tags).sort();
 };
 
 export const getAllCompanies = (): string[] => {
   const companies = new Set<string>();
-  cards.forEach(card => card.companyTags.forEach(company => companies.add(company)));
+  cards.forEach(card => {
+    if (card.companyTags && Array.isArray(card.companyTags)) {
+      card.companyTags.forEach(company => companies.add(company));
+    }
+  });
   return Array.from(companies).sort();
 };
 
