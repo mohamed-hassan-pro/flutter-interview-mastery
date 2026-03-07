@@ -21,8 +21,8 @@ export function SyncModal() {
 
     const handleExport = () => {
         try {
-            // Zustand persist saves to localStorage with key 'progress-storage'
-            const data = localStorage.getItem('progress-storage');
+            // The actual key used for progress storage is 'flutter-interview-mastery-progress'
+            const data = localStorage.getItem('flutter-interview-mastery-progress');
             if (!data) throw new Error('No data found');
 
             const encoded = btoa(encodeURIComponent(data));
@@ -44,7 +44,7 @@ export function SyncModal() {
             // Basic validation
             const parsed = JSON.parse(decoded);
             if (parsed && parsed.state && parsed.state.studiedCards) {
-                localStorage.setItem('progress-storage', decoded);
+                localStorage.setItem('flutter-interview-mastery-progress', decoded);
                 toast.success(isArabic ? 'تم استعادة التقدم بنجاح! جاري التحديث...' : 'Progress restored! Reloading...');
                 setTimeout(() => window.location.reload(), 1500);
             } else {

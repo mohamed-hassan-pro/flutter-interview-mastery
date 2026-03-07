@@ -1,4 +1,4 @@
-import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { allCards as cards } from '@/data/allCards';
 import type { Card } from '@/types/card';
@@ -24,7 +24,7 @@ import {
   Mail,
   Sun
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+// import { motion, AnimatePresence } from 'framer-motion';
 import { CardDetail } from '@/pages/CardDetail';
 import { StudyMode } from '@/pages/StudyMode';
 import { QuizMode } from '@/pages/QuizMode';
@@ -36,6 +36,7 @@ function Dashboard() {
   const isArabic = currentLanguage === 'ar';
 
   useEffect(() => {
+    console.log("App mounted - Flutter Interview Mastery");
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -250,58 +251,22 @@ function Dashboard() {
         </div>
       </footer>
 
+      {/* Mount Indicator - Debug ONLY */}
+      <div className="fixed bottom-0 right-0 p-1 text-[8px] text-slate-400 pointer-events-none opacity-20">
+        v1.0.1-mounted
+      </div>
     </div>
   );
 }
 
 function AnimatedRoutes() {
-  const location = useLocation();
-
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Dashboard />
-          </motion.div>
-        } />
-        <Route path="/card/:id" element={
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-          >
-            <CardDetail />
-          </motion.div>
-        } />
-        <Route path="/study" element={
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <StudyMode />
-          </motion.div>
-        } />
-        <Route path="/quiz" element={
-          <motion.div
-            initial={{ opacity: 0, rotateY: 90 }}
-            animate={{ opacity: 1, rotateY: 0 }}
-            exit={{ opacity: 0, rotateY: -90 }}
-            transition={{ duration: 0.2 }}
-          >
-            <QuizMode />
-          </motion.div>
-        } />
-      </Routes>
-    </AnimatePresence>
+    <Routes>
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/card/:id" element={<CardDetail />} />
+      <Route path="/study" element={<StudyMode />} />
+      <Route path="/quiz" element={<QuizMode />} />
+    </Routes>
   );
 }
 
