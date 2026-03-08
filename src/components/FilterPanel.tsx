@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/accordion';
 import { Filter, RotateCcw } from 'lucide-react';
 import { useProgressStore } from '@/store/useProgressStore';
-import { getAllCompanies } from '@/data/allCards';
+
 
 interface FilterPanelProps {
   cards: Card[];
@@ -26,7 +26,7 @@ interface FilterPanelProps {
 
 interface FilterState {
   level: Level | 'All';
-  company: string | 'All';
+
   frequency: Frequency | 'All';
   showStudied: boolean | 'all';
   showWeakOnly: boolean;
@@ -36,13 +36,13 @@ interface FilterState {
 export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
   const { currentLanguage, studiedCards, getWeakCards, getDueCards } = useProgressStore();
   const isArabic = currentLanguage === 'ar';
-  const allCompanies = getAllCompanies();
+
   const weakCards = getWeakCards();
   const dueCards = getDueCards();
 
   const [filters, setFilters] = useState<FilterState>({
     level: 'All',
-    company: 'All',
+
     frequency: 'All',
     showStudied: 'all',
     showWeakOnly: false,
@@ -56,11 +56,6 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
       filtered = filtered.filter((card) => card.level === newFilters.level);
     }
 
-    if (newFilters.company !== 'All') {
-      filtered = filtered.filter((card) =>
-        card.companyTags && Array.isArray(card.companyTags) && card.companyTags.includes(newFilters.company)
-      );
-    }
 
 
 
@@ -97,11 +92,9 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
   };
 
 
-
   const resetFilters = () => {
     const defaultFilters: FilterState = {
       level: 'All',
-      company: 'All',
       frequency: 'All',
       showStudied: 'all',
       showWeakOnly: false,
@@ -113,7 +106,6 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
 
   const hasActiveFilters =
     filters.level !== 'All' ||
-    filters.company !== 'All' ||
     filters.frequency !== 'All' ||
     filters.showStudied !== 'all' ||
     filters.showWeakOnly ||
@@ -151,29 +143,6 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
                 <SelectItem value="Junior">Junior</SelectItem>
                 <SelectItem value="Mid">Mid</SelectItem>
                 <SelectItem value="Senior">Senior</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Company Filter */}
-          <div>
-            <label className={`text-sm font-bold mb-2 block text-slate-900 dark:text-slate-100 ${isArabic ? 'arabic-text' : ''}`}>
-              {isArabic ? 'أسئلة شركات معينة' : 'Company Specific'}
-            </label>
-            <Select
-              value={filters.company}
-              onValueChange={(value) => updateFilter('company', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={isArabic ? 'اختر الشركة' : 'Select company'} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All" className={isArabic ? 'arabic-text' : ''}>{isArabic ? 'الكل' : 'All'}</SelectItem>
-                {allCompanies.map((company) => (
-                  <SelectItem key={company} value={company}>
-                    {company}
-                  </SelectItem>
-                ))}
               </SelectContent>
             </Select>
           </div>

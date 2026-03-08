@@ -39,11 +39,9 @@ final unique = nums.toSet().toList();`
     ],
     interviewerMind: { whatTheyWant: ["يعرف الفرق بين mutating و non-mutating operations", "يستخدم functional style"], redFlags: ["يستخدم for loops بدل map/where", "ينسى toList()"], greenFlags: ["يذكر time complexity", "يستخدم spread + set للـ deduplication"] },
     linkedCards: { prerequisites: ["collections-generics"], nextSteps: [{ id: "map-set-advanced", title: "Map & Set Advanced" }], related: [{ id: "algorithm-basics", title: "Algorithm Basics" }] },
-    commonPitfalls: [{ mistake: "تعديل List أثناء الـ iteration", whyWrong: "يسبب ConcurrentModificationError", correctApproach: "اعمل copy أو استخدم removeWhere", egyptianContext: "خطأ شائع في شركات زي MaxAB" }],
+    commonPitfalls: [{ mistake: "تعديل List أثناء الـ iteration", whyWrong: "يسبب ConcurrentModificationError", correctApproach: "اعمل copy أو استخدم removeWhere" }],
     answerStrategy: { structure: ["اذكر العملية", "اشرح التعقيد", "اديه مثال كود", "اذكر البديل"], timeAllocation: { junior: "2-3 دق", mid: "3-4 دق", senior: "5 دق" }, keyPhrases: ["O(n log n)", "immutable operations", "functional style"] },
-    quickRevision: { bulletPoints: ["sort() = mutates", "map/where = returns Iterable", "fold = accumulate", "expand = flatten"], memoryHook: "map/where/reduce = functional trinity", cheatSheet: "sort() | map() | where() | fold() | expand() | toSet().toList()" },
-    companyTags: ["MaxAB", "Swvl", "ITWorx"],
-    egyptianMarket: { popularity: "Very High", salaryImpact: "Moderate" }
+    quickRevision: { bulletPoints: ["sort() = mutates", "map/where = returns Iterable", "fold = accumulate", "expand = flatten"], memoryHook: "map/where/reduce = functional trinity", cheatSheet: "sort() | map() | where() | fold() | expand() | toSet().toList()" }
   },
 
   {
@@ -84,11 +82,9 @@ for (var w in words) freq.update(w, (v) => v+1, ifAbsent: () => 1);`
     ],
     interviewerMind: { whatTheyWant: ["يفهم الـ underlying data structures", "يعرف متى يستخدم أي implementation"], redFlags: ["يستخدم Map دايمًا بدون تفكير", "لا يعرف LinkedHashMap"], greenFlags: ["يذكر HashMap للـ performance", "يفكر في الـ use case قبل الاختيار"] },
     linkedCards: { prerequisites: ["list-advanced"], nextSteps: [{ id: "time-complexity", title: "Time Complexity" }], related: [{ id: "collections-generics", title: "Collections & Generics" }] },
-    commonPitfalls: [{ mistake: "استخدام == لمقارنة Maps", whyWrong: "بيقارن reference مش content", correctApproach: "استخدم mapEquals من flutter/foundation", egyptianContext: "شائع في code reviews" }],
+    commonPitfalls: [{ mistake: "استخدام == لمقارنة Maps", whyWrong: "بيقارن reference مش content", correctApproach: "استخدم mapEquals من flutter/foundation" }],
     answerStrategy: { structure: ["اذكر الـ implementation", "اشرح الـ complexity", "امتى تستخدم كل واحد"], timeAllocation: { junior: "2 دق", mid: "3 دق", senior: "4 دق" }, keyPhrases: ["O(1) lookup", "insertion-ordered", "frequency counter"] },
-    quickRevision: { bulletPoints: ["LinkedHashMap = default", "HashMap = fast unordered", "SplayTreeMap = sorted", "putIfAbsent = safe insert"], memoryHook: "Hash=fast, Tree=sorted, Linked=ordered", cheatSheet: "HashMap O(1) | SplayTreeMap O(log n) | LinkedHashMap = default" },
-    companyTags: ["Swvl", "Thndr", "MaxAB"],
-    egyptianMarket: { popularity: "High", salaryImpact: "Moderate" }
+    quickRevision: { bulletPoints: ["LinkedHashMap = default", "HashMap = fast unordered", "SplayTreeMap = sorted", "putIfAbsent = safe insert"], memoryHook: "Hash=fast, Tree=sorted, Linked=ordered", cheatSheet: "HashMap O(1) | SplayTreeMap O(log n) | LinkedHashMap = default" }
   },
 
   {
@@ -142,11 +138,11 @@ bool hasDuplicates(List<int> list) {
     ],
     interviewerMind: { whatTheyWant: ["يعرف يحسب التعقيد", "يعرف يحسّن الكود"], redFlags: ["لا يعرف Big O أصلاً", "يقول O(n) لكل حاجة"], greenFlags: ["يفكر في space complexity", "يذكر amortized complexity", "يقترح Set عوضًا عن nested loop"] },
     linkedCards: { prerequisites: ["map-set-advanced"], nextSteps: [{ id: "sorting-algorithms", title: "Sorting Algorithms" }], related: [{ id: "list-advanced", title: "List Advanced" }] },
-    commonPitfalls: [{ mistake: "استخدام List.contains() في loop", whyWrong: "يعمل O(n²) بدون ما تحس", correctApproach: "حوّل اللست لـ Set قبل الـ lookup", egyptianContext: "سؤال أساسي في Swvl و Thndr" }],
+    commonPitfalls: [{
+      mistake: "استخدام List.contains() في loop", whyWrong: "يعمل O(n²) بدون ما تحس", correctApproach: "حوّل اللست لـ Set قبل الـ lookup"
+    }],
     answerStrategy: { structure: ["عرّف Big O", "ادي أمثلة لكل نوع", "وضح كيف تُحسّن الكود"], timeAllocation: { junior: "2-3 دق", mid: "3-4 دق", senior: "5-7 دق" }, keyPhrases: ["time complexity", "space complexity", "amortized O(1)", "trade-off"] },
-    quickRevision: { bulletPoints: ["O(1)=constant", "O(log n)=binary search", "O(n)=linear", "O(n log n)=sort", "O(n²)=nested loops"], memoryHook: "1 < log n < n < n log n < n²", cheatSheet: "HashMap=O(1) | List.contains=O(n) | sort=O(n log n)" },
-    companyTags: ["Swvl", "Thndr", "MaxAB", "Valeo"],
-    egyptianMarket: { popularity: "Very High", salaryImpact: "Critical" }
+    quickRevision: { bulletPoints: ["O(1)=constant", "O(log n)=binary search", "O(n)=linear", "O(n log n)=sort", "O(n²)=nested loops"], memoryHook: "1 < log n < n < n log n < n²", cheatSheet: "HashMap=O(1) | List.contains=O(n) | sort=O(n log n)" }
   },
 
   {
@@ -192,11 +188,9 @@ users.sort((a, b) => b.age.compareTo(a.age)); // age descending`
     ],
     interviewerMind: { whatTheyWant: ["يفهم متى يستخدم أي algorithm", "يعرف يكتب custom comparator"], redFlags: ["يقول bubble sort للـ production", "لا يعرف stable sort"], greenFlags: ["يذكر TimSort", "يكتب clean comparator"] },
     linkedCards: { prerequisites: ["time-complexity"], nextSteps: [{ id: "search-algorithms", title: "Search Algorithms" }], related: [] },
-    commonPitfalls: [{ mistake: "نسيان stable sort في الـ UI", whyWrong: "يغير ترتيب عناصر متساوية ويؤثر على UX", correctApproach: "استخدم Dart's built-in sort (stable)", egyptianContext: "مهم في apps زي MaxAB للـ product listing" }],
+    commonPitfalls: [{ mistake: "نسيان stable sort في الـ UI", whyWrong: "يغير ترتيب عناصر متساوية ويؤثر على UX", correctApproach: "استخدم Dart's built-in sort (stable)" }],
     answerStrategy: { structure: ["اذكر الـ algorithm", "اشرح الـ complexity", "متى تستخدمه", "Dart specifics"], timeAllocation: { junior: "2 دق", mid: "3 دق", senior: "4 دق" }, keyPhrases: ["TimSort", "stable sort", "O(n log n)", "custom comparator"] },
-    quickRevision: { bulletPoints: ["Dart uses TimSort", "Stable = preserves equal order", "Custom comparator with sort()", "Merge > Quick (stable)"], memoryHook: "Tim = Time (efficient) Sort", cheatSheet: "list.sort((a,b) => a.x.compareTo(b.x))" },
-    companyTags: ["ITWorx", "Valeo", "MaxAB"],
-    egyptianMarket: { popularity: "Medium", salaryImpact: "Moderate" }
+    quickRevision: { bulletPoints: ["Dart uses TimSort", "Stable = preserves equal order", "Custom comparator with sort()", "Merge > Quick (stable)"], memoryHook: "Tim = Time (efficient) Sort", cheatSheet: "list.sort((a,b) => a.x.compareTo(b.x))" }
   },
 
   {
@@ -243,11 +237,9 @@ int bSearch(List<int> list, int target) {
     ],
     interviewerMind: { whatTheyWant: ["يفهم متى يستخدم binary search", "يعرف alternatives"], redFlags: ["لا يعرف شرط الـ sorted data"], greenFlags: ["يذكر Fuse.js للـ fuzzy search", "يفكر في debounce"] },
     linkedCards: { prerequisites: ["sorting-algorithms"], nextSteps: [{ id: "linked-list-tree", title: "Linked List & Tree" }], related: [] },
-    commonPitfalls: [{ mistake: "تطبيق binary search على unsorted list", whyWrong: "نتائج خاطئة وبدون error", correctApproach: "تأكد من الـ sort أولاً أو استخدم linear search", egyptianContext: "خطأ شائع في مقابلات Swvl" }],
+    commonPitfalls: [{ mistake: "تطبيق binary search على unsorted list", whyWrong: "نتائج خاطئة وبدون error", correctApproach: "تأكد من الـ sort أولاً أو استخدم linear search" }],
     answerStrategy: { structure: ["اشرح الـ algorithm", "اشرح الـ precondition", "اكتب الكود", "اذكر البدائل"], timeAllocation: { junior: "2 دق", mid: "3 دق", senior: "4 دق" }, keyPhrases: ["O(log n)", "sorted prerequisite", "Fuse.js for fuzzy"] },
-    quickRevision: { bulletPoints: ["Binary = O(log n) sorted", "Linear = O(n) any", "Set.contains = O(1)", "Fuse.js = fuzzy"], memoryHook: "Binary = split in half each time", cheatSheet: "binarySearch(sorted, target) from collection pkg" },
-    companyTags: ["Swvl", "MaxAB", "Thndr"],
-    egyptianMarket: { popularity: "High", salaryImpact: "Moderate" }
+    quickRevision: { bulletPoints: ["Binary = O(log n) sorted", "Linear = O(n) any", "Set.contains = O(1)", "Fuse.js = fuzzy"], memoryHook: "Binary = split in half each time", cheatSheet: "binarySearch(sorted, target) from collection pkg" }
   },
 
   {
@@ -301,11 +293,9 @@ void bfs(TreeNode root) {
     ],
     interviewerMind: { whatTheyWant: ["يفهم هياكل البيانات الهرمية", "يربطها بـ Flutter"], redFlags: ["لا يعرف DFS/BFS", "لا يعرف Dart's LinkedList"], greenFlags: ["يربط بـ Flutter widget tree", "يستخدم Queue للـ BFS"] },
     linkedCards: { prerequisites: ["search-algorithms"], nextSteps: [{ id: "stack-queue-heap", title: "Stack Queue & Heap" }], related: [] },
-    commonPitfalls: [{ mistake: "استخدام List بدل Queue للـ BFS", whyWrong: "removeAt(0) في List هو O(n)", correctApproach: "استخدم Queue من dart:collection", egyptianContext: "خطأ شائع في senior interviews" }],
+    commonPitfalls: [{ mistake: "استخدام List بدل Queue للـ BFS", whyWrong: "removeAt(0) في List هو O(n)", correctApproach: "استخدم Queue من dart:collection" }],
     answerStrategy: { structure: ["اشرح الـ structure", "اكتب الكود", "اربطه بـ Flutter"], timeAllocation: { junior: "3 دق", mid: "4 دق", senior: "5-7 دق" }, keyPhrases: ["O(1) insert", "DFS recursive", "BFS queue-based"] },
-    quickRevision: { bulletPoints: ["BFS = Queue", "DFS = Stack/Recursive", "BST = sorted tree", "Flutter widget tree = tree structure"], memoryHook: "BFS = Breadth (wide), DFS = Depth (deep)", cheatSheet: "BFS: queue.add(); DFS: recurse(node.children)" },
-    companyTags: ["Valeo", "International", "ITWorx"],
-    egyptianMarket: { popularity: "Low", salaryImpact: "Major for Senior" }
+    quickRevision: { bulletPoints: ["BFS = Queue", "DFS = Stack/Recursive", "BST = sorted tree", "Flutter widget tree = tree structure"], memoryHook: "BFS = Breadth (wide), DFS = Depth (deep)", cheatSheet: "BFS: queue.add(); DFS: recurse(node.children)" }
   },
 
   {
@@ -350,11 +340,9 @@ print(pq.removeFirst()); // 1 — smallest first`
     ],
     interviewerMind: { whatTheyWant: ["يفهم LIFO vs FIFO", "يربط بـ Flutter examples"], redFlags: ["يخلط Queue مع List", "لا يعرف PriorityQueue"], greenFlags: ["يربط Navigator بـ Stack", "يذكر microtask queue"] },
     linkedCards: { prerequisites: ["linked-list-tree"], nextSteps: [{ id: "recursion-dp", title: "Recursion & DP" }], related: [{ id: "async-future", title: "Async Future" }] },
-    commonPitfalls: [{ mistake: "استخدام List.removeAt(0) كـ Queue", whyWrong: "O(n) لأن بيشيف كل العناصر", correctApproach: "استخدم Queue من dart:collection", egyptianContext: "خطأ شائع عند Junior developers" }],
+    commonPitfalls: [{ mistake: "استخدام List.removeAt(0) كـ Queue", whyWrong: "O(n) لأن بيشيف كل العناصر", correctApproach: "استخدم Queue من dart:collection" }],
     answerStrategy: { structure: ["عرّف كل structure", "اذكر use case", "اكتب كود مختصر"], timeAllocation: { junior: "2 دق", mid: "3 دق", senior: "4 دق" }, keyPhrases: ["LIFO", "FIFO", "priority scheduling"] },
-    quickRevision: { bulletPoints: ["Stack = LIFO = Navigator", "Queue = FIFO = BFS", "PriorityQueue = heap", "Microtask = highest priority"], memoryHook: "Stack plates, Queue cinema line, Heap VIP", cheatSheet: "stack: add/removeLast | queue: add/removeFirst | pq: addAll/removeFirst" },
-    companyTags: ["Swvl", "MaxAB", "Thndr"],
-    egyptianMarket: { popularity: "Medium", salaryImpact: "Moderate" }
+    quickRevision: { bulletPoints: ["Stack = LIFO = Navigator", "Queue = FIFO = BFS", "PriorityQueue = heap", "Microtask = highest priority"], memoryHook: "Stack plates, Queue cinema line, Heap VIP", cheatSheet: "stack: add/removeLast | queue: add/removeFirst | pq: addAll/removeFirst" }
   },
 
   {
@@ -402,11 +390,9 @@ int fibDP(int n) {
     ],
     interviewerMind: { whatTheyWant: ["يفهم التكرارية والـ DP", "يكتب كود صحيح"], redFlags: ["لا يعرف base case", "ينسى الـ memoization"], greenFlags: ["يذكر أن Dart لا تعمل tail recursion", "يفكر في space vs time trade-off"] },
     linkedCards: { prerequisites: ["stack-queue-heap"], nextSteps: [{ id: "graph-algorithms", title: "Graph Algorithms" }], related: [] },
-    commonPitfalls: [{ mistake: "استخدام recursion بدون base case", whyWrong: "Stack Overflow error", correctApproach: "دايماً عرّف base case أولاً", egyptianContext: "سؤال أساسي في مقابلات Senior level" }],
+    commonPitfalls: [{ mistake: "استخدام recursion بدون base case", whyWrong: "Stack Overflow error", correctApproach: "دايماً عرّف base case أولاً" }],
     answerStrategy: { structure: ["عرّف المشكلة", "حدد الـ base case", "اكتب الـ recursive solution", "حسّنه بـ DP"], timeAllocation: { junior: "3 دق", mid: "4 دق", senior: "7 دق" }, keyPhrases: ["memoization", "base case", "overlapping subproblems"] },
-    quickRevision: { bulletPoints: ["Base case = stop condition", "Memo = HashMap cache", "DP = avoid recomputation", "Dart: no tail-call optimization"], memoryHook: "DP = smart recursion with a notepad", cheatSheet: "memo.putIfAbsent(n, () => f(n-1) + f(n-2))" },
-    companyTags: ["Thndr", "Swvl", "International"],
-    egyptianMarket: { popularity: "Medium", salaryImpact: "Major for Senior" }
+    quickRevision: { bulletPoints: ["Base case = stop condition", "Memo = HashMap cache", "DP = avoid recomputation", "Dart: no tail-call optimization"], memoryHook: "DP = smart recursion with a notepad", cheatSheet: "memo.putIfAbsent(n, () => f(n-1) + f(n-2))" }
   },
 
   {
@@ -459,11 +445,9 @@ List<String> bfs(String start, String end) {
     ],
     interviewerMind: { whatTheyWant: ["يعرف model graphs", "يطبق BFS/DFS"], redFlags: ["لا يعرف adjacency list", "يخلط BFS مع DFS"], greenFlags: ["يطبقه على Flutter dependency system", "يذكر Dijkstra"] },
     linkedCards: { prerequisites: ["recursion-dp"], nextSteps: [{ id: "widget-lifecycle", title: "Widget Lifecycle" }], related: [] },
-    commonPitfalls: [{ mistake: "نسيان الـ visited set في الـ graph traversal", whyWrong: "infinite loop في cyclic graphs", correctApproach: "دايماً track الـ visited nodes", egyptianContext: "خطأ شائع في coding interviews" }],
+    commonPitfalls: [{ mistake: "نسيان الـ visited set في الـ graph traversal", whyWrong: "infinite loop في cyclic graphs", correctApproach: "دايماً track الـ visited nodes" }],
     answerStrategy: { structure: ["ارسم الـ graph", "اختار الـ traversal المناسب", "اكتب الكود", "اذكر الـ complexity"], timeAllocation: { junior: "3 دق", mid: "5 دق", senior: "10 دق" }, keyPhrases: ["adjacency list", "visited set", "BFS/DFS", "DAG"] },
-    quickRevision: { bulletPoints: ["Graph = Map<Node, List<Node>>", "BFS = Queue + shortest path", "DFS = Stack/Recursion", "Visited set = avoid cycles"], memoryHook: "BFS = explore wide, DFS = explore deep", cheatSheet: "Map<String,List<String>> | Queue for BFS | Set for visited" },
-    companyTags: ["Valeo", "International", "Thndr"],
-    egyptianMarket: { popularity: "Low", salaryImpact: "Critical for Senior" }
+    quickRevision: { bulletPoints: ["Graph = Map<Node, List<Node>>", "BFS = Queue + shortest path", "DFS = Stack/Recursion", "Visited set = avoid cycles"], memoryHook: "BFS = explore wide, DFS = explore deep", cheatSheet: "Map<String,List<String>> | Queue for BFS | Set for visited" }
   },
 
   {
@@ -496,8 +480,8 @@ class Rect extends Shape { final double w, h; Rect(this.w, this.h); }
 
 double area(Shape s) => switch (s) {
   Circle(:var r) => 3.14 * r * r,
-  Rect(:var w, :var h) => w * h,
-}; // compiler error if case missing!`
+  Rect(:var w, :var h) => w * h
+  }; // compiler error if case missing!`
       }
     },
     questions: [
@@ -509,10 +493,12 @@ double area(Shape s) => switch (s) {
     ],
     interviewerMind: { whatTheyWant: ["يعرف Dart 3 features", "يطبقها على real code"], redFlags: ["لا يعرف records أصلاً", "لا يعرف sealed classes Dart 3"], greenFlags: ["يربطها بـ BLoC states", "يذكر exhaustive checking"] },
     linkedCards: { prerequisites: ["graph-algorithms"], nextSteps: [{ id: "widget-lifecycle", title: "Widget Lifecycle" }], related: [{ id: "abstract-interfaces", title: "Abstract & Interfaces" }] },
-    commonPitfalls: [{ mistake: "استخدام Map بدل Records لإرجاع قيم", whyWrong: "Map غير type-safe وغير destructured", correctApproach: "استخدم Records (T1, T2)", egyptianContext: "Dart 3 feature مهم للـ 2025 interviews" }],
+    commonPitfalls: [{
+      mistake: "استخدام Map بدل Records لإرجاع قيم", whyWrong: "Map غير type-safe وغير destructured", correctApproach: "استخدم Records (T1, T2)"
+    }],
     answerStrategy: { structure: ["اشرح الـ feature", "اديه مثال practical", "وضح الميزة على الـ alternatives"], timeAllocation: { junior: "2 دق", mid: "3 دق", senior: "4 دق" }, keyPhrases: ["records", "sealed classes", "exhaustive switch", "pattern matching"] },
-    quickRevision: { bulletPoints: ["Record = (T1, T2) or (name: T)", "sealed = exhaustive switch", "Patterns = destructuring", "when = guard clause"], memoryHook: "Records = lightweight tuple, Sealed = all cases known", cheatSheet: "(int id, String name) | sealed class | switch exhaustive" },
-    companyTags: ["Swvl", "Thndr", "MaxAB"],
-    egyptianMarket: { popularity: "Growing", salaryImpact: "Major" }
+    quickRevision: { bulletPoints: ["Record = (T1, T2) or (name: T)", "sealed = exhaustive switch", "Patterns = destructuring", "when = guard clause"], memoryHook: "Records = lightweight tuple, Sealed = all cases known", cheatSheet: "(int id, String name) | sealed class | switch exhaustive" }
   }
 ];
+
+

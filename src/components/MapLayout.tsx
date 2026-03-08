@@ -36,10 +36,14 @@ export function MapLayout({ cards }: MapLayoutProps) {
     // We'll calculate groups based on the filtered cards provided to this component.
     // If the total cards is < 150 (due to filtering), we can just show them in one group, or keep the 15-chunk logic.
     // Actually, grouping by card.number is safer.
+    // Group cards into 10 levels dynamically. 
+    // Usually 150 cards/10 = 15 per level, but we use Math.ceil to handle extra cards.
+    const cardsPerLevel = Math.max(15, Math.ceil(cards.length / 10));
+
     const groupedLevels = [];
     for (let levelIndex = 0; levelIndex < 10; levelIndex++) {
-        const minId = levelIndex * 15 + 1;
-        const maxId = (levelIndex + 1) * 15;
+        const minId = levelIndex * cardsPerLevel + 1;
+        const maxId = (levelIndex === 9) ? Infinity : (levelIndex + 1) * cardsPerLevel;
         const levelCards = cards.filter(c => c.number >= minId && c.number <= maxId);
 
         // Add custom titles based on topics (approximate)

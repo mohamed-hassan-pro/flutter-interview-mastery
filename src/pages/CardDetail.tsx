@@ -16,8 +16,6 @@ import {
   Code,
   AlertTriangle,
   Lightbulb,
-  Building2,
-  TrendingUp,
   Clock,
   ChevronLeft,
   ChevronRight
@@ -348,34 +346,7 @@ export function CardDetail() {
             </div>
           )}
 
-          {/* Company Tags */}
-          <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-            <div className="flex items-center gap-2 mb-4">
-              <Building2 className="w-5 h-5 text-blue-600" />
-              <h2 className="text-xl font-semibold">{isArabic ? 'الشركات' : 'Companies'}</h2>
-            </div>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {card.companyTags?.map((company) => (
-                <Badge key={company} variant="outline">{company}</Badge>
-              ))}
-            </div>
-            {card.egyptianMarket && (
-              <div className="flex items-center gap-6 text-sm">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-green-600" />
-                  <span className="text-slate-600 dark:text-slate-400">
-                    {isArabic ? 'الشعبية:' : 'Popularity:'} {card.egyptianMarket.popularity}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-yellow-500" />
-                  <span className="text-slate-600 dark:text-slate-400">
-                    {isArabic ? 'تأثير الراتب:' : 'Salary Impact:'} {card.egyptianMarket.salaryImpact}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
+
 
           {/* Linked Cards */}
           {(prerequisites.length > 0 || nextSteps.length > 0) && (

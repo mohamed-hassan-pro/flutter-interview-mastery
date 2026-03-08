@@ -57,7 +57,6 @@ export interface Pitfall {
   mistake: string;
   whyWrong: string;
   correctApproach: string;
-  egyptianContext?: string;
 }
 
 export interface AnswerStrategy {
@@ -76,10 +75,7 @@ export interface QuickRevision {
   cheatSheet: string;
 }
 
-export interface EgyptianMarket {
-  popularity: string;
-  salaryImpact: string;
-}
+
 
 export interface Card {
   id: string;
@@ -97,13 +93,10 @@ export interface Card {
   commonPitfalls?: Pitfall[];
   answerStrategy?: AnswerStrategy;
   quickRevision?: QuickRevision;
-  companyTags: string[];
-  egyptianMarket: EgyptianMarket;
 }
 
 export interface FilterOptions {
   level: Level | 'All';
-  company: string | 'All';
   tags: string[];
   frequency: Frequency | 'All';
   searchQuery: string;

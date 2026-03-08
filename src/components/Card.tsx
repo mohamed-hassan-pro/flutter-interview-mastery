@@ -9,8 +9,6 @@ import {
   Lightbulb,
   CheckCircle,
   Star,
-  Building2,
-  TrendingUp,
   ArrowRight,
   Clock
 } from 'lucide-react';
@@ -289,36 +287,7 @@ export function Card({ card, compact = false }: CardProps) {
         </div>
       )}
 
-      {/* Company Tags */}
-      <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-        <div className="flex items-center gap-2 mb-3">
-          <Building2 className="w-5 h-5 text-blue-600" />
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-            {isArabic ? 'الشركات' : 'Companies'}
-          </h3>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {card.companyTags && Array.isArray(card.companyTags) && card.companyTags.map((company) => (
-            <Badge key={company} variant="outline" className="text-xs">
-              {company}
-            </Badge>
-          ))}
-        </div>
-        <div className="mt-3 flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-1">
-            <TrendingUp className="w-4 h-4 text-green-600" />
-            <span className="text-slate-600 dark:text-slate-400">
-              {isArabic ? 'الشعبية:' : 'Popularity:'} {card.egyptianMarket.popularity}
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 text-yellow-500" />
-            <span className="text-slate-600 dark:text-slate-400">
-              {isArabic ? 'تأثير الراتب:' : 'Salary Impact:'} {card.egyptianMarket.salaryImpact}
-            </span>
-          </div>
-        </div>
-      </div>
+
 
       {/* Actions */}
       <div className="p-6 bg-slate-50 dark:bg-slate-900/50">

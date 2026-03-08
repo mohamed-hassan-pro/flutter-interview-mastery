@@ -5,8 +5,42 @@
 
 import type { Card } from '@/types/card';
 import { cards } from './cards';
+import { cardsExtra1 } from './cards_extra1';
+import { cardsExtra2 } from './cards_extra2';
+import { cardsExtra3 } from './cards_extra3';
+import { cardsExtra4 } from './cards_extra4';
+import { cardsExtra5 } from './cards_extra5';
+import { cardsExtra7 } from './cards_extra7';
+import { cardsExtra8 } from './cards_extra8';
+import { cardsExtra9 } from './cards_extra9';
+import { cardsExtra10 } from './cards_extra10';
 
-export const allCards: Card[] = cards;
+// Combine all cards, ensuring no duplicates by ID
+const rawCards = [
+    ...cards,
+    ...cardsExtra1,
+    ...cardsExtra2,
+    ...cardsExtra3,
+    ...cardsExtra4,
+    ...cardsExtra5,
+    ...cardsExtra7,
+    ...cardsExtra8,
+    ...cardsExtra9,
+    ...cardsExtra10
+];
+
+// Deduplicate and re-number to ensure unique sequence
+const seenIds = new Set<string>();
+export const allCards: Card[] = rawCards
+    .filter(c => {
+        if (seenIds.has(c.id)) return false;
+        seenIds.add(c.id);
+        return true;
+    })
+    .map((c, index) => ({
+        ...c,
+        number: index + 1 // Re-index for consistent 1-150 sequence
+    }));
 
 // ─── Utility Functions ───────────────────────────────────────────────────────
 
@@ -22,8 +56,7 @@ export const getCardsByLevel = (level: string): Card[] =>
 export const getCardsByTag = (tag: string): Card[] =>
     allCards.filter(c => c.tags && Array.isArray(c.tags) && c.tags.includes(tag));
 
-export const getCardsByCompany = (company: string): Card[] =>
-    allCards.filter(c => c.companyTags && Array.isArray(c.companyTags) && c.companyTags.includes(company));
+
 
 export const getCardsByFrequency = (freq: string): Card[] =>
     allCards.filter(c => c.frequency === freq);
@@ -36,16 +69,6 @@ export const getAllTags = (): string[] => {
         }
     });
     return Array.from(tags).sort();
-};
-
-export const getAllCompanies = (): string[] => {
-    const companies = new Set<string>();
-    allCards.forEach(c => {
-        if (c.companyTags && Array.isArray(c.companyTags)) {
-            c.companyTags.forEach(co => companies.add(co));
-        }
-    });
-    return Array.from(companies).sort();
 };
 
 export const getAllLevels = (): string[] =>
@@ -69,8 +92,7 @@ export const searchCards = (query: string): Card[] => {
         c.title.toLowerCase().includes(q) ||
         (c.titleAr ?? '').includes(q) ||
         (c.definition?.summary ?? '').toLowerCase().includes(q) ||
-        (c.tags && Array.isArray(c.tags) && c.tags.some(t => t.toLowerCase().includes(q))) ||
-        (c.companyTags && Array.isArray(c.companyTags) && c.companyTags.some(co => co.toLowerCase().includes(q)))
+        (c.tags && Array.isArray(c.tags) && c.tags.some(t => t.toLowerCase().includes(q)))
     );
 };
 
