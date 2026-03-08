@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Target, Trophy, Monitor, Map, FileText } from 'lucide-react';
 import { Button } from './ui/button';
 import { useProgressStore } from '@/store/useProgressStore';
+import { ComingSoonModal } from './ComingSoonModal';
 
 interface HeroProps {
     onStart: () => void;
@@ -94,10 +95,16 @@ export function Hero({ onStart }: HeroProps) {
                         <Map className="w-5 h-5 mr-2" />
                         <span className={`text-lg font-bold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'ابدأ التعلم' : 'Start Learning'}</span>
                     </Button>
-                    <Button size="lg" variant="outline" className="border-cyan-800 bg-slate-800 text-white hover:bg-slate-700 rounded-full px-8 h-14 relative overflow-hidden" onClick={() => window.location.hash = '#/quiz'}>
+                    {/* <Button size="lg" variant="outline" className="border-cyan-800 bg-slate-800 text-white hover:bg-slate-700 rounded-full px-8 h-14 relative overflow-hidden" onClick={() => window.location.hash = '#/quiz'}>
                         <Trophy className="w-5 h-5 mr-2 text-yellow-400" />
                         <span className={`text-lg font-bold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'محاكاة المقابلات' : 'Interview Simulation'}</span>
-                    </Button>
+                    </Button> */}
+                    <ComingSoonModal>
+                        <Button size="lg" variant="outline" className="border-cyan-800 bg-slate-800 text-white hover:bg-slate-700 rounded-full px-8 h-14 relative overflow-hidden">
+                            <Trophy className="w-5 h-5 mr-2 text-yellow-400" />
+                            <span className={`text-lg font-bold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'محاكاة المقابلات' : 'Interview Simulation'}</span>
+                        </Button>
+                    </ComingSoonModal>
                     <Button size="lg" variant="outline" className="border-cyan-800 bg-slate-800 text-white hover:bg-slate-700 rounded-full px-8 h-14" onClick={onStart}>
                         <Target className="w-5 h-5 mr-2 text-rose-400" />
                         <span className={`text-lg font-bold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'خريطة الطريق' : 'Roadmap'}</span>

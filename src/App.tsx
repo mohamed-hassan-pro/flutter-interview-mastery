@@ -28,6 +28,7 @@ import {
 import { CardDetail } from '@/pages/CardDetail';
 import { StudyMode } from '@/pages/StudyMode';
 import { QuizMode } from '@/pages/QuizMode';
+import { ComingSoonModal } from '@/components/ComingSoonModal';
 
 function Dashboard() {
   const [filteredCards, setFilteredCards] = useState<Card[]>(cards);
@@ -103,12 +104,18 @@ function Dashboard() {
                 {isArabic ? 'وضع الدراسة' : 'Study Mode'}
               </Button>
             </Link>
-            <Link to="/quiz">
+            {/* <Link to="/quiz">
               <Button variant="outline" size="sm">
                 <Brain className="w-4 h-4 mr-2" />
                 {isArabic ? 'محاكاة المقابلات' : 'Interview Simulation'}
               </Button>
-            </Link>
+            </Link> */}
+            <ComingSoonModal>
+              <Button variant="outline" size="sm">
+                <Brain className="w-4 h-4 mr-2" />
+                {isArabic ? 'محاكاة المقابلات' : 'Interview Simulation'}
+              </Button>
+            </ComingSoonModal>
           </nav>
         </div>
       </header>
