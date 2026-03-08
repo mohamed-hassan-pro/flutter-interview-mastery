@@ -60,11 +60,9 @@ export function Hero({ onStart }: HeroProps) {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className={`text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed mb-12 ${isArabic ? 'arabic-text' : ''}`}
+                    className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed mb-12 arabic-text"
                 >
-                    {isArabic
-                        ? 'دليلك المتكامل لاجتياز مقابلات Flutter بثقة. نأخذك من الأساسيات وحتى هندسة البرمجيات المتقدمة (Architecture)، مع +150 موضوع، أمثلة عملية، ومحاكي حقيقي للمقابلات.'
-                        : 'The ultimate guide to ace Flutter interviews with confidence. From core basics to advanced architecture, featuring 150+ topics, practical examples, and a real interview simulator.'}
+                    دليلك المتكامل لاجتياز مقابلات Flutter بثقة. نأخذك من الأساسيات وحتى هندسة البرمجيات المتقدمة (Architecture)، مع +150 موضوع، أمثلة عملية، ومحاكي حقيقي للمقابلات.
                 </motion.p>
 
                 {/* Stats Row */}
@@ -76,11 +74,11 @@ export function Hero({ onStart }: HeroProps) {
                 >
                     <div className="flex flex-col items-center relative">
                         <span className="text-3xl md:text-4xl font-bold text-cyan-400 mb-1">+150</span>
-                        <span className="text-slate-400 text-sm">{isArabic ? 'موضوع / كارد' : 'Topics / Cards'}</span>
+                        <span className="text-slate-400 text-sm">موضوع / كارد</span>
                     </div>
                     <div className="flex flex-col items-center relative mt-8 md:mt-0">
                         <span className="text-3xl md:text-4xl font-bold text-cyan-400 mb-1">10</span>
-                        <span className="text-slate-400 text-sm">{isArabic ? 'مستويات رئيسية' : 'Core Levels'}</span>
+                        <span className="text-slate-400 text-sm">مستويات رئيسية</span>
                     </div>
                 </motion.div>
 

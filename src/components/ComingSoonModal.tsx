@@ -1,4 +1,3 @@
-import { useProgressStore } from '@/store/useProgressStore';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -15,9 +14,6 @@ interface ComingSoonModalProps {
 }
 
 export function ComingSoonModal({ children }: ComingSoonModalProps) {
-    const { currentLanguage } = useProgressStore();
-    const isArabic = currentLanguage === 'ar';
-
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -28,13 +24,11 @@ export function ComingSoonModal({ children }: ComingSoonModalProps) {
                     <div className="w-16 h-16 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center mb-4 border border-cyan-500/30 animate-pulse">
                         <Brain className="w-8 h-8 text-cyan-400" />
                     </div>
-                    <DialogTitle className={`text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 mb-2 ${isArabic ? 'arabic-text' : ''}`}>
-                        {isArabic ? 'قريباً جداً!' : 'Coming Soon!'}
+                    <DialogTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-400 mb-2 arabic-text">
+                        قريباً جداً!
                     </DialogTitle>
-                    <DialogDescription className={`text-slate-300 text-lg leading-relaxed ${isArabic ? 'arabic-text' : ''}`}>
-                        {isArabic
-                            ? 'نحن نعمل حالياً على تطوير محاكاة ذكية للمقابلات باستخدام الذكاء الاصطناعي لمساعدتك في التدريب بشكل واقعي.'
-                            : 'We are currently developing an AI-powered interview simulation to help you practice in a realistic environment.'}
+                    <DialogDescription className="text-slate-300 text-lg leading-relaxed arabic-text">
+                        نحن نعمل حالياً على تطوير محاكاة ذكية للمقابلات باستخدام الذكاء الاصطناعي لمساعدتك في التدريب بشكل واقعي.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -43,13 +37,11 @@ export function ComingSoonModal({ children }: ComingSoonModalProps) {
                         <Clock className="w-5 h-5 text-amber-500" />
                     </div>
                     <div>
-                        <p className={`text-sm font-semibold text-white ${isArabic ? 'arabic-text' : ''}`}>
-                            {isArabic ? 'كن مستعداً!' : 'Get Ready!'}
+                        <p className="text-sm font-semibold text-white arabic-text">
+                            كن مستعداً!
                         </p>
-                        <p className={`text-xs text-slate-400 ${isArabic ? 'arabic-text' : ''}`}>
-                            {isArabic
-                                ? 'سيتم إطلاق هذه الميزة في التحديث القادم.'
-                                : 'This feature will be launched in the next update.'}
+                        <p className="text-xs text-slate-400 arabic-text">
+                            سيتم إطلاق هذه الميزة في التحديث القادم.
                         </p>
                     </div>
                 </div>
@@ -62,8 +54,8 @@ export function ComingSoonModal({ children }: ComingSoonModalProps) {
                         }}
                     >
                         <Sparkles className="w-5 h-5 mr-2" />
-                        <span className={isArabic ? 'arabic-text' : ''}>
-                            {isArabic ? 'انتظرونا' : 'Stay Tuned'}
+                        <span className="arabic-text">
+                            انتظرونا
                         </span>
                     </Button>
                 </div>

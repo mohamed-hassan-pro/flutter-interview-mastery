@@ -309,9 +309,9 @@ export function QuizMode() {
                   <h3 className="font-semibold text-green-800 dark:text-green-300 mb-3">
                     {isArabic ? 'الإجابة:' : 'Answer:'}
                   </h3>
-                  <ul className={`list-disc list-inside space-y-3 ${isArabic ? 'arabic-text mr-4' : ''}`}>
+                  <ul className={`list-disc list-inside space-y-3 text-right ${isArabic ? 'arabic-text mr-4' : ''}`}>
                     {currentQuestion.answer.map((point, idx) => (
-                      <li key={idx} className="text-green-800 dark:text-green-200 font-medium">{point}</li>
+                      <li key={idx} className="text-green-800 dark:text-green-200 font-medium leading-relaxed">{point}</li>
                     ))}
                   </ul>
                 </div>

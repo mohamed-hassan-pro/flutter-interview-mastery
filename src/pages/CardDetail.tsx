@@ -241,9 +241,9 @@ export function CardDetail() {
                           className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg"
                         >
                           {q.expectedAnswer.points && (
-                            <ul className="list-disc list-inside space-y-1">
+                            <ul className="list-disc list-inside space-y-2 text-right">
                               {q.expectedAnswer.points.map((point, pidx) => (
-                                <li key={pidx} className="text-green-800 dark:text-green-300">{point}</li>
+                                <li key={pidx} className="text-green-800 dark:text-green-300 arabic-text leading-relaxed">{point}</li>
                               ))}
                             </ul>
                           )}

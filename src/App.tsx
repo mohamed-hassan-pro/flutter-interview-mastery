@@ -18,7 +18,6 @@ import {
   GraduationCap,
   Brain,
   Moon,
-  Globe,
   Github,
   Linkedin,
   Mail,
@@ -33,7 +32,7 @@ import { ComingSoonModal } from '@/components/ComingSoonModal';
 function Dashboard() {
   const [filteredCards, setFilteredCards] = useState<Card[]>(cards);
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('map');
-  const { currentLanguage, darkMode, toggleLanguage, toggleDarkMode, studiedCards } = useProgressStore();
+  const { currentLanguage, darkMode, toggleDarkMode, studiedCards } = useProgressStore();
   const isArabic = currentLanguage === 'ar';
 
   useEffect(() => {
@@ -46,7 +45,7 @@ function Dashboard() {
   }, [darkMode]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors" dir="rtl">
       {/* Header - Made smaller and sticky */}
       <header className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-2">
@@ -66,15 +65,7 @@ function Dashboard() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleLanguage}
-                className="hidden sm:flex"
-              >
-                <Globe className="w-4 h-4 mr-2" />
-                {isArabic ? 'EN' : 'AR'}
-              </Button>
+              {/* Language toggle removed - App standardized to Arabic */}
               <Button
                 variant="ghost"
                 size="icon"

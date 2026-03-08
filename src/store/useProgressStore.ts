@@ -35,7 +35,7 @@ export const useProgressStore = create<ProgressState>()(
       studiedCards: [],
       confidenceLevels: {},
       studyProgress: [],
-      currentLanguage: 'en',
+      currentLanguage: 'ar',
       darkMode: false,
 
       addStudied: (cardId: string) => {
@@ -137,9 +137,8 @@ export const useProgressStore = create<ProgressState>()(
       },
 
       toggleLanguage: () => {
-        set((state) => ({
-          currentLanguage: state.currentLanguage === 'en' ? 'ar' : 'en',
-        }));
+        // Language is hardcoded to Arabic to resolve RTL alignment issues
+        set({ currentLanguage: 'ar' });
       },
 
       toggleDarkMode: () => {
