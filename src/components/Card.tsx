@@ -53,9 +53,12 @@ export function Card({ card, compact = false }: CardProps) {
           <div className="flex justify-between items-start mb-2">
             <div>
               <span className="text-xs font-mono text-slate-500 dark:text-slate-400">#{card.number}</span>
-              <h3 className={`font-bold text-slate-900 dark:text-white line-clamp-1 ${isArabic ? 'arabic-text' : ''}`}>
-                {isArabic && card.titleAr ? card.titleAr : card.title}
+              <h3 className="font-bold text-slate-900 dark:text-white line-clamp-1">
+                {card.title}
               </h3>
+              {isArabic && card.titleAr && (
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 arabic-text -mt-1">{card.titleAr}</p>
+              )}
             </div>
             <div className="flex gap-1">
               {isStudied && (
@@ -106,10 +109,10 @@ export function Card({ card, compact = false }: CardProps) {
                 </Badge>
               )}
             </div>
-            <h2 className={`text-2xl font-bold text-slate-900 dark:text-white ${isArabic ? 'arabic-text' : ''}`}>
-              {isArabic && card.titleAr ? card.titleAr : card.title}
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+              {card.title}
             </h2>
-            {card.titleAr && !isArabic && (
+            {card.titleAr && (
               <p className="text-readable-muted text-sm mt-1 arabic-text">{card.titleAr}</p>
             )}
           </div>

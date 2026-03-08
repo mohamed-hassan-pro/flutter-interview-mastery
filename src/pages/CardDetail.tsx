@@ -121,10 +121,10 @@ export function CardDetail() {
                     </Badge>
                   )}
                 </div>
-                <h1 className={`text-3xl font-bold text-slate-900 dark:text-white ${isArabic ? 'arabic-text' : ''}`}>
-                  {isArabic && card.titleAr ? card.titleAr : card.title}
+                <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+                  {card.title}
                 </h1>
-                {card.titleAr && !isArabic && (
+                {card.titleAr && (
                   <p className="text-readable-muted mt-1 arabic-text">{card.titleAr}</p>
                 )}
               </div>

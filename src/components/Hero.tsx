@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { Target, Trophy, Monitor, Map, FileText } from 'lucide-react';
 import { Button } from './ui/button';
-import { useProgressStore } from '@/store/useProgressStore';
 import { ComingSoonModal } from './ComingSoonModal';
 
 interface HeroProps {
@@ -9,9 +8,6 @@ interface HeroProps {
 }
 
 export function Hero({ onStart }: HeroProps) {
-    const { currentLanguage } = useProgressStore();
-    const isArabic = currentLanguage === 'ar';
-
     return (
         <div className="relative overflow-hidden bg-slate-900 text-slate-50 py-20 px-4">
             {/* Background gradients */}
@@ -26,12 +22,8 @@ export function Hero({ onStart }: HeroProps) {
                     animate={{ opacity: 1, y: 0 }}
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/80 border border-slate-700/50 text-sm font-medium mb-8"
                 >
-                    🎁 <span className={isArabic ? 'arabic-text' : ''}>
-                        {isArabic ? 'هدية للمطورين' : 'Gift for Developers'}
-                        {' '}
-                        <a href="https://www.linkedin.com/in/mohamed-hassan-pro/" target="_blank" rel="noopener noreferrer" className="hover:underline font-bold text-cyan-400">
-                            {isArabic ? 'من محمد حسن' : 'by Mohamed Hassan'}
-                        </a>
+                    🎁 <span className="arabic-text">
+                        هدية للمطورين من <a href="https://www.linkedin.com/in/mohamed-hassan-pro/" target="_blank" rel="noopener noreferrer" className="hover:underline font-bold text-cyan-400">محمد حسن</a>
                     </span>
                 </motion.div>
 
@@ -62,7 +54,7 @@ export function Hero({ onStart }: HeroProps) {
                     transition={{ delay: 0.3 }}
                     className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed mb-12 arabic-text"
                 >
-                    دليلك المتكامل لاجتياز مقابلات Flutter بثقة. نأخذك من الأساسيات وحتى هندسة البرمجيات المتقدمة (Architecture)، مع +150 موضوع، أمثلة عملية، ومحاكي حقيقي للمقابلات.
+                    وجهتك الأولى لإتقان مقابلات فلاتر البرمجية. نرافقك في رحلة تبدأ من المفاهيم الأساسية وتصل بك لدرجة الاحتراف في هندسة البرمجيات المتقدمة، مع تغطية أكثر من 150 موضوعاً تخصصياً وأمثلة تطبيقية شاملة.
                 </motion.p>
 
                 {/* Stats Row */}
@@ -91,7 +83,7 @@ export function Hero({ onStart }: HeroProps) {
                 >
                     <Button size="lg" className="bg-cyan-600 hover:bg-cyan-700 text-white rounded-full px-8 h-14" onClick={onStart}>
                         <Map className="w-5 h-5 mr-2" />
-                        <span className={`text-lg font-bold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'ابدأ التعلم' : 'Start Learning'}</span>
+                        <span className="text-lg font-bold arabic-text">ابدأ التعلم</span>
                     </Button>
                     {/* <Button size="lg" variant="outline" className="border-cyan-800 bg-slate-800 text-white hover:bg-slate-700 rounded-full px-8 h-14 relative overflow-hidden" onClick={() => window.location.hash = '#/quiz'}>
                         <Trophy className="w-5 h-5 mr-2 text-yellow-400" />
@@ -100,12 +92,12 @@ export function Hero({ onStart }: HeroProps) {
                     <ComingSoonModal>
                         <Button size="lg" variant="outline" className="border-cyan-800 bg-slate-800 text-white hover:bg-slate-700 rounded-full px-8 h-14 relative overflow-hidden">
                             <Trophy className="w-5 h-5 mr-2 text-yellow-400" />
-                            <span className={`text-lg font-bold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'محاكاة المقابلات' : 'Interview Simulation'}</span>
+                            <span className="text-lg font-bold arabic-text">محاكاة المقابلات</span>
                         </Button>
                     </ComingSoonModal>
                     <Button size="lg" variant="outline" className="border-cyan-800 bg-slate-800 text-white hover:bg-slate-700 rounded-full px-8 h-14" onClick={onStart}>
                         <Target className="w-5 h-5 mr-2 text-rose-400" />
-                        <span className={`text-lg font-bold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'خريطة الطريق' : 'Roadmap'}</span>
+                        <span className="text-lg font-bold arabic-text">خريطة الطريق</span>
                     </Button>
                 </motion.div>
 
@@ -120,24 +112,24 @@ export function Hero({ onStart }: HeroProps) {
                         <div className="w-12 h-12 mx-auto bg-slate-700 rounded-xl flex items-center justify-center mb-4">
                             <Monitor className="w-6 h-6 text-green-400" />
                         </div>
-                        <p className={`text-slate-300 leading-relaxed font-medium ${isArabic ? 'arabic-text' : ''}`}>
-                            {isArabic ? 'لو لسه بتبدأ طريقك في Flutter والمقابلات' : 'If you are just starting with Flutter interviews'}
+                        <p className="text-slate-300 leading-relaxed font-medium arabic-text">
+                            لو كنت في بداية رحلتك مع فلاتر وتستعد لأولى مقابلاتك التقنية
                         </p>
                     </div>
                     <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 text-center hover:bg-slate-800 transition-colors">
                         <div className="w-12 h-12 mx-auto bg-slate-700 rounded-xl flex items-center justify-center mb-4">
                             <Target className="w-6 h-6 text-rose-400" />
                         </div>
-                        <p className={`text-slate-300 leading-relaxed font-medium ${isArabic ? 'arabic-text' : ''}`}>
-                            {isArabic ? 'لو بتراجع وتجهز لـ Technical Interviews' : 'If you are preparing for technical interviews'}
+                        <p className="text-slate-300 leading-relaxed font-medium arabic-text">
+                            لو هدفك مراجعة المفاهيم البرمجية والتحضير للمقابلات باحترافية
                         </p>
                     </div>
                     <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 text-center hover:bg-slate-800 transition-colors">
                         <div className="w-12 h-12 mx-auto bg-slate-700 rounded-xl flex items-center justify-center mb-4">
                             <FileText className="w-6 h-6 text-yellow-400" />
                         </div>
-                        <p className={`text-slate-300 leading-relaxed font-medium ${isArabic ? 'arabic-text' : ''}`}>
-                            {isArabic ? 'لو عايز تعمق فهمك وتبني Architecture قوية' : 'If you want to deepen understanding and build solid Architecture'}
+                        <p className="text-slate-300 leading-relaxed font-medium arabic-text">
+                            لو تسعى لتعميق معرفتك التقنية وبناء مشاريع بهندسة برمجية متينة
                         </p>
                     </div>
                 </motion.div>

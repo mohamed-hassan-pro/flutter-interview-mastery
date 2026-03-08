@@ -190,61 +190,67 @@ function Dashboard() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-8 py-8 text-sm">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start mb-6 text-center md:text-left">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 justify-center md:justify-start">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-                  <BookOpen className="w-4 h-4 text-white" />
-                </div>
-                <h3 className="font-bold text-base">Flutter Interview Mastery</h3>
+      <footer className="bg-slate-900 border-t border-slate-800 pt-16 pb-8 text-center">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="mb-12">
+            <div className="flex justify-center mb-6">
+              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <span className="text-3xl">💙</span>
               </div>
             </div>
 
-            <div className="space-y-3">
-              <h4 className="font-semibold text-sm">{isArabic ? 'تواصل معي' : 'Connect with me'}</h4>
-              <div className="flex gap-3 justify-center md:justify-start">
-                <a
-                  href="https://github.com/mohamed-hassan-pro"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-purple-100 hover:text-purple-600 transition-colors"
-                >
-                  <Github className="w-4 h-4" />
-                </a>
-                <a
-                  href="https://www.linkedin.com/in/mohamed-hassan-pro/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-blue-100 hover:text-blue-600 transition-colors"
-                >
-                  <Linkedin className="w-4 h-4" />
-                </a>
-                <a
-                  href="mailto:mohamedhassankamel9@gmail.com"
-                  className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-rose-100 hover:text-rose-600 transition-colors"
-                >
-                  <Mail className="w-4 h-4" />
-                </a>
-              </div>
+            <h3 className="text-2xl font-bold text-slate-200 mb-8 arabic-text">
+              صُنع بحب بواسطة محمد حسن مبدع
+            </h3>
+
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+              <a
+                href="https://www.linkedin.com/in/mohamed-hassan-pro/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-6 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-full transition-all shadow-lg shadow-cyan-900/20 font-bold"
+              >
+                <Linkedin className="w-5 h-5" />
+                <span className="arabic-text">تواصل معي على LinkedIn</span>
+              </a>
+
+              <a
+                href="https://github.com/mohamed-hassan-pro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-full transition-all border border-slate-700 font-bold"
+              >
+                <Github className="w-5 h-5" />
+                <span className="arabic-text">شارك في التطوير</span>
+              </a>
             </div>
 
-            <div className="space-y-3">
-              <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 py-1 px-3 rounded-full text-xs">
-                🎁 {isArabic ? 'هدية بمناسبة إتمامي 20 عاماً' : 'Gift for turning 20 years old'}
-              </Badge>
-              <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                {isArabic ? 'صُنع بحب بواسطة محمد حسن' : 'Created with love by Mohamed Hassan'}
+            <div className="flex justify-center mb-12">
+              <a
+                href="mailto:mohamedhassankamel9@gmail.com"
+                className="flex items-center gap-2 px-6 py-3 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-full transition-all border border-rose-500/30 font-bold"
+              >
+                <Mail className="w-5 h-5" />
+                <span className="arabic-text">تواصل عبر الإيميل</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Social Message Card */}
+          <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-8 mb-12">
+            <h4 className="text-xl font-bold text-white mb-4 arabic-text">🚀 الرحلة لسه في البداية!</h4>
+            <p className="text-slate-400 mb-6 leading-relaxed arabic-text">
+              بجهز محتوى أكثر عن SOLID, GOOD (Object-Oriented Design), Design Patterns, Principles — عشان الدليل دا يبقى مرجعك الكامل.
+            </p>
+            <div className="pt-6 border-t border-slate-700/50">
+              <p className="text-slate-300 font-medium arabic-text">
+                🙏 زكاة العلم نشره — لو الدليل فادك، شاركه مع زمايلك. يمكن تكون سبب في فتح باب خير لحد غيرك ❤️
               </p>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-slate-100 dark:border-slate-700/50 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-            <p>© 2026 Flutter Interview Mastery.</p>
-            <div className="flex gap-6">
-              <a href="#" className="hover:text-purple-500 transition-colors">{isArabic ? 'عن المشروع' : 'About'}</a>
-            </div>
+          <div className="text-slate-500 text-xs font-mono">
+            <p>.Flutter Interview Mastery 2026 ©</p>
           </div>
         </div>
       </footer>

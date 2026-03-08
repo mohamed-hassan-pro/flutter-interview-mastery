@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/accordion';
 import { Filter, RotateCcw } from 'lucide-react';
 import { useProgressStore } from '@/store/useProgressStore';
-import { getAllTags, getAllCompanies } from '@/data/allCards';
+import { getAllCompanies } from '@/data/allCards';
 
 interface FilterPanelProps {
   cards: Card[];
@@ -27,7 +27,6 @@ interface FilterPanelProps {
 interface FilterState {
   level: Level | 'All';
   company: string | 'All';
-  tags: string[];
   frequency: Frequency | 'All';
   showStudied: boolean | 'all';
   showWeakOnly: boolean;
@@ -37,7 +36,6 @@ interface FilterState {
 export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
   const { currentLanguage, studiedCards, getWeakCards, getDueCards } = useProgressStore();
   const isArabic = currentLanguage === 'ar';
-  const allTags = getAllTags();
   const allCompanies = getAllCompanies();
   const weakCards = getWeakCards();
   const dueCards = getDueCards();
@@ -45,7 +43,6 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
   const [filters, setFilters] = useState<FilterState>({
     level: 'All',
     company: 'All',
-    tags: [],
     frequency: 'All',
     showStudied: 'all',
     showWeakOnly: false,
@@ -65,11 +62,7 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
       );
     }
 
-    if (newFilters.tags.length > 0) {
-      filtered = filtered.filter((card) =>
-        card.tags && Array.isArray(card.tags) && newFilters.tags.some((tag) => card.tags.includes(tag))
-      );
-    }
+
 
     if (newFilters.frequency !== 'All') {
       filtered = filtered.filter((card) => card.frequency === newFilters.frequency);
@@ -103,18 +96,12 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
     applyFilters(newFilters);
   };
 
-  const toggleTag = (tag: string) => {
-    const newTags = filters.tags.includes(tag)
-      ? filters.tags.filter((t) => t !== tag)
-      : [...filters.tags, tag];
-    updateFilter('tags', newTags);
-  };
+
 
   const resetFilters = () => {
     const defaultFilters: FilterState = {
       level: 'All',
       company: 'All',
-      tags: [],
       frequency: 'All',
       showStudied: 'all',
       showWeakOnly: false,
@@ -127,7 +114,6 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
   const hasActiveFilters =
     filters.level !== 'All' ||
     filters.company !== 'All' ||
-    filters.tags.length > 0 ||
     filters.frequency !== 'All' ||
     filters.showStudied !== 'all' ||
     filters.showWeakOnly ||
@@ -214,24 +200,7 @@ export function FilterPanel({ cards, onFilterChange }: FilterPanelProps) {
             </Select>
           </div>
 
-          {/* Tags Filter */}
-          <div>
-            <label className={`text-sm font-bold mb-2 block text-slate-900 dark:text-slate-100 ${isArabic ? 'arabic-text' : ''}`}>
-              {isArabic ? 'مواضيع محددة' : 'Specific Topics'}
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {allTags.slice(0, 10).map((tag) => (
-                <Badge
-                  key={tag}
-                  variant={filters.tags.includes(tag) ? 'default' : 'outline'}
-                  className="cursor-pointer"
-                  onClick={() => toggleTag(tag)}
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
+
 
           {/* Study Status */}
           <div>

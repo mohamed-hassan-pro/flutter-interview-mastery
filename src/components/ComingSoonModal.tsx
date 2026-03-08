@@ -7,7 +7,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
-import { Sparkles, Brain, Clock } from 'lucide-react';
+import { Brain, Clock } from 'lucide-react';
 
 interface ComingSoonModalProps {
     children: React.ReactNode;
@@ -53,7 +53,7 @@ export function ComingSoonModal({ children }: ComingSoonModalProps) {
                             // Close dialog manually if needed, but DialogTrigger handles toggle
                         }}
                     >
-                        <Sparkles className="w-5 h-5 mr-2" />
+
                         <span className="arabic-text">
                             انتظرونا
                         </span>
