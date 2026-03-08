@@ -155,7 +155,7 @@ export function StudyMode() {
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {currentCard.tags.map((tag) => (
+                {currentCard.tags && Array.isArray(currentCard.tags) && currentCard.tags.map((tag) => (
                   <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>
                 ))}
               </div>

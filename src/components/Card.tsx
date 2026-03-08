@@ -125,7 +125,7 @@ export function Card({ card, compact = false }: CardProps) {
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2">
-          {card.tags.map((tag) => (
+          {card.tags && Array.isArray(card.tags) && card.tags.map((tag) => (
             <Badge key={tag} variant="outline" className="text-xs">
               {tag}
             </Badge>
@@ -295,7 +295,7 @@ export function Card({ card, compact = false }: CardProps) {
           </h3>
         </div>
         <div className="flex flex-wrap gap-2">
-          {card.companyTags.map((company) => (
+          {card.companyTags && Array.isArray(card.companyTags) && card.companyTags.map((company) => (
             <Badge key={company} variant="outline" className="text-xs">
               {company}
             </Badge>

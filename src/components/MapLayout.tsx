@@ -141,7 +141,7 @@ export function MapLayout({ cards }: MapLayoutProps) {
                                                         <Badge className={`${getLevelColor(card.level)} text-[10px] px-1.5 py-0`}>
                                                             {card.level}
                                                         </Badge>
-                                                        {card.tags.slice(0, 2).map(tag => (
+                                                        {card.tags && Array.isArray(card.tags) && card.tags.slice(0, 2).map(tag => (
                                                             <span key={tag} className="text-[10px] text-slate-500 bg-slate-200/50 dark:bg-slate-800 px-1.5 py-0.5 rounded">
                                                                 {tag}
                                                             </span>

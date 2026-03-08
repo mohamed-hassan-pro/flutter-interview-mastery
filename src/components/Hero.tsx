@@ -77,10 +77,10 @@ export function Hero({ onStart }: HeroProps) {
                         <span className="text-3xl md:text-4xl font-bold text-cyan-400 mb-1">+150</span>
                         <span className="text-slate-400 text-sm">{isArabic ? 'موضوع / كارد' : 'Topics / Cards'}</span>
                     </div>
-                    <div className="flex flex-col items-center relative">
+                    <div className="flex flex-col items-center relative mt-8 md:mt-0">
                         <span className="text-3xl md:text-4xl font-bold text-cyan-400 mb-1">10</span>
                         <span className="text-slate-400 text-sm">{isArabic ? 'مستويات رئيسية' : 'Core Levels'}</span>
-                        <span className="absolute -bottom-6 text-emerald-400 text-sm font-bold opacity-80">{isArabic ? 'خريطة الطريق المدمجة' : 'Built-in Roadmap'}</span>
+                        <span className="md:absolute md:-bottom-6 mt-2 md:mt-0 text-emerald-400 text-sm font-bold opacity-80">{isArabic ? 'خريطة الطريق المدمجة' : 'Built-in Roadmap'}</span>
                     </div>
                 </motion.div>
 
