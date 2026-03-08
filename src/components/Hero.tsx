@@ -23,7 +23,9 @@ export function Hero({ onStart }: HeroProps) {
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/80 border border-slate-700/50 text-sm font-medium mb-8"
                 >
                     🎁 <span className="arabic-text">
-                        هدية للمطورين من <a href="https://www.linkedin.com/in/mohamed-hassan-pro/" target="_blank" rel="noopener noreferrer" className="hover:underline font-bold text-cyan-400">محمد حسن</a>
+                        هدية للمطورين من <a href="https://www.linkedin.com/in/mohamed-hassan-pro/" target="_blank" rel="noopener noreferrer" className="hover:underline font-bold text-cyan-400">
+                            محمد حسن
+                        </a>
                     </span>
                 </motion.div>
 
@@ -85,10 +87,7 @@ export function Hero({ onStart }: HeroProps) {
                         <Map className="w-5 h-5 mr-2" />
                         <span className="text-lg font-bold arabic-text">ابدأ التعلم</span>
                     </Button>
-                    {/* <Button size="lg" variant="outline" className="border-cyan-800 bg-slate-800 text-white hover:bg-slate-700 rounded-full px-8 h-14 relative overflow-hidden" onClick={() => window.location.hash = '#/quiz'}>
-                        <Trophy className="w-5 h-5 mr-2 text-yellow-400" />
-                        <span className={`text-lg font-bold ${isArabic ? 'arabic-text' : ''}`}>{isArabic ? 'محاكاة المقابلات' : 'Interview Simulation'}</span>
-                    </Button> */}
+
                     <ComingSoonModal>
                         <Button size="lg" variant="outline" className="border-cyan-800 bg-slate-800 text-white hover:bg-slate-700 rounded-full px-8 h-14 relative overflow-hidden">
                             <Trophy className="w-5 h-5 mr-2 text-yellow-400" />
